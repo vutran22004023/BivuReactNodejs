@@ -106,7 +106,7 @@ const updateUser = async (id, data) => {
         message: "Id không tồn tại",
       };
     }
-    const updateUser = await UserModel.findByIdAndUpdate(id, data, { new: true} )
+    const updateUser = await UserModel.findByIdAndUpdate(id, data )
     return {
       status: 200,
       message: "Cập nhật người dùng thành công",

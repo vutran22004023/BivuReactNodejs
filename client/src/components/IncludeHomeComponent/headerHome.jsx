@@ -1,5 +1,5 @@
-import { Button, Col, Input, Popover, Row, Space } from "antd";
-import React,{useState} from "react";
+import { Avatar, Button, Col, Input, Popover, Row, Space } from "antd";
+import React,{useEffect, useState} from "react";
 import {
   WrapperHeaderTop,
   WrapperHeaderMid,
@@ -8,8 +8,8 @@ import {
   WrapperHeaderSpan,
   WrapperHeaderTypeProduct,
   WrapperHeaderLink,
-} from "../style";
-
+} from "../../pages/HomePage/style";
+import Loading from  '../../components/LoadComponent/Loading'
 import {WapperContentPopup} from './style'
 
 import {
@@ -17,37 +17,43 @@ import {
   CaretDownOutlined,
   ShoppingCartOutlined,
 } from "@ant-design/icons";
-import Logo1 from "../../../assets/font-end/imgs/logo/logo1.png";
-import Logo2 from "../../../assets/font-end/imgs/logo/logo2.png";
-import ButtonInputSearch from "../../../components/ButtonSearch/ButtonInputSearch";
-import TypeProduct from "../../../components/TypeProduct/TypeProduct";
+import Logo1 from "../../assets/font-end/imgs/logo/logo1.png";
+import Logo2 from "../../assets/font-end/imgs/logo/logo2.png";
+import ButtonInputSearch from "../ButtonSearch/ButtonInputSearch";
+import TypeProduct from "../TypeProduct/TypeProduct";
 import { useSelector, useDispatch } from "react-redux";
-import { UserService} from "../../../services/index";
+import { UserService} from "../../services/index";
 import { useNavigate } from "react-router-dom";
-import { resetUser } from "../../../redux/Slides/userSlide";
+import { resetUser } from "../../redux/Slides/userSlide";
 export default function headerHome() {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const arr = ["TV", "Tu Lanh", "Dieu hoa"];
   const[loading, setLoading] = useState(false)
-
+  const [userName, setUserName] = useState('')
+  const [userAvatar, setUserAvatar] = useState('')
   const handLogout = async () => {
     localStorage.removeItem('access_Token');
     document.cookie = 'access_Token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     try {
         setLoading(true)
          UserService.LogOutUser();
-        navigate('/');
+        navigate('/profile-user');
         dispatch(resetUser())
         setLoading(false)
     } catch (error) {
         console.error("Error logging out:", error);
     }
 }
+
+  useEffect(() => {
+    setUserName(user?.name)
+    setUserAvatar(user?.avatar)
+  },[user?.name,user?.avatar ])
   const content = (
-    <div>
-      <p>Thông tin người dùng</p>
+    <div style={{padding: '0 10px'}}>
+      <WapperContentPopup onClick={()=> navigate('/profile-user')}>Thông tin người dùng</WapperContentPopup>
       <WapperContentPopup onClick={handLogout}>Đăng xuất</WapperContentPopup>
     </div>
   );
@@ -91,13 +97,18 @@ export default function headerHome() {
         <Col
           span={6}
           style={{ textAlign: "left", display: "flex", gap: "10px" }}
-        >
+        > 
+          {/* <Loading isLoading= {loading}> */}
           <WrapperHeaderAccount>
-            <UserOutlined style={{ fontSize: "40px" }} />
-            {user?.name ? (
+            {userAvatar? (
+              <Avatar src={userAvatar}  size={40} />
+            ): (
+              <UserOutlined style={{ fontSize: "40px" }} />
+            )}
+            {user?.access_Token ? (
               <>
                 <Popover content={content}  trigger="click">
-                  <div style={{ cursor: "pointer" }}>{user.name}</div>
+                  <div style={{ cursor: "pointer" }}>{userName}</div>
                 </Popover>
               </>
             ) : (
@@ -114,6 +125,7 @@ export default function headerHome() {
               </div>
             )}
           </WrapperHeaderAccount>
+          {/* </Loading> */}
           <WrapperHeaderCart style={{ textAlign: "center" }}>
             <ShoppingCartOutlined style={{ fontSize: "40px" }} />
             <WrapperHeaderSpan>Giỏ hàng</WrapperHeaderSpan>

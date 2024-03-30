@@ -3,6 +3,7 @@ import HomePage from '../pages/HomePage'
 import ProductHome from '../pages/HomePage/ContentHome/ProductHome/ProductHome'
 import CategoryHome from '../pages/HomePage/ContentHome/CategoryHome/CategoryHome'
 import DetailProduct from './../pages/HomePage/ContentHome/DetailsProduct/DetailProduct';
+import ProFileUser from "../pages/HomePage/ContentHome/ProfileUserHome/ProFileUser";
 import SignIn from "../pages/LoginPage/SignIn";
 import SignUp from '../pages/LoginPage/SignUp'
 import { useEffect } from "react";
@@ -43,6 +44,10 @@ export default createBrowserRouter (
                         {
                             element: <DetailProduct />,
                             path: "/chi-tiet",
+                        },
+                        {
+                            element: <ProFileUser />,
+                            path: "/profile-user",
                         },
                     ]
                 },

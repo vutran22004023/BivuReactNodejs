@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import HeaderHome from './IncludesHome/headerHome'
+import HeaderHome from '../../components/IncludeHomeComponent/headerHome.jsx'
 import '../../assets/font-end/css/Home.css'
 import { Outlet } from "react-router-dom";
 import { isJsonString } from "../../utils";

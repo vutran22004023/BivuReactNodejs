@@ -66,14 +66,14 @@ const loginUser = async (req, res) => {
 const updateUser =async (req, res) => {
     try{
         const userid = req.params.id
-        const data = req.body
+        const {email,name, phone, address, avatar} = req.body
         if(!userid) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'id không tồn tại'
             })
         }
-        const response = await Userservices.updateUser(userid,data)
+        const response = await Userservices.updateUser(userid,req.body)
         return res.status(200).json(response)
     }catch(e) {
         return res.status(404).json({

@@ -33,11 +33,24 @@ const refreshToken = async () => {
     return res.data
 }
 
+const updateUser = async (id,data,access_Token) => {
+    const res = await axios.put(`${import.meta.env.REACT_APP_API_URL}/user/update-user/${id}`,data,{
+        headers: {
+            token: `Beare ${access_Token}`
+        }
+    })
+    console.log('access_Token',access_Token)
+    return res.data
+}
+
+
+
 export default {
     loginUser,
     RegistUser,
     getDetailUser,
     refreshToken,
     axiosJWT,
-    LogOutUser
+    LogOutUser,
+    updateUser
 }

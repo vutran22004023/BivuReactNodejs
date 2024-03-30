@@ -23,14 +23,12 @@ const UserSchema =  new mongoose.Schema(
         type: Number,
         required: true,
     },
-    access_token: {
+    address: {
         type: String,
-        required: false,
     },
-    refresh_token: {
+    avatar: {
         type: String,
-        required: false,
-    },
+    }
 },{
     timestamps: true,
 }

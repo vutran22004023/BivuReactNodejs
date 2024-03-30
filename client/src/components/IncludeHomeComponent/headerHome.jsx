@@ -25,11 +25,16 @@ import { useSelector, useDispatch } from "react-redux";
 import { UserService} from "../../services/index";
 import { useNavigate } from "react-router-dom";
 import { resetUser } from "../../redux/Slides/userSlide";
+
+
+
+
+
+
 export default function headerHome() {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  const arr = ["TV", "Tu Lanh", "Dieu hoa"];
   const[loading, setLoading] = useState(false)
   const [userName, setUserName] = useState('')
   const [userAvatar, setUserAvatar] = useState('')
@@ -57,6 +62,8 @@ export default function headerHome() {
       <WapperContentPopup onClick={handLogout}>Đăng xuất</WapperContentPopup>
     </div>
   );
+
+  const arr = ["TV", "Tu Lanh", "Dieu hoa"];
   return (
     <div>
       <WrapperHeaderTop style={{ textAlign: "center" }}>

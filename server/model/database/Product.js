@@ -31,6 +31,12 @@ const ProductSchema =  new mongoose.Schema(
         type: String,
         required: true,
     },
+    discount: {
+        type: Number,
+    },
+    selled: {
+        type: Number,
+    },
 },{
     timestamps: true,
 }

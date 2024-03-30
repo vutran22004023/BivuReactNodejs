@@ -9,7 +9,8 @@ import { StyleNameProduct,
    
    } from "./style";
 import { StarFilled } from "@ant-design/icons";
-export default function CardConponent() {
+export default function CardConponent(props) {
+  const {counInStock, description, image, name, price,rating,type,discount,selled} = props
   return (
     <WapperCardStyled
       hoverable
@@ -21,9 +22,9 @@ export default function CardConponent() {
         />
       }
     >
-      <StyleNameProduct>Iphone</StyleNameProduct>
+      <StyleNameProduct>{name}</StyleNameProduct>
       <WrapperReporText>
-        <span>4.96</span>
+        <span>{rating}</span>
         <span>
           <StarFilled
             style={{ fontSize: "12px", color: "yellow", marginTop: "4px" }}
@@ -32,7 +33,7 @@ export default function CardConponent() {
         <span>| Đã Bán 1000+</span>
       </WrapperReporText>
       <WrapperPriceText>
-        <span>1.000.0000 đ</span>
+        <span>{price} đ</span>
         <span><WrapperDisscountText>-5%</WrapperDisscountText></span>
       </WrapperPriceText>
     </WapperCardStyled>

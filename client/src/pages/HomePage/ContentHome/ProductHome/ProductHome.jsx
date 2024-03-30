@@ -6,7 +6,17 @@ import CardComponent from '../../../../components/CardComponent/CardComponent'
 import { Button, Col, Row, Image } from 'antd'
 import { WapperButton } from './style'
 import product1 from '../../../../assets/font-end/imgs/Product/product1.png'
+import {useQuery} from '@tanstack/react-query'
+import {ProductService}from '../../../../services/index'
 export default function ProductHome() {
+
+  const fetchProductAll = async() => {
+    
+    const res =  await ProductService.getAllProduct()
+    return res
+  }
+
+  const { isLoading, data:products } = useQuery({queryKey: ['products'], queryFn: fetchProductAll, retry:3, retryDelay: 1000});
   return (
     <div id='container' style={{padding: ' 0 130px', marginTop: '20px' }}>
         <Row>
@@ -28,12 +38,22 @@ export default function ProductHome() {
           </Col>
         </Row>
         <div style={{marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent:'space-around',flexWrap: 'wrap'}}>
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
-          <CardComponent />
+          {products?.data?.map((product)=> {
+            return (
+              <CardComponent
+              key={product._id}
+              counInStock ={product.counInStock}
+              description={product.description}
+              image ={product.image}
+              name = {product.name}
+              price = {product.price}
+              rating = {product.rating}   
+              type = {product.type}
+              discount = {product.discount}
+              selled = {product.selled}
+              />
+            )
+          })}
         </div>
         <div style={{width:'100%', display: 'flex', justifyContent: 'center',marginTop: '10px'}}>
           <WapperButton size='ouline'>Xem thêm</WapperButton>

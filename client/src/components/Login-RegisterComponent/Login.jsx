@@ -99,6 +99,25 @@ export default function Login() {
             }}
             textButton={"Đăng nhập"}
           ></ButtonFrom>
+
+          <div style={{textAlign: 'center'}}>
+            <h4>Hoặc</h4>
+            <ButtonFrom
+            size={40}
+            styleButton={{
+              background:"rgb(255, 57,69)",
+              height: "40px",
+              width: "100%",
+              border: "none",
+              borderRadius: "4px",
+              color: "#fff",
+              fontSize: "15px",
+              fontWeight: "700",
+            }}
+            textButton={"Đăng nhập"}
+          ></ButtonFrom>
+          </div>
       </div>
+
     );
 }

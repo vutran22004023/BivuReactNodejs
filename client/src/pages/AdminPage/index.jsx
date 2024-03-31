@@ -95,7 +95,7 @@ export default function index() {
             </Button>
           </Box>
           <OrderTable />
-          {/* <OrderList /> */}
+          <OrderList />
         </Box>
       </Box>
     </CssVarsProvider>

@@ -6,6 +6,7 @@ export const WrapperHeaderTop = styled(Row)`
     background-color: #dee2e6;
     padding: 10px 20px;
     align-items:center;
+    width: 100%;
 `
 
 export const WrapperHeaderMid = styled(Row)`

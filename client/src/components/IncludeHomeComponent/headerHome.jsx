@@ -1,4 +1,4 @@
-import { Avatar, Col, Input, Popover, Row, Space } from "antd";
+import { Avatar, Col, Image } from "antd";
 import React, { useEffect, useState } from "react";
 import {
   WrapperHeaderTop,
@@ -26,13 +26,12 @@ import { UserService } from "../../services/index";
 import { useNavigate } from "react-router-dom";
 import { resetUser } from "../../redux/Slides/userSlide";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import Button from "@mui/material/Button";
-import Divider from "@mui/material/Divider";
-import Grid from "@mui/material/Grid";
 import {
-  Tabs,
+  Box,
+  Drawer,
+  Button,
+  Divider,
+  Grid,
   Tab,
   List,
   ListItem,
@@ -207,12 +206,13 @@ export default function headerHome() {
 
       <WrapperHeaderMid gutter={16} style={{ textAlign: "center" }}>
         <Col span={4}>
-          <img
+          <Image
             src={Logo1}
             style={{
               width: "150px",
               height: "80px",
             }}
+            preview={false}
           />
         </Col>
         {/* <Col span={9}>

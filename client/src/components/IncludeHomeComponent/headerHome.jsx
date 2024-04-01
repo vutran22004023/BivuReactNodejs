@@ -84,6 +84,10 @@ export default function headerHome() {
     window.location.reload();
   };
 
+  const handleItemClickAdmin = () => {
+    navigate("/admin");
+  }
+
   useEffect(() => {
     setUserName(user?.name);
     setUserAvatar(user?.avatar);
@@ -154,6 +158,18 @@ export default function headerHome() {
                   <ListItemText primary="Thông tin người dùng" />
                 </ListItemButton>
               </ListItem>
+              {user?.isAdmin === true && (
+                <>
+                <ListItem disablePadding onClick={handleItemClickAdmin}>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <PersonIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Chỉnh sửa thông tin trang web"/>
+                </ListItemButton>
+              </ListItem>
+                </>
+              )}
               <ListItem disablePadding onClick={handLogout}>
                 <ListItemButton>
                   <ListItemIcon>

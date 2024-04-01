@@ -6,10 +6,12 @@ import CategoryHome from "../pages/HomePage/ContentHome/CategoryHome/CategoryHom
 import DetailProduct from "./../pages/HomePage/ContentHome/DetailsProduct/DetailProduct";
 import ProFileUser from "../pages/HomePage/ContentHome/ProfileUserHome/ProFileUser";
 import AdminPage from "../pages/AdminPage/index";
+import { isJsonString } from "../utils";
 import { jwtDecode } from "jwt-decode";
 import { UserService } from "../services/index.js";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUser } from "../redux/Slides/userSlide";
+import OderAdmin from '../pages/AdminPage/ContentAdmin/OrderAdmin/oder.jsx'
 const PrivateUser = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
@@ -66,14 +68,11 @@ const PrivateUser = () => {
 const PrivateRouteAdmin = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
-  useEffect(() =>{
-    if (user?.isAdmin === true) {
-      return <Outlet />;
-    } else if (user?.isAdmin ===  false && user.access_Token === '') {
-      
-      return navigate("/");
-    }
-  },[])
+  if (user?.isAdmin === true || user?.access_Token) {
+    return <Outlet />;
+  } else if (user?.isAdmin === false || user?.access_Token === '') {
+    return navigate("/");
+  }
 };
 
 export default createBrowserRouter([
@@ -110,6 +109,12 @@ export default createBrowserRouter([
           {
             element: <AdminPage />,
             path: "/admin",
+            children: [
+              {
+                element: <OderAdmin/>,
+                path: 'order'
+              }
+            ]
           },
         ],
       },

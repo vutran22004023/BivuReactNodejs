@@ -34,7 +34,7 @@ const createProduct = async (req, res) => {
     try {
     const {name,image,type,price,counInStock,rating,description} = req.body;
 
-    if(!name || !image || !type || !price|| !counInStock || !rating || !description) {
+    if(!name || !image || !type || !price || !description) {
         return res.status(200).json({
             status: 'ERR',
             message: "Chưa điền đầy đủ thông tin sản phẩm"

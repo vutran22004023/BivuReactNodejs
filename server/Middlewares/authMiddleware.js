@@ -12,7 +12,7 @@ const auth = (req, res, next) => {
                 message: 'Token không đúng',
             })
         }
-        if(user?.isAdmin) {
+        if(user?.isAdmin === true) {
             next();
         }else {
             return res.status(404).json({

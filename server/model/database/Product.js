@@ -21,11 +21,9 @@ const ProductSchema =  new mongoose.Schema(
     },
     counInStock: {
         type: Number,
-        required: true,
     },
     rating: {
         type: Number,
-        required: true,
     },
     description: {
         type: String,

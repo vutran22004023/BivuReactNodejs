@@ -11,7 +11,7 @@ import { jwtDecode } from "jwt-decode";
 import { UserService } from "../services/index.js";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUser } from "../redux/Slides/userSlide";
-import OderAdmin from '../pages/AdminPage/ContentAdmin/OrderAdmin/oder.jsx'
+import OderAdmin from '../pages/AdminPage/ContentAdmin/OrderAdmin/ProductAdmin'
 const PrivateUser = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
@@ -112,7 +112,7 @@ export default createBrowserRouter([
             children: [
               {
                 element: <OderAdmin/>,
-                path: 'order'
+                path: 'san-pham'
               }
             ]
           },

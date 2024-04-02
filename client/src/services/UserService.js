@@ -39,7 +39,6 @@ const updateUser = async (id,data,access_Token) => {
             token: `Beare ${access_Token}`
         }
     })
-    console.log('access_Token',access_Token)
     return res.data
 }
 

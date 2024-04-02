@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useMutationHooks } from "../../../../hooks/UseMutationHook";
 import OrderTable from "../../../../components/AdminPageComponent/OrderTable";
 import OrderList from "../../../../components/AdminPageComponent/OrderList";
 import Button from "@mui/joy/Button";
@@ -13,16 +14,14 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { Modal, Form, Input, Upload, Avatar } from "antd";
 import { getBase64 } from "../../../../utils";
 import { UploadOutlined } from "@ant-design/icons";
-import { useMutationHooks } from "../../../../hooks/UseMutationHook.js";
-import { UserService, ProductService } from "../../../../services/index.js";
+import {  ProductService } from "../../../../services/index.js";
 import { useSelector, useDispatch } from "react-redux";
-import {AxiosError} from 'axios';
+import axios from 'axios'
 import {
   success,
   error,
   warning,
 } from "../../../../components/MessageComponents/Message";
-// name,image,type,price,counInStock,rating,description
 export default function ProductAdmin() {
   const user = useSelector((state) => state.user);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,36 +34,33 @@ export default function ProductAdmin() {
     rating: "",
     description: "",
   });
+
+  //trạng thái mở modal
   const showModal = () => {
     setIsModalOpen(true);
+    form.resetFields();
   };
+
   const handleOk = () => {
     onFinish();
   };
-
-
-
-  const mutation = useMutationHooks((data) => {
-    const { name, image, type, price, counInStock, rating, description } = data;
-    const access_Token = user.access_Token.split("=")[1];
-    ProductService.createProduct(data, access_Token);
-  });
-
+  //trang thái đóng modal
   const handleCancel = () => {
     setIsModalOpen(false);
+    form.resetFields();
   };
 
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
-
+// ochange dữ liệu khi nhập vào imput
   const handleOnchanges = (e) => {
     setStateProduct({
       ...stateProduct,
       [e.target.name]: e.target.value,
     });
   };
-
+// xử lý phần file ảnh
   const handleOnchangeAvatar = async ({ fileList }) => {
     const file = fileList[0];
     if (!file.url && !file.preview) {
@@ -75,24 +71,43 @@ export default function ProductAdmin() {
       image: file.preview,
     });
   };
-
-
-  
-  const { data,isSuccess, isError } = mutation;
-  useEffect(() => {
-    if (isSuccess) {
-      success();
-      setStateProduct({
-        ...stateProduct
-      })
-    } else if (isError) {
-      error();
-    }
-  }, [isSuccess,isError]);
-
   const onFinish = () => {
     mutation.mutate(stateProduct);
   };
+
+//Api react product
+  const mutation =  useMutationHooks(async (data) => {
+    const access_Token =  user.access_Token.split("=")[1];
+        const res = await axios.post(`${import.meta.env.REACT_APP_API_URL}/product/create-product`,data,{
+        headers: {
+            token: `Beare ${access_Token}`,
+        }
+    })
+    return res.data
+  });
+  // thông báo status khi submit
+  const { data, isPending, isSuccess, isError } = mutation;
+  const [form] = Form.useForm();
+  useEffect(() => {
+    if(data?.status === 200) {
+      success();
+      setStateProduct({
+        name: "",
+        image: "",
+        type: "",
+        price: "",
+        counInStock: "",
+        rating: "",
+        description: "",
+      });
+      setIsModalOpen(false);
+    }if(data?.status ==='ERR') {
+      error();
+
+    }
+  },[data?.status])
+
+
   return (
     <>
       <Outlet />
@@ -159,10 +174,10 @@ export default function ProductAdmin() {
           <Form
             name="basic"
             labelCol={{
-              span: 8,
+              span: 6,
             }}
             wrapperCol={{
-              span: 16,
+              span: 18,
             }}
             style={{
               maxWidth: 600,
@@ -170,9 +185,9 @@ export default function ProductAdmin() {
             initialValues={{
               remember: true,
             }}
-            autoComplete="off"
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
+            form= {form}
           >
             <Form.Item
               label="Tên sản phẩm"
@@ -242,15 +257,15 @@ export default function ProductAdmin() {
               />
             </Form.Item>
             <Form.Item>
-              {/* {error.response.data.message && (
+              {data?.status ==='ERR' && (
                 <div
                   style={{ color: "red", fontSize: "14px", paddingTop: "10px" }}
                 >
-                  error.response.data.message
+                  {data?.message}
                 </div>
-              )} */}
+              )} 
 
-              {/* {isSuccess && (
+               {data?.status === 200 && (
                 <div
                   style={{
                     color: "#4fba69",
@@ -258,9 +273,9 @@ export default function ProductAdmin() {
                     paddingTop: "10px",
                   }}
                 >
-                  cập nhập thành công
+                  {data?.message}
                 </div>
-              )} */}
+              )}
             </Form.Item>
 
             <Form.Item

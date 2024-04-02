@@ -43,7 +43,7 @@ export default function Register() {
   //Api login
   const mutation = useMutationHooks((data) => UserService.RegistUser(data));
   const { data, isPending, isSuccess, isError } = mutation;
-
+  console.log(mutation)
   useEffect(() => {
     if (data?.status == 200) {
       success();

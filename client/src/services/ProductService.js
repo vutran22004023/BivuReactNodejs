@@ -17,6 +17,17 @@ const updatedDetailProduct= async (id,data,access_Token) => {
     })
     return res.data
 }
+
+const DeleteDetailProduct= async (id,access_Token) => {
+    const res = await axios.delete(`${import.meta.env.REACT_APP_API_URL}/product/delete-product/${id}`,{
+        headers: {
+            token: `Beare ${access_Token}`,
+        }
+    })
+    console.log(access_Token)
+    return res.data
+}
+
 const getDetailProduct= async (id) => {
     const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/detail-product/${id}`)
     return res.data
@@ -32,5 +43,6 @@ export default {
     createProduct,
     getAllProduct,
     updatedDetailProduct,
-    getDetailProduct
+    getDetailProduct,
+    DeleteDetailProduct
 }

@@ -11,7 +11,7 @@ import {
     warning,
   } from "../../components/MessageComponents/Message";
   import { useNavigate } from "react-router-dom";
-
+import IsLoadingComponent from '../LoadComponent/Loading.jsx'
 export default function Login() {
 
     const [passwordVisible, setPasswordVisible] = useState(false);
@@ -81,6 +81,7 @@ export default function Login() {
               {data?.message}
             </div>
           )}
+          <IsLoadingComponent isLoading={isPending}>
           <ButtonFrom
             onClick={handleSignUp}
             disabled={!email.length || !password.length}
@@ -99,6 +100,7 @@ export default function Login() {
             }}
             textButton={"Đăng nhập"}
           ></ButtonFrom>
+          </IsLoadingComponent>
 
           <div style={{textAlign: 'center'}}>
             <h4>Hoặc</h4>

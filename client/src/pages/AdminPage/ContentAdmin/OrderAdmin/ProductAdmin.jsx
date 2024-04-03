@@ -12,7 +12,7 @@ import { Outlet } from "react-router-dom";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { Modal, Form, Input, Upload, Avatar,Space } from "antd";
 import { getBase64 } from "../../../../utils";
-import { UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined, WarningOutlined } from "@ant-design/icons";
 import { ProductService } from "../../../../services/index.js";
 import { useSelector, useDispatch } from "react-redux";
 import axios from 'axios'
@@ -27,6 +27,7 @@ import {
 } from "../../../../components/MessageComponents/Message";
 import DrawerComponent from '../../../../components/DrawerComponent/Drawer'
 import LoadingComponent from '../../../../components/LoadComponent/Loading.jsx'
+import ModalComponent from '../../../../components/ModalComponent/Modal.jsx'
 
 
 
@@ -45,10 +46,10 @@ export default function ProductAdmin() {
       </MenuButton>
       <Menu size="sm" sx={{ minWidth: 140 }}>
         <MenuItem onClick = {handleDetailProduct} >Chỉnh sửa</MenuItem>
-        <MenuItem>Rename</MenuItem>
-        <MenuItem>Move</MenuItem>
+        {/* <MenuItem>Rename</MenuItem>
+        <MenuItem>Move</MenuItem> */}
         <Divider />
-        <MenuItem color="danger">Delete</MenuItem>
+        <MenuItem color="danger" onClick={handleModalDelete}>Delete</MenuItem>
       </Menu>
     </Dropdown>
   );
@@ -59,6 +60,7 @@ export default function ProductAdmin() {
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
+  const [isModalOpenDelete, setIsModalOpenDelete] = useState(false);
   const [stateProduct, setStateProduct] = useState({
     name: "",
     image: "",
@@ -138,7 +140,11 @@ export default function ProductAdmin() {
 
 
   const onFinish = () => {
-    mutation.mutate(stateProduct);
+    mutation.mutate(stateProduct, {
+      onSettled: () => {
+        queryProduct.refetch()
+      }
+    });
   };
 
 
@@ -166,13 +172,26 @@ export default function ProductAdmin() {
     const access_Token =  user?.access_Token.split("=")[1];
     const res = ProductService.updatedDetailProduct(RowSelected, data,access_Token)
     return res;
+  }
+  )
+
+  //api delete product
+  const mutationDelete= useMutationHooks(() => {
+
+    const access_Token =  user?.access_Token.split("=")[1];
+    const res = ProductService.DeleteDetailProduct(RowSelected,access_Token)
+
+    return res;
   })
 
 
+
   const { data, isPending, isSuccess, isError } = mutation;
-  const { isPending:isLoadingProducts, data:products } = useQuery({queryKey: ['products'], queryFn: fetchProductAll, retryDelay: 1000, staleTime: 30000});
+  const queryProduct = useQuery({queryKey: ['products'], queryFn: fetchProductAll, retryDelay: 1000, staleTime: 1000});
+  const { isPending:isLoadingProducts, data:products } =queryProduct
   const { data: dataUpdate, isPending: dataUpdateisLoading } = mutationUpdate;
-  console.log(mutationUpdate)
+  const {data: dataDelete, isPending: dataDeleteisLoading } =mutationDelete;
+  console.log(dataDelete)
   const columns = [
     {
       title: 'Name',
@@ -218,11 +237,22 @@ export default function ProductAdmin() {
     if(dataUpdate?.status === 200) {
       success();
       setIsOpenDrawer(false)
-    }if(dataUpdate?.status ==='ERR') {
+    }else if(dataUpdate?.status ==='ERR') {
       error();
 
     }
   },[dataUpdate?.status])
+
+  //thông báo status khi xóa product
+  useEffect(() => {
+    if(dataDelete?.status === 200) {
+      success();
+      setIsModalOpenDelete(false);
+    }else if(dataDelete?.status ==='ERR') {
+      error();
+
+    }
+  },[dataDelete?.status])
   
   //reset lại null sau khi create product thành công 
   useEffect(() => {
@@ -270,8 +300,35 @@ export default function ProductAdmin() {
 
     // xử lý khi bấm vào submit update product
     const onUpdateProduct = () => {
-      mutationUpdate.mutate(stateProductDetail)
+      mutationUpdate.mutate(stateProductDetail,{
+        onSettled: () => {
+          queryProduct.refetch()
+        }
+      })
     }
+
+
+    //phần về delete product
+    const handleModalDelete = () => {
+      if(RowSelected) {
+        setIsModalOpenDelete(true);
+        console.log("handleModalDelete",RowSelected)
+      }
+    };
+  
+    const handleOkDelete = () => {
+      mutationDelete.mutate(RowSelected,{
+        onSettled: () => {
+          queryProduct.refetch()
+        }
+      })
+    };
+  
+    const handleCancelDelete = () => {
+      setIsModalOpenDelete(false);
+    };
+
+
 
   return (
     <>
@@ -610,6 +667,15 @@ export default function ProductAdmin() {
           </Form>
           </LoadingComponent>
         </DrawerComponent>
+
+        <ModalComponent  isOpen={isModalOpenDelete} onOk={handleOkDelete} onCancel={handleCancelDelete}>
+        <LoadingComponent isLoading={dataDeleteisLoading}>
+        <div style={{textAlign: "center"}}>
+          <WarningOutlined style={{fontSize: '50px', color: 'red'}} />
+          <p>bạn có chắc chắn xóa dữ liệu này không?</p>
+        </div>
+        </LoadingComponent>
+        </ModalComponent>
         
 
       </Box>

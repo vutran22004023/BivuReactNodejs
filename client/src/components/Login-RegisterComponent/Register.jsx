@@ -6,6 +6,7 @@ import ButtonFrom from "../../components/ButtonSearch/Button";
 import { Image, Input } from "antd";
 import product1 from "../../assets/font-end/imgs/Product/product1.png";
 import { useMutationHooks } from "../../hooks/UseMutationHook";
+import IsLoadingComponent from '../LoadComponent/Loading'
 import { UserService } from "../../services";
 import {
   success,
@@ -133,6 +134,7 @@ export default function Register() {
           {data?.message}
         </div>
       )}
+      <IsLoadingComponent isLoading={isPending}>
       <ButtonFrom
         disabled={
           !name.length ||
@@ -165,6 +167,7 @@ export default function Register() {
       >
         Đăng kí
       </ButtonFrom>
+      </IsLoadingComponent>
     </div>
   );
 }

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useMutationHooks } from "../../../../hooks/UseMutationHook";
 import OrderTable from "../../../../components/AdminPageComponent/OrderTable";
-import OrderList from "../../../../components/AdminPageComponent/OrderList";
 import Button from "@mui/joy/Button";
 import Breadcrumbs from "@mui/joy/Breadcrumbs";
 import Link from "@mui/joy/Link";
@@ -11,10 +10,10 @@ import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import { Outlet } from "react-router-dom";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import { Modal, Form, Input, Upload, Avatar } from "antd";
+import { Modal, Form, Input, Upload, Avatar,Space } from "antd";
 import { getBase64 } from "../../../../utils";
 import { UploadOutlined } from "@ant-design/icons";
-import {  ProductService } from "../../../../services/index.js";
+import { ProductService } from "../../../../services/index.js";
 import { useSelector, useDispatch } from "react-redux";
 import axios from 'axios'
 import {useQuery} from '@tanstack/react-query'
@@ -26,6 +25,8 @@ import {
   error,
   warning,
 } from "../../../../components/MessageComponents/Message";
+import DrawerComponent from '../../../../components/DrawerComponent/Drawer'
+import LoadingComponent from '../../../../components/LoadComponent/Loading.jsx'
 
 
 
@@ -33,6 +34,7 @@ import {
 
 export default function ProductAdmin() {
 
+  //button thêm sửa xóa
   const RowMenu = () => (
     <Dropdown>
       <MenuButton
@@ -42,7 +44,7 @@ export default function ProductAdmin() {
         <MoreHorizRoundedIcon />
       </MenuButton>
       <Menu size="sm" sx={{ minWidth: 140 }}>
-        <MenuItem onClick = {handleDetailProduct} >Edit</MenuItem>
+        <MenuItem onClick = {handleDetailProduct} >Chỉnh sửa</MenuItem>
         <MenuItem>Rename</MenuItem>
         <MenuItem>Move</MenuItem>
         <Divider />
@@ -50,9 +52,23 @@ export default function ProductAdmin() {
       </Menu>
     </Dropdown>
   );
+
+  // các biến dữ liệu
   const user = useSelector((state) => state.user);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOpenDrawer, setIsOpenDrawer] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
   const [stateProduct, setStateProduct] = useState({
+    name: "",
+    image: "",
+    type: "",
+    price: "",
+    counInStock: "",
+    rating: "",
+    description: "",
+  });
+  const [stateProductDetail, setStateProductDetail] = useState({
     name: "",
     image: "",
     type: "",
@@ -63,16 +79,13 @@ export default function ProductAdmin() {
   });
 
   const [RowSelected,setRowSelected] = useState('')
-   
-  const handleDetailProduct = () => {
-    console.log("handleDetailProduct",RowSelected)
-  }
 
+  
 
   //trạng thái mở modal
   const showModal = () => {
     setIsModalOpen(true);
-    form.resetFields();
+    // form.resetFields();
   };
 
   const handleOk = () => {
@@ -94,6 +107,13 @@ export default function ProductAdmin() {
       [e.target.name]: e.target.value,
     });
   };
+
+  const handleOnchangeDetails = (e) => {
+    setStateProductDetail({
+      ...stateProductDetail,
+      [e.target.name]: e.target.value,
+    });
+  };
 // xử lý phần file ảnh
   const handleOnchangeAvatar = async ({ fileList }) => {
     const file = fileList[0];
@@ -105,13 +125,25 @@ export default function ProductAdmin() {
       image: file.preview,
     });
   };
+  const handleOnchangeAvatarDetailProduct = async ({ fileList }) => {
+    const file = fileList[0];
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+    setStateProductDetail({
+      ...stateProductDetail,
+      image: file.preview,
+    });
+  };
+
+
   const onFinish = () => {
     mutation.mutate(stateProduct);
   };
 
 
 
-//Api react product
+//Api create product
   const mutation =  useMutationHooks(async (data) => {
     const access_Token =  user.access_Token.split("=")[1];
         const res = await axios.post(`${import.meta.env.REACT_APP_API_URL}/product/create-product`,data,{
@@ -121,17 +153,26 @@ export default function ProductAdmin() {
     })
     return res.data
   });
-
+  // api get all products
   const fetchProductAll = async() => {
     
     const res =  await ProductService.getAllProduct()
     return res
   }
 
+  // api update product id
+  const mutationUpdate= useMutationHooks((data) => {
+    const {id, ...rests} = data;
+    const access_Token =  user?.access_Token.split("=")[1];
+    const res = ProductService.updatedDetailProduct(RowSelected, data,access_Token)
+    return res;
+  })
+
 
   const { data, isPending, isSuccess, isError } = mutation;
-  const { isLoading:isLoadingProducts, data:products } = useQuery({queryKey: ['products'], queryFn: fetchProductAll, retryDelay: 1000});
-
+  const { isPending:isLoadingProducts, data:products } = useQuery({queryKey: ['products'], queryFn: fetchProductAll, retryDelay: 1000, staleTime: 30000});
+  const { data: dataUpdate, isPending: dataUpdateisLoading } = mutationUpdate;
+  console.log(mutationUpdate)
   const columns = [
     {
       title: 'Name',
@@ -172,8 +213,65 @@ export default function ProductAdmin() {
     }
   },[data?.status])
 
+  // thông báo status khi submit bên update
+  useEffect(() => {
+    if(dataUpdate?.status === 200) {
+      success();
+      setIsOpenDrawer(false)
+    }if(dataUpdate?.status ==='ERR') {
+      error();
+
+    }
+  },[dataUpdate?.status])
+  
+  //reset lại null sau khi create product thành công 
+  useEffect(() => {
+    form.setFieldsValue(stateProduct)
+  },[form, stateProduct])
+
   
 
+
+    // show  sản phẩm của id và cập nhập lại product
+    const fetchGetDetailsProduct = async () => {
+      const res = await ProductService.getDetailProduct(RowSelected)
+      // console.log('res.data', res)
+      if(res?.data) {
+        setStateProductDetail ({
+          name: res?.data?.name,
+          image: res?.data?.image,
+          type: res?.data?.type,
+          price: res?.data?.price,
+          counInStock: res?.data?.counInStock,
+          rating: res?.data?.rating,
+          description: res?.data?.description,
+        })
+      }
+      setIsLoadingUpdate(false)
+    }
+
+    // console.log('setStateProductDetail', stateProductDetail)
+
+    //sao khi bấm vào cập nhập thì input có thể hiện thị thông tin
+    useEffect(() => {
+      form.setFieldsValue(stateProductDetail);
+  }, [form, stateProductDetail]);
+
+
+    const handleDetailProduct = () => {
+      if(RowSelected) {
+        setIsLoadingUpdate(true)
+        fetchGetDetailsProduct()
+        setIsOpenDrawer(true)
+      }
+      // console.log("handleDetailProduct",RowSelected)
+    }
+
+
+    // xử lý khi bấm vào submit update product
+    const onUpdateProduct = () => {
+      mutationUpdate.mutate(stateProductDetail)
+    }
 
   return (
     <>
@@ -238,6 +336,7 @@ export default function ProductAdmin() {
           onCancel={handleCancel}
           okText="Submit"
         >
+          <LoadingComponent isLoading = {isLoading}>
           <Form
             name="basic"
             labelCol={{
@@ -369,8 +468,152 @@ export default function ProductAdmin() {
               </Upload>
             </Form.Item>
           </Form>
+          </LoadingComponent>
         </Modal>
+
+        <DrawerComponent width={720} title="Chỉnh sửa thông tin sản phẩm" isOpen={isOpenDrawer} onClose={() => setIsOpenDrawer(false)} 
+        extra={
+          <Space>
+            <Button onClick={() => setIsOpenDrawer(false)}>Cancel</Button>
+            <Button onClick={onUpdateProduct} type="primary">
+              Cập Nhập
+            </Button>
+          </Space>
+        }
+         >
+         <LoadingComponent isLoading = {isLoadingUpdate ||dataUpdateisLoading}>
+          <Form
+            name="basic"
+            labelCol={{
+              span: 6,
+            }}
+            wrapperCol={{
+              span: 18,
+            }}
+            style={{
+              maxWidth: 600,
+            }}
+            initialValues={{
+              remember: true,
+            }}
+            form={form}
+          >
+            <Form.Item
+              label="Tên sản phẩm"
+              name="name"
+              rules={[
+                {
+                  required: true,
+                  message: "Vui lòng điền tên sản phẩm",
+                },
+              ]}
+            >
+              <Input
+                value={stateProductDetail.name}
+                onChange={handleOnchangeDetails}
+                name="name"
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Thể Loại"
+              name="type"
+              rules={[
+                {
+                  required: true,
+                  message: "vui lòng nhập thể loại",
+                },
+              ]}
+            >
+              <Input
+                value={stateProductDetail.type}
+                onChange={handleOnchangeDetails}
+                name="type"
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Mô tả"
+              name="description"
+              rules={[
+                {
+                  required: true,
+                  message: "vui lòng nhập Mô tả sản phẩm",
+                },
+              ]}
+            >
+              <Input
+                value={stateProductDetail.description}
+                onChange={handleOnchangeDetails}
+                name="description"
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Giá sản phẩm"
+              name="price"
+              rules={[
+                {
+                  required: true,
+                  message: "vui lòng nhập giá sản phẩm",
+                },
+              ]}
+            >
+              <Input
+                value={stateProductDetail.price}
+                onChange={handleOnchangeDetails}
+                name="price"
+              />
+            </Form.Item>
+            <Form.Item>
+              {dataUpdate?.status ==='ERR' && (
+                <div
+                  style={{ color: "red", fontSize: "14px", paddingTop: "10px" }}
+                >
+                  {dataUpdate?.message}
+                </div>
+              )} 
+
+               {/* {dataUpdate?.status === 200 && (
+                <div
+                  style={{
+                    color: "#4fba69",
+                    fontSize: "14px",
+                    paddingTop: "10px",
+                  }}
+                >
+                  {dataUpdate?.message}
+                </div>
+              )} */}
+            </Form.Item>
+
+            <Form.Item
+              name="image"
+              rules={[
+                {
+                  required: true,
+                  message: "Vui lòng thêm ảnh sản phẩm",
+                },
+              ]}
+            >
+              <Upload
+                onChange={handleOnchangeAvatarDetailProduct}
+                listType="picture"
+                defaultFileList={stateProductDetail?.image}
+                maxCount={1}
+              >
+                <Button style={{ marginTop: "10px" }} icon={<UploadOutlined />}>
+                  Click thêm ảnh sản phẩm
+                </Button>
+              </Upload>
+            </Form.Item>
+          </Form>
+          </LoadingComponent>
+        </DrawerComponent>
+        
+
       </Box>
+      <LoadingComponent isLoading={isLoadingProducts}>
       <OrderTable products= {products}  columns= {columns} onRow={(record, rowIndex) => {
     return {
       onClick: (event) => {
@@ -378,6 +621,8 @@ export default function ProductAdmin() {
       }, 
     };
   }}  />
+  </LoadingComponent>
+
     </>
   );
 }

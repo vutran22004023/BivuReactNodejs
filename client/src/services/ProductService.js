@@ -6,7 +6,19 @@ const createProduct = async (data, access_Token) => {
             token: `Beare ${access_Token}`,
         }
     })
-    console.log(res.data)
+    return res.data
+}
+
+const updatedDetailProduct= async (id,data,access_Token) => {
+    const res = await axiosJWT.put(`${import.meta.env.REACT_APP_API_URL}/product/update-product/${id}`,data,{
+        headers: {
+            token: `Beare ${access_Token}`,
+        }
+    })
+    return res.data
+}
+const getDetailProduct= async (id) => {
+    const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/detail-product/${id}`)
     return res.data
 }
 
@@ -18,5 +30,7 @@ const getAllProduct = async () => {
 
 export default {
     createProduct,
-    getAllProduct
+    getAllProduct,
+    updatedDetailProduct,
+    getDetailProduct
 }

@@ -35,8 +35,8 @@ const createProduct = async (newProduct) => {
 }
 
 const updateProduct = async(id, data) => {
+  
     try {
-
         const checkProduct = await ProductModel.findOne({
           _id: id,
         });
@@ -46,7 +46,7 @@ const updateProduct = async(id, data) => {
             message: "Id không tồn tại",
           };
         }
-        const updateProduct = await ProductModel.findByIdAndUpdate(id, data, { new: true} )
+        const updateProduct = await ProductModel.findByIdAndUpdate(id, data,{ new: true })
         return {
           status: 200,
           message: `Cập nhập thành công id : ${updateProduct._id}`,

@@ -21,25 +21,6 @@ export default function  OrderTable  (props) {
 
   })
 
-  // const start = () => {
-  //   setLoading(true);
-  //   // ajax request after empty completing
-  //   setTimeout(() => {
-  //     setSelectedRowKeys([]);
-  //     setLoading(false);
-  //   }, 1000);
-  // };
-
-
-
-  
-  // const data = products?.data?.map((product) => {
-  //   return {
-  //     ...product, key:product._id
-  //   };
-  // });
-
-  
   const onSelectChange = (newSelectedRowKeys) => {
     console.log('selectedRowKeys changed: ', newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
@@ -51,15 +32,13 @@ export default function  OrderTable  (props) {
   const hasSelected = selectedRowKeys.length > 0;
 
 
-
-
-
-
-
-
-
   return (
-    <Table rowSelection={rowSelection} columns={columns} dataSource={data}
+    <Table rowSelection={rowSelection} columns={columns} dataSource={data} pagination={{
+      pageSize: 50,
+    }}
+    scroll={{
+      y: 490,
+    }}
     {...props}
      />
   )

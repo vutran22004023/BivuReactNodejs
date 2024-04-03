@@ -55,6 +55,7 @@ const updateProduct = async(req, res) => {
     try{
         const productid = req.params.id
         const data = req.body
+
         if(!productid) {
             return res.status(200).json({
                 status: 'Err',

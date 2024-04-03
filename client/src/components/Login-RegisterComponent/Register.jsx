@@ -24,7 +24,7 @@ export default function Register() {
   const [phone, setPhone] = useState("");
 
   const handleOnchangeName = (value) => {
-    setName(value);
+    setName(value)
   };
   const handleOnchangeEmail = (value) => {
     setEmail(value);

@@ -17,12 +17,39 @@ import { UploadOutlined } from "@ant-design/icons";
 import {  ProductService } from "../../../../services/index.js";
 import { useSelector, useDispatch } from "react-redux";
 import axios from 'axios'
+import {useQuery} from '@tanstack/react-query'
+import IconButton, { iconButtonClasses } from '@mui/joy/IconButton';
+import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
+import {Menu,MenuButton,Dropdown, MenuItem, Divider } from '@mui/joy';
 import {
   success,
   error,
   warning,
 } from "../../../../components/MessageComponents/Message";
+
+
+
+
+
 export default function ProductAdmin() {
+
+  const RowMenu = () => (
+    <Dropdown>
+      <MenuButton
+        slots={{ root: IconButton }}
+        slotProps={{ root: { variant: 'plain', color: 'neutral', size: 'sm' } }}
+      >
+        <MoreHorizRoundedIcon />
+      </MenuButton>
+      <Menu size="sm" sx={{ minWidth: 140 }}>
+        <MenuItem onClick = {handleDetailProduct} >Edit</MenuItem>
+        <MenuItem>Rename</MenuItem>
+        <MenuItem>Move</MenuItem>
+        <Divider />
+        <MenuItem color="danger">Delete</MenuItem>
+      </Menu>
+    </Dropdown>
+  );
   const user = useSelector((state) => state.user);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [stateProduct, setStateProduct] = useState({
@@ -34,6 +61,13 @@ export default function ProductAdmin() {
     rating: "",
     description: "",
   });
+
+  const [RowSelected,setRowSelected] = useState('')
+   
+  const handleDetailProduct = () => {
+    console.log("handleDetailProduct",RowSelected)
+  }
+
 
   //trạng thái mở modal
   const showModal = () => {
@@ -75,6 +109,8 @@ export default function ProductAdmin() {
     mutation.mutate(stateProduct);
   };
 
+
+
 //Api react product
   const mutation =  useMutationHooks(async (data) => {
     const access_Token =  user.access_Token.split("=")[1];
@@ -85,8 +121,37 @@ export default function ProductAdmin() {
     })
     return res.data
   });
-  // thông báo status khi submit
+
+  const fetchProductAll = async() => {
+    
+    const res =  await ProductService.getAllProduct()
+    return res
+  }
+
+
   const { data, isPending, isSuccess, isError } = mutation;
+  const { isLoading:isLoadingProducts, data:products } = useQuery({queryKey: ['products'], queryFn: fetchProductAll, retryDelay: 1000});
+
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+    },
+    {
+      title: 'Price',
+      dataIndex: 'price',
+    },
+    {
+      title: 'Rating',
+      dataIndex: 'rating',
+    },
+    {
+      title: 'Action',
+      dataIndex: 'action',
+      render: RowMenu 
+    }
+  ];
+  // thông báo status khi submit
   const [form] = Form.useForm();
   useEffect(() => {
     if(data?.status === 200) {
@@ -106,6 +171,8 @@ export default function ProductAdmin() {
 
     }
   },[data?.status])
+
+  
 
 
   return (
@@ -304,8 +371,13 @@ export default function ProductAdmin() {
           </Form>
         </Modal>
       </Box>
-      <OrderTable />
-      <OrderList />
+      <OrderTable products= {products}  columns= {columns} onRow={(record, rowIndex) => {
+    return {
+      onClick: (event) => {
+        setRowSelected(record._id)
+      }, 
+    };
+  }}  />
     </>
   );
 }

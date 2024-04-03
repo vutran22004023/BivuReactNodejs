@@ -16,7 +16,7 @@ export default function ProductHome() {
     return res
   }
 
-  const { isLoading, data:products } = useQuery({queryKey: ['products'], queryFn: fetchProductAll, retry:3, retryDelay: 1000});
+  const { isLoading, data:products } = useQuery({queryKey: ['products'], queryFn: fetchProductAll, retryDelay: 1000});
   return (
     <div id='container' style={{padding: ' 0 130px', marginTop: '20px' }}>
         <Row>

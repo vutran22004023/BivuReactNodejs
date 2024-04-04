@@ -128,7 +128,7 @@ const getAllProduct = async(limit = 10, page =0,sort ,filter) => {
       }
 }
 
-const getDetailProduct = async(id) => {
+const getDetailProduct = async(ids) => {
     try {
 
         const checkProduct = await ProductModel.findOne({
@@ -153,10 +153,26 @@ const getDetailProduct = async(id) => {
       }
 }
 
+
+const deleteProductMany = async(ids) => {
+  try {
+
+    await ProductModel.deleteMany({_id: ids})
+    return {
+      status: 200,
+      message: `Xóa thành công`,
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
+
 export default {
     createProduct,
     updateProduct,
     deleteProduct,
     getAllProduct,
     getDetailProduct,
+    deleteProductMany
 }

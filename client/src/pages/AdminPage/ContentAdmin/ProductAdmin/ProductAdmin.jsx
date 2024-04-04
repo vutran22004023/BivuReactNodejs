@@ -179,6 +179,23 @@ export default function ProductAdmin() {
 
     return res;
   })
+  // api delete many products
+  const mutationDeleteMany= useMutationHooks((data) => {
+    const {access_Token, ...id} = data
+    const res = ProductService.DeleteManyProduct(id,access_Token)
+    return res;
+  })
+  
+
+  const handleDeleteMany = (ids) => {
+    // console.log('_id', {_id})
+    const access_Token =  user?.access_Token.split("=")[1];
+    mutationDeleteMany.mutate({id: ids, access_Token: access_Token},{
+      onSettled: () => {
+        queryProduct.refetch()
+      }
+    })
+  }
 
 
 // các biến dữ liệu
@@ -188,6 +205,8 @@ export default function ProductAdmin() {
   const dataAllProduct = products?.data
   const { data: dataUpdate, isPending: dataUpdateisLoading } = mutationUpdate;
   const {data: dataDelete, isPending: dataDeleteisLoading } =mutationDelete;
+  const {data:dataDeleteMany, isPending: dataDeleteisLoadingMany} =mutationDeleteMany
+
   // xử lý search trong table
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
@@ -344,6 +363,15 @@ export default function ProductAdmin() {
 
     }
   },[dataUpdate?.status])
+
+  useEffect(() => {
+    if(dataDeleteMany?.status === 200) {
+      success();
+    }else if(dataDeleteMany?.status ==='ERR') {
+      error();
+    }
+  },[dataDeleteMany?.status])
+  
 
   //thông báo status khi xóa product
   useEffect(() => {
@@ -780,7 +808,7 @@ export default function ProductAdmin() {
         </ModalComponent>
         
         <LoadingComponent isLoading={isLoadingProducts}>
-      <OrderTable products= {dataAllProduct}  columns= {columns} onRow={(record, rowIndex) => {
+      <OrderTable handleDeleteMany= {handleDeleteMany} dataDeleteisLoadingMany={dataDeleteisLoadingMany} dataDeleteMany={dataDeleteMany} products= {dataAllProduct}  columns= {columns} onRow={(record, rowIndex) => {
     return {
       onClick: (event) => {
         setRowSelected(record._id)

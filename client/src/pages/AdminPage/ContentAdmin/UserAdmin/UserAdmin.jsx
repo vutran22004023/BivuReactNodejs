@@ -302,6 +302,12 @@ export default function UserAdmin() {
         return res
     })
 
+    const mutationDeleteMany= useMutationHooks((data) => {
+      const {access_Token, ...id} = data
+      const res = UserService.DeleteManyUser(id,access_Token)
+      return res;
+    })
+
     // end Xử lý api create, getAllUser user api
 
     // các biên show dữ liệu ra client
@@ -311,7 +317,7 @@ export default function UserAdmin() {
     const dataAllUser = Users?.data.allUser
     const {data:UsersUpdateDetail,isPending: isLoadingUpdateUserDetail} = mutationUpdate
     const {data:DeleteUser, isPending: isLoadingDeleteUser} = mutationDelete
-
+    const {data:dataDeleteMany, isPending: dataDeleteisLoadingMany} =mutationDeleteMany
     // show status khi submit dữ liệu tới server
     useEffect(() => {
         if(data?.status === 200) {
@@ -339,6 +345,14 @@ export default function UserAdmin() {
             error()
         }
     }, [UsersUpdateDetail?.data])
+
+    useEffect(() => {
+      if(dataDeleteMany?.status === 200) {
+        success();
+      }else if(dataDeleteMany?.status ==='ERR') {
+        error();
+      }
+    },[dataDeleteMany?.status])
 
     useEffect(() => {
         if(DeleteUser?.status === 200) {
@@ -387,7 +401,7 @@ export default function UserAdmin() {
     const onButtonUpdateUserDetail = () => {
         mutationUpdate.mutate(stateUserDetail,{
             onSettled: () => {
-              queryProduct.refetch()
+              queryUser.refetch()
             }
           })
     }
@@ -403,7 +417,7 @@ export default function UserAdmin() {
     const handleOkDelete = () => {
         mutationDelete.mutate({
             onSettled: () => {
-              queryProduct.refetch()
+              queryUser.refetch()
             }
           })
     }
@@ -413,6 +427,18 @@ export default function UserAdmin() {
     }
     //end modal delete user
 
+
+    //Truyền dữ liệu many id 
+
+    const handleDeleteMany = (ids) => {
+      // console.log('_id', {_id})
+      const access_Token =  user?.access_Token.split("=")[1];
+      mutationDeleteMany.mutate({id: ids, access_Token: access_Token},{
+        onSettled: () => {
+          queryUser.refetch()
+        }
+      })
+    }
 
 
   return (
@@ -816,7 +842,7 @@ export default function UserAdmin() {
 
 
         <LoadingComponent isLoading={isLoadingUserAll}>
-      <OrderTable products={dataAllUser}  columns= {columns} 
+      <OrderTable products={dataAllUser} dataDeleteMany={dataDeleteMany} dataDeleteisLoadingMany={dataDeleteisLoadingMany}  columns= {columns} handleDeleteMany= {handleDeleteMany}
       onRow={(record, rowIndex) => {
         return {
       onClick: (event) => {

@@ -196,6 +196,22 @@ const getDetailsUser = async (id) => {
 
 
 
+
+const deleteUserMany = async(ids) => {
+  try {
+
+    await UserModel.deleteMany({_id: ids})
+    return {
+      status: 200,
+      message: `Xóa thành công`,
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+
 export default {
   creactUsers,
   loginUser,
@@ -203,5 +219,5 @@ export default {
   deleteUser,
   getAllUser,
   getDetailsUser,
-
+  deleteUserMany
 };

@@ -60,6 +60,14 @@ const DeleteUser = async (id,access_Token) => {
     })
     return res.data
 }
+const DeleteManyUser = async (id,access_Token) => {
+    const res = await axios.post(`${import.meta.env.REACT_APP_API_URL}/user/delete-many-user`,id,{
+        headers: {
+            token: `Beare ${access_Token}`
+        }
+    })
+    return res.data
+}
 
 
 
@@ -72,5 +80,6 @@ export default {
     LogOutUser,
     updateUser,
     getALLUser,
-    DeleteUser
+    DeleteUser,
+    DeleteManyUser
 }

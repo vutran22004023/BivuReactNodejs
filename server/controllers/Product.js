@@ -89,6 +89,24 @@ const deleteProduct = async(req, res) => {
     }
 }
 
+const deleteManyProduct = async(req, res) => {
+    try {
+        const ids = req.body.id
+        if(!ids) {
+            return res.status(200).json({
+                status: 'Err',
+                message: 'id không tồn tại'
+            })
+        }
+        const response = await Productservices.deleteProductMany(ids)
+        return res.status(200).json(response)
+    }catch(e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
+
 
 export default {
     getAllProduct,
@@ -96,5 +114,6 @@ export default {
     updateProduct,
     deleteProduct,
     createProduct,
-    getDetailProduct
+    getDetailProduct,
+    deleteManyProduct
 }

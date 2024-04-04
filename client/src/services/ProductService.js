@@ -24,6 +24,15 @@ const DeleteDetailProduct= async (id,access_Token) => {
             token: `Beare ${access_Token}`,
         }
     })
+    return res.data
+}
+
+const DeleteManyProduct= async (id,access_Token) => {
+    const res = await axios.post(`${import.meta.env.REACT_APP_API_URL}/product/delete-many-product`,id,{
+        headers: {
+            token: `Beare ${access_Token}`,
+        }
+    })
     console.log(access_Token)
     return res.data
 }
@@ -44,5 +53,6 @@ export default {
     getAllProduct,
     updatedDetailProduct,
     getDetailProduct,
-    DeleteDetailProduct
+    DeleteDetailProduct,
+    DeleteManyProduct
 }

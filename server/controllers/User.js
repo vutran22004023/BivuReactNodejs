@@ -172,6 +172,27 @@ const logoutUser = async (req, res) => {
 }
 
 
+const deleteManyUser = async(req, res) => {
+    try {
+        const ids = req.body.id
+        if(!ids) {
+            return res.status(200).json({
+                status: 'Err',
+                message: 'id không tồn tại'
+            })
+        }
+        const response = await Userservices.deleteUserMany(ids)
+        return res.status(200).json(response)
+    }catch(e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
+
+
+
+
 
 export default {
     creactUser,
@@ -181,5 +202,6 @@ export default {
     allUser,
     getDetailsUser,
     refreshToken,
-    logoutUser
+    logoutUser,
+    deleteManyUser
 }

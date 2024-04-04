@@ -8,4 +8,5 @@ router.get('/detail-product/:id',productController.getDetailProduct)
 router.post('/create-product',authMiddleware.auth,productController.createProduct)
 router.put('/update-product/:id',authMiddleware.auth,productController.updateProduct)
 router.delete('/delete-product/:id',authMiddleware.auth,productController.deleteProduct)
+router.post('/delete-many-product', authMiddleware.auth,productController.deleteManyProduct)
 export default router

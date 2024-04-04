@@ -188,7 +188,6 @@ export default function ProductAdmin() {
   const dataAllProduct = products?.data
   const { data: dataUpdate, isPending: dataUpdateisLoading } = mutationUpdate;
   const {data: dataDelete, isPending: dataDeleteisLoading } =mutationDelete;
-  console.log(dataAllProduct)
   // xử lý search trong table
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');

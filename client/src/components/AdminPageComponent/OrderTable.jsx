@@ -107,7 +107,7 @@ export default function  OrderTable  (props) {
       pageSize: 50,
     }}
     scroll={{
-      y: 490,
+      y: 450,
     }}
     {...props}
      />

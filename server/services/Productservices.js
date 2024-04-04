@@ -128,7 +128,7 @@ const getAllProduct = async(limit = 10, page =0,sort ,filter) => {
       }
 }
 
-const getDetailProduct = async(ids) => {
+const getDetailProduct = async(id) => {
     try {
 
         const checkProduct = await ProductModel.findOne({

@@ -114,6 +114,5 @@ export default {
     updateProduct,
     deleteProduct,
     createProduct,
-    getDetailProduct,
     deleteManyProduct
 }

@@ -1,13 +1,13 @@
 import React, { useState, useEffect,useRef } from "react";
-import { useMutationHooks } from "../../../../hooks/UseMutationHook";
-import OrderTable from "../../../../components/AdminPageComponent/OrderTable";
+import { useMutationHooks } from "../../../../hooks/UseMutationHook.js";
+import OrderTable from "../../../../components/AdminPageComponent/OrderTable.jsx";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import { Outlet } from "react-router-dom";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { Modal, Form, Input, Upload, Avatar,Space  } from "antd";
 import { SearchOutlined } from '@ant-design/icons';
-import { getBase64 } from "../../../../utils";
+import { getBase64 } from "../../../../utils.js";
 import { UploadOutlined, WarningOutlined } from "@ant-design/icons";
 import { ProductService } from "../../../../services/index.js";
 import { useSelector, useDispatch } from "react-redux";
@@ -20,8 +20,8 @@ import {
   success,
   error,
   warning,
-} from "../../../../components/MessageComponents/Message";
-import DrawerComponent from '../../../../components/DrawerComponent/Drawer'
+} from "../../../../components/MessageComponents/Message.jsx";
+import DrawerComponent from '../../../../components/DrawerComponent/Drawer.jsx'
 import LoadingComponent from '../../../../components/LoadComponent/Loading.jsx'
 import ModalComponent from '../../../../components/ModalComponent/Modal.jsx'
 
@@ -185,9 +185,10 @@ export default function ProductAdmin() {
   const { data, isPending, isSuccess, isError } = mutation;
   const queryProduct = useQuery({queryKey: ['products'], queryFn: fetchProductAll, retryDelay: 1000, staleTime: 1000});
   const { isPending:isLoadingProducts, data:products } =queryProduct
+  const dataAllProduct = products?.data
   const { data: dataUpdate, isPending: dataUpdateisLoading } = mutationUpdate;
   const {data: dataDelete, isPending: dataDeleteisLoading } =mutationDelete;
-
+  console.log(dataAllProduct)
   // xử lý search trong table
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
@@ -414,7 +415,7 @@ export default function ProductAdmin() {
     const handleModalDelete = () => {
       if(RowSelected) {
         setIsModalOpenDelete(true);
-        console.log("handleModalDelete",RowSelected)
+        // console.log("handleModalDelete",RowSelected)
       }
     };
   
@@ -779,10 +780,8 @@ export default function ProductAdmin() {
         </LoadingComponent>
         </ModalComponent>
         
-
-      </Box>
-      <LoadingComponent isLoading={isLoadingProducts}>
-      <OrderTable products= {products}  columns= {columns} onRow={(record, rowIndex) => {
+        <LoadingComponent isLoading={isLoadingProducts}>
+      <OrderTable products= {dataAllProduct}  columns= {columns} onRow={(record, rowIndex) => {
     return {
       onClick: (event) => {
         setRowSelected(record._id)
@@ -791,6 +790,9 @@ export default function ProductAdmin() {
   }}  />
   </LoadingComponent>
 
+      </Box>
+
     </>
+    
   );
 }

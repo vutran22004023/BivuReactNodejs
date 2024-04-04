@@ -13,6 +13,7 @@ import {
   error,
   warning,
 } from "../../components/MessageComponents/Message";
+import {useQuery} from '@tanstack/react-query'
 
 export default function Register() {
   const navigate = useNavigate();

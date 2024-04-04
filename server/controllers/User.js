@@ -66,7 +66,7 @@ const loginUser = async (req, res) => {
 const updateUser =async (req, res) => {
     try{
         const userid = req.params.id
-        const {email,name, phone, address, avatar} = req.body
+        const {email,name, phone, address, avatar, isAdmin} = req.body
         if(!userid) {
             return res.status(200).json({
                 status: 'ERR',

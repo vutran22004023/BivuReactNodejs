@@ -11,9 +11,8 @@ export default function  OrderTable  (props) {
   const {products, columns} =props
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
-
   
-  const data = products?.data?.map((product) => {
+  const data = products?.map((product) => {
     return {
       ...product,
       key: product._id,

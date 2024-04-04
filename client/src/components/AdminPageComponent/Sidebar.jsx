@@ -52,6 +52,21 @@ function Toggler({ defaultExpanded = false, renderToggle, children }) {
 export default function Sidebar() {
   const user = useSelector((state) => state.user);
   const navigate = useNavigate()
+  const [selectedIndex, setSelectedIndex] = React.useState('san-pham');
+
+  const handleListItemClick = (event, index) => {
+    switch (index) {
+      case 'san-pham':
+        setSelectedIndex(index);
+        navigate('/admin/san-pham');
+        break;
+      case 'nguoi-dung':
+        setSelectedIndex(index);
+        navigate('/admin/nguoi-dung');
+        break;
+    }
+    }
+
   return (
     <Sheet
       className="Sidebar"
@@ -151,10 +166,20 @@ export default function Sidebar() {
           </ListItem>
 
           <ListItem>
-            <ListItemButton selected onClick={() => {navigate('/admin/san-pham')}}>
+            <ListItemButton selected={selectedIndex === 'san-pham'}
+            onClick={(event) => handleListItemClick(event, 'san-pham')}>
               <ShoppingCartRoundedIcon />
               <ListItemContent>
                 <Typography level="title-sm">Sản Phẩm</Typography>
+              </ListItemContent>
+            </ListItemButton>
+          </ListItem>
+          <ListItem>
+            <ListItemButton selected={selectedIndex === 'nguoi-dung'}
+            onClick={(event) => handleListItemClick(event, 'nguoi-dung')}>
+                <GroupRoundedIcon />
+              <ListItemContent>
+              <Typography level="title-sm">Users</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
@@ -190,7 +215,7 @@ export default function Sidebar() {
             </Toggler>
           </ListItem> */}
 
-          <ListItem>
+          {/* <ListItem>
             <ListItemButton
               role="menuitem"
               component="a"
@@ -204,9 +229,9 @@ export default function Sidebar() {
                 4
               </Chip>
             </ListItemButton>
-          </ListItem>
+          </ListItem> */}
 
-          <ListItem nested>
+          {/* <ListItem nested>
             <Toggler
               renderToggle={({ open, setOpen }) => (
                 <ListItemButton onClick={() => setOpen(!open)}>
@@ -238,7 +263,7 @@ export default function Sidebar() {
                 </ListItem>
               </List>
             </Toggler>
-          </ListItem>
+          </ListItem> */}
         </List>
 
         <List

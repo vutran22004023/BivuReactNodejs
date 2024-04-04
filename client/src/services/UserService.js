@@ -25,6 +25,16 @@ const getDetailUser = async (id,access_Token) => {
     return res.data
 }
 
+const getALLUser = async (access_Token) => {
+    const res = await axiosJWT.get(`${import.meta.env.REACT_APP_API_URL}/user/all-user`,{
+        headers: {
+            token: `Beare ${access_Token}`
+        }
+
+    })
+    return res.data
+}
+
 const refreshToken = async () => {
     const res = await axios.post(`${import.meta.env.REACT_APP_API_URL}/user/refresh-token`, {
         withCredentials: true,
@@ -42,6 +52,15 @@ const updateUser = async (id,data,access_Token) => {
     return res.data
 }
 
+const DeleteUser = async (id,access_Token) => {
+    const res = await axios.delete(`${import.meta.env.REACT_APP_API_URL}/user/delete-user/${id}`,{
+        headers: {
+            token: `Beare ${access_Token}`
+        }
+    })
+    return res.data
+}
+
 
 
 export default {
@@ -51,5 +70,7 @@ export default {
     refreshToken,
     axiosJWT,
     LogOutUser,
-    updateUser
+    updateUser,
+    getALLUser,
+    DeleteUser
 }

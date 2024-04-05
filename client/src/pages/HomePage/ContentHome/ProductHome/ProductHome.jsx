@@ -10,6 +10,7 @@ import {useQuery} from '@tanstack/react-query'
 import {ProductService}from '../../../../services/index'
 import {useSelector,useDispatch} from 'react-redux'
 import {DataSearchProduct,IsloadingSearchProduct,IsloadingSearchProductFebounce} from '../../../../redux/Slides/productSlide'
+// import {debounce} from '../../../../hooks/UseMutationHook'
 export default function ProductHome() {
   const dispatch = useDispatch();
   const productSearch = useSelector((state) => state.product.search)
@@ -17,16 +18,7 @@ export default function ProductHome() {
   const refSearch = useRef()
   // Hàm debounce
   const [isDebounceLoading, setIsDebounceLoading] = useState(false);
-  const debounce = (func, delay) => {
-    let timeoutId;
-    return function (...args) {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        setIsDebounceLoading(false); // Thiết lập trạng thái loading khi debounce kết thúc
-        func.apply(this, args);
-      }, delay);
-    };
-  };
+
   const fetchProductAll = async (search) => {
     if (!productSearch.isInputEmpty) { // Kiểm tra nếu ô input không rỗng
       const res = await ProductService.getAllProduct(search);
@@ -39,6 +31,18 @@ export default function ProductHome() {
       return ''; // Trả về giá trị rỗng
     }
   };
+
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return function (...args) {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setIsDebounceLoading(false); // Thiết lập trạng thái loading khi debounce kết thúc
+        func.apply(this, args);
+      }, delay);
+    };
+  };
+  //tạo độ trể khi người dùng nhập input
   const debouncedFetch = useRef(debounce(fetchProductAll, 300));
 
 

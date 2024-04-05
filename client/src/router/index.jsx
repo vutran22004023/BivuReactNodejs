@@ -1,18 +1,40 @@
-import React, { useEffect } from "react";
+import React, {Suspense, useEffect } from "react";
 import { createBrowserRouter, Outlet, useNavigate } from "react-router-dom";
-import HomePage from "../pages/HomePage";
+// import HomePage from "../pages/HomePage";
 import ProductHome from "../pages/HomePage/ContentHome/ProductHome/ProductHome";
-import CategoryHome from "../pages/HomePage/ContentHome/CategoryHome/CategoryHome";
-import DetailProduct from "./../pages/HomePage/ContentHome/DetailsProduct/DetailProduct";
-import ProFileUser from "../pages/HomePage/ContentHome/ProfileUserHome/ProFileUser";
-import AdminPage from "../pages/AdminPage/index";
+// import CategoryHome from "../pages/HomePage/ContentHome/CategoryHome/CategoryHome";
+// import DetailProduct from "../pages/HomePage/ContentHome/DetailsProduct/DetailProduct.jsx";
+// import ProFileUser from "../pages/HomePage/ContentHome/ProfileUserHome/ProFileUser";
+// import AdminPage from "../pages/AdminPage/index";
 import { isJsonString } from "../utils";
 import { jwtDecode } from "jwt-decode";
 import { UserService } from "../services/index.js";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUser } from "../redux/Slides/userSlide";
-import OderAdmin from '../pages/AdminPage/ContentAdmin/ProductAdmin/ProductAdmin'
-import UserAdmin from '../pages/AdminPage/ContentAdmin/UserAdmin/UserAdmin'
+// import OderAdmin from "../pages/AdminPage/ContentAdmin/ProductAdmin/ProductAdmin";
+// import UserAdmin from "../pages/AdminPage/ContentAdmin/UserAdmin/UserAdmin";
+import IsLoadingComponent from "../components/LoadComponent/Loading.jsx";
+const HomePage = React.lazy(() => import("../pages/HomePage"));
+// const ProductHome = React.lazy(() =>
+//   import("../pages/HomePage/ContentHome/ProductHome/ProductHome")
+// );
+const CategoryHome = React.lazy(() =>
+  import("../pages/HomePage/ContentHome/ProductHome/ProductHome")
+);
+const DetailProduct = React.lazy(() =>
+  import("../pages/HomePage/ContentHome/DetailsProduct/DetailProduct.jsx")
+);
+const ProFileUser = React.lazy(() =>
+  import("../pages/HomePage/ContentHome/ProfileUserHome/ProFileUser")
+);
+const AdminPage = React.lazy(() => import("../pages/AdminPage/index"));
+const OderAdmin = React.lazy(() =>
+  import("../pages/AdminPage/ContentAdmin/ProductAdmin/ProductAdmin")
+);
+const UserAdmin = React.lazy(() =>
+  import("../pages/AdminPage/ContentAdmin/UserAdmin/UserAdmin")
+);
+
 const PrivateUser = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
@@ -63,15 +85,23 @@ const PrivateUser = () => {
     const res = await UserService.getDetailUser(id, accessTokenValue);
     dispatch(updateUser({ ...res?.data, access_Token: token }));
   };
-  return <Outlet />;
+  return (
+    <Suspense fallback={<IsLoadingComponent></IsLoadingComponent>}>
+      <Outlet />
+    </Suspense>
+  );
 };
 
 const PrivateRouteAdmin = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   if (user?.isAdmin === true || user?.access_Token) {
-    return <Outlet />;
-  } else if (user?.isAdmin === false || user?.access_Token === '') {
+    return (
+      <Suspense fallback={<IsLoadingComponent></IsLoadingComponent>}>
+        <Outlet />
+      </Suspense>
+    );
+  } else if (user?.isAdmin === false || user?.access_Token === "") {
     return navigate("/");
   }
 };
@@ -112,14 +142,14 @@ export default createBrowserRouter([
             path: "/admin",
             children: [
               {
-                element: <OderAdmin/>,
-                path: 'san-pham'
+                element: <OderAdmin />,
+                path: "san-pham",
               },
               {
-                element: <UserAdmin/>,
-                path: 'nguoi-dung'
-              }
-            ]
+                element: <UserAdmin />,
+                path: "nguoi-dung",
+              },
+            ],
           },
         ],
       },

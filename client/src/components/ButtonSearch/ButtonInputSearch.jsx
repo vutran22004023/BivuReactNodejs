@@ -20,6 +20,7 @@ export default function ButtonInputSearch(props) {
         borderRadius = 'none'
         className="input-no-border-radius"
         style={{backgroundColor: backgroundColorInput,borderRadius: 'none'}}
+        {...props}
         />
 
         <Button size ={size}

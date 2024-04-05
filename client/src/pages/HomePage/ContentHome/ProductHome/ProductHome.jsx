@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useState,useRef} from 'react'
 import Sider1 from '../../../../assets/font-end/imgs/slides/side1.png'
 import Sider2 from '../../../../assets/font-end/imgs/slides/side2.png'
 import SiderConponent from '../../../../components/SiderConponent/SiderConponent'
@@ -8,15 +8,60 @@ import { WapperButton } from './style'
 import product1 from '../../../../assets/font-end/imgs/Product/product1.png'
 import {useQuery} from '@tanstack/react-query'
 import {ProductService}from '../../../../services/index'
+import {useSelector,useDispatch} from 'react-redux'
+import {DataSearchProduct,IsloadingSearchProduct,IsloadingSearchProductFebounce} from '../../../../redux/Slides/productSlide'
 export default function ProductHome() {
+  const dispatch = useDispatch();
+  const productSearch = useSelector((state) => state.product.search)
+  const [stateProduct, setStateProduct] = useState([])
+  const refSearch = useRef()
+  // Hàm debounce
+  const [isDebounceLoading, setIsDebounceLoading] = useState(false);
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return function (...args) {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setIsDebounceLoading(false); // Thiết lập trạng thái loading khi debounce kết thúc
+        func.apply(this, args);
+      }, delay);
+    };
+  };
+  const fetchProductAll = async (search) => {
+    if (!productSearch.isInputEmpty) { // Kiểm tra nếu ô input không rỗng
+      const res = await ProductService.getAllProduct(search);
+      if (search?.length > 0) {
+        setStateProduct(res?.data);
+      }
+      return res;
+    } else {
+      setStateProduct([]); // Cập nhật stateProduct về mảng rỗng nếu ô input rỗng
+      return ''; // Trả về giá trị rỗng
+    }
+  };
+  const debouncedFetch = useRef(debounce(fetchProductAll, 300));
 
-  const fetchProductAll = async() => {
-    
-    const res =  await ProductService.getAllProduct()
-    return res
-  }
 
-  const { isLoading, data:products } = useQuery({queryKey: ['products'], queryFn: fetchProductAll, retryDelay: 1000});
+  useEffect(() => {
+    if (refSearch.current) {
+      setIsDebounceLoading(true); 
+      debouncedFetch.current(productSearch);
+    }
+    refSearch.current = true;
+  }, [productSearch]);
+  
+
+
+  const { data:products,isPending:isLoadingProducts } = useQuery({queryKey: ['products'], queryFn: fetchProductAll, retryDelay: 10000});
+  useEffect(() =>{
+    if(products?.length > 0) {
+      setStateProduct(products)
+    }
+  }, [products])
+  // đẩy dữ liệu qua redux
+      dispatch(DataSearchProduct(stateProduct));
+      dispatch(IsloadingSearchProduct(isLoadingProducts));
+      dispatch(IsloadingSearchProductFebounce(isDebounceLoading))
   return (
     <div id='container' style={{padding: ' 0 130px', marginTop: '20px' }}>
         <Row>

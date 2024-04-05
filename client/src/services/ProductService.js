@@ -42,9 +42,15 @@ const getDetailProduct= async (id) => {
     return res.data
 }
 
-const getAllProduct = async () => {
-    const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/all-products`)
-    return res.data
+const getAllProduct = async (search) => {
+    if(search.length > 0) {
+        const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/all-products?filter=name&filter=${search}`)
+        return res.data
+
+    }else {
+        const res =await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/all-products`)
+        return res.data
+    }
 }
 
 

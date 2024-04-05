@@ -1,4 +1,4 @@
-import { Avatar, Col, Image } from "antd";
+import { Avatar, Col, Image,List } from "antd";
 import React, { useEffect, useState } from "react";
 import {
   WrapperHeaderTop,
@@ -25,6 +25,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { UserService } from "../../services/index";
 import { useNavigate } from "react-router-dom";
 import { resetUser } from "../../redux/Slides/userSlide";
+import {SearchProduct,SearchisInputEmpty} from '../../redux/Slides/productSlide'
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import {
   Box,
@@ -33,7 +34,6 @@ import {
   Divider,
   Grid,
   Tab,
-  List,
   ListItem,
   ListItemButton,
   ListItemText,
@@ -46,22 +46,34 @@ import LoginComponent from "../Login-RegisterComponent/Login";
 import RegisterComponent from "../Login-RegisterComponent/Register";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
-
+import IsLoadingComponent from '../LoadComponent/Loading'
 export default function headerHome() {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
+  const productSearch = useSelector((state) => state.product);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState("");
   const [userAvatar, setUserAvatar] = useState("");
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("1");
+  const [search,setSearch] = useState('')
+  const [showList, setShowList] = useState(false);
+  const [isInputEmpty, setIsInputEmpty] = useState(true);
+  const handleSearchInputFocus = () => {
+    setShowList(true);
+  };
+  const handleSearchInputBlur = () => {
+    setShowList(false);
+  };
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
+
+  //Xử lý phần Loading Logout
   const handLogout = async () => {
     localStorage.removeItem("access_Token");
     document.cookie =
@@ -205,8 +217,22 @@ export default function headerHome() {
   );
 
 
+  const handleSearchInput = (e) => {
+    setSearch(e.target.value)
+    dispatch(SearchProduct(e.target.value))
+    setIsInputEmpty(e.target.value.trim() === ''); 
+  } 
+  useEffect(()=> {
+    // setIsInputEmpty(isInputEmpty)
+  },[isInputEmpty])
+  dispatch(SearchisInputEmpty(isInputEmpty))
 
-  
+
+  const dataSearch = productSearch?.dataSearch?.map((item, index) => {
+    return {
+      title: item.name, 
+    };
+  });
   return (
     <div>
       <WrapperHeaderTop style={{ textAlign: "center" }}>
@@ -238,13 +264,41 @@ export default function headerHome() {
           }}/>
         </Col> */}
         <Col span={14}>
-          <ButtonInputSearch
-            size="large"
-            placeholder="Nhập dữ liệu"
-            textButton="Tìm kiếm"
-          />
+        <div style={{ position: 'relative' }}>
+  <ButtonInputSearch
+    size="large"
+    placeholder="Nhập dữ liệu"
+    textButton="Tìm kiếm"
+    onChange={handleSearchInput}
+    onFocus={handleSearchInputFocus}
+    onBlur={handleSearchInputBlur}
+  />
+  {showList && (
+    <IsLoadingComponent isLoading={productSearch?.isLoadingData ||productSearch?.isLoadingDebounce }>
+  <List
+    ordered
+    dataSource={dataSearch}
+    style={{
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    width: '100%',
+    zIndex: 10000,
+    backgroundColor: '#FFFFFF',
+    padding: 10,
+    marginTop: 1,
+    boxShadow: '10px 0px 15px -10px rgba(0,0,0,0.75), -10px 0px 15px -10px rgba(0,0,0,0.75), 0px 10px 15px -10px rgba(0,0,0,0.75)'
+  }}
+    renderItem={(item,index) => (
+      <List.Item>
+        {item.title}
+      </List.Item>
+    )}
+  />
+  </IsLoadingComponent>
+)}
+</div>
         </Col>
-
         <Col
           span={6}
           style={{ textAlign: "left", display: "flex", gap: "10px" }}

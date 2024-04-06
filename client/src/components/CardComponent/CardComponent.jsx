@@ -1,6 +1,7 @@
 import React from "react";
 import { Card } from "antd";
 const { Meta } = Card;
+import "../../assets/font-end/css/Home.css";
 import { StyleNameProduct,
    WrapperReporText,
    WrapperPriceText,
@@ -9,8 +10,13 @@ import { StyleNameProduct,
    
    } from "./style";
 import { StarFilled } from "@ant-design/icons";
-export default function CardConponent(props) {
+
+
+
+
+const CardComponent =(props) => {
   const {counInStock, description, image, name, price,rating,type,discount,selled} = props
+  
   return (
     <WapperCardStyled
       hoverable
@@ -18,6 +24,7 @@ export default function CardConponent(props) {
       cover={
         <img
           alt="example"
+          loading="lazy"
           src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
         />
       }
@@ -33,9 +40,39 @@ export default function CardConponent(props) {
         <span>| Đã Bán 1000+</span>
       </WrapperReporText>
       <WrapperPriceText>
-        <span>{price} đ</span>
+      <span>{price.toLocaleString()} đ</span>
         <span><WrapperDisscountText>-5%</WrapperDisscountText></span>
       </WrapperPriceText>
     </WapperCardStyled>
   );
+
 }
+
+const CardLoading =() =>{
+  return (
+    <WapperCardStyled
+      hoverable
+      bodyStyle={{ padding: "13px" }}
+      className="movie--isloading"
+      cover={
+        <div className="loading-image"></div>
+      }
+    >
+      <StyleNameProduct><div className="loading-main-text"></div></StyleNameProduct>
+      <WrapperReporText>
+      <div className="loading-text-container">
+        <div className="loading-main-text"></div>
+        <div className="loading-sub-text"></div>
+      </div>
+      </WrapperReporText>
+      <WrapperPriceText>
+        <div className="loading-main-text"></div>
+        <div className="loading-sub-text"></div>
+      </WrapperPriceText>
+    </WapperCardStyled>
+  );
+}
+
+CardComponent.CardLoading = CardLoading
+
+export default CardComponent;

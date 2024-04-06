@@ -14,6 +14,10 @@ import { updateUser } from "../redux/Slides/userSlide";
 // import OderAdmin from "../pages/AdminPage/ContentAdmin/ProductAdmin/ProductAdmin";
 // import UserAdmin from "../pages/AdminPage/ContentAdmin/UserAdmin/UserAdmin";
 import IsLoadingComponent from "../components/LoadComponent/Loading.jsx";
+
+
+//sử dụng Code Splitting
+
 const HomePage = React.lazy(() => import("../pages/HomePage"));
 // const ProductHome = React.lazy(() =>
 //   import("../pages/HomePage/ContentHome/ProductHome/ProductHome")
@@ -34,6 +38,9 @@ const OderAdmin = React.lazy(() =>
 const UserAdmin = React.lazy(() =>
   import("../pages/AdminPage/ContentAdmin/UserAdmin/UserAdmin")
 );
+
+
+
 
 const PrivateUser = () => {
   const dispatch = useDispatch();

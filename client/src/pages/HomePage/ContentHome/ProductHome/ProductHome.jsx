@@ -3,65 +3,86 @@ import Sider1 from '../../../../assets/font-end/imgs/slides/side1.png'
 import Sider2 from '../../../../assets/font-end/imgs/slides/side2.png'
 import SiderConponent from '../../../../components/SiderConponent/SiderConponent'
 import CardComponent from '../../../../components/CardComponent/CardComponent'
-import { Button, Col, Row, Image } from 'antd'
+import IsLoadingComponent from '../../../../components/LoadComponent/Loading'
+import { Button, Col, Row, Image  } from 'antd'
 import { WapperButton } from './style'
 import product1 from '../../../../assets/font-end/imgs/Product/product1.png'
 import {useQuery} from '@tanstack/react-query'
 import {ProductService}from '../../../../services/index'
 import {useSelector,useDispatch} from 'react-redux'
+import {useDebounce} from '../../../../hooks/UseMutationHook'
 import {DataSearchProduct,IsloadingSearchProduct,IsloadingSearchProductFebounce} from '../../../../redux/Slides/productSlide'
+import IsLoadingCardComponent from '../../../../components/LoadComponent/LoadingCard'
 // import {debounce} from '../../../../hooks/UseMutationHook'
 export default function ProductHome() {
   const dispatch = useDispatch();
   const productSearch = useSelector((state) => state.product.search)
+  const searchDebouned = useDebounce(productSearch, 500)
   const [stateProduct, setStateProduct] = useState([])
   const refSearch = useRef()
+  const [limit, setLimit] = useState(6)
   // Hàm debounce
   const [isDebounceLoading, setIsDebounceLoading] = useState(false);
 
-  const fetchProductAll = async (search) => {
+  // const fetchProductAll = async (search) => {
+  //   if (!productSearch.isInputEmpty) { // Kiểm tra nếu ô input không rỗng
+  //     const res = await ProductService.getAllProduct(search);
+  //     if (search?.length > 0) {
+  //       setStateProduct(res?.data);
+  //     }
+  //     return res;
+  //   } else {
+  //     setStateProduct([]); // Cập nhật stateProduct về mảng rỗng nếu ô input rỗng
+  //     return ''; // Trả về giá trị rỗng
+  //   }
+  // };
+  const fetchProductAll = async (context) => {
+    const limit = context.queryKey[1]
+    const search = context.queryKey[2]
+    // console.log(limit, search)
     if (!productSearch.isInputEmpty) { // Kiểm tra nếu ô input không rỗng
-      const res = await ProductService.getAllProduct(search);
+      const res = await ProductService.getAllProduct(limit,search);
       if (search?.length > 0) {
         setStateProduct(res?.data);
       }
       return res;
     } else {
       setStateProduct([]); // Cập nhật stateProduct về mảng rỗng nếu ô input rỗng
-      return ''; // Trả về giá trị rỗng
+      const res = await ProductService.getAllProduct(limit,search);
+      return res; // Trả về giá trị rỗng
     }
   };
 
-  const debounce = (func, delay) => {
-    let timeoutId;
-    return function (...args) {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        setIsDebounceLoading(false); // Thiết lập trạng thái loading khi debounce kết thúc
-        func.apply(this, args);
-      }, delay);
-    };
-  };
-  //tạo độ trể khi người dùng nhập input
-  const debouncedFetch = useRef(debounce(fetchProductAll, 300));
+  const fetchProductAllLimit = async (context) => {
+    const limit = context.queryKey[1]
+    const search = ''
+      const res = await ProductService.getAllProduct(limit,search);
+      return res; 
+    }
+
+
 
 
   useEffect(() => {
     if (refSearch.current) {
-      setIsDebounceLoading(true); 
-      debouncedFetch.current(productSearch);
+      fetchProductAll(searchDebouned)
+
     }
     refSearch.current = true;
-  }, [productSearch]);
+  }, [searchDebouned]);
   
 
 
-  const { data:products,isPending:isLoadingProducts } = useQuery({queryKey: ['products'], queryFn: fetchProductAll, retryDelay: 10000});
+  const { data:products,isLoading:isLoadingProducts } = useQuery({queryKey: ['products', limit,searchDebouned], queryFn: fetchProductAll});
+  const { data: productsLimit, isLoading: isLoadingProductsLimit, isPreviousData } = useQuery({ queryKey: ['productsLimit', limit], queryFn: fetchProductAllLimit,keepPreviousData: true, retry:3, retryDelay: 1000 });
+  console.log(isPreviousData)
   useEffect(() =>{
     if(products?.length > 0) {
       setStateProduct(products)
-    }
+    }   
   }, [products])
+  useEffect(() => {
+  },[isPreviousData])
   // đẩy dữ liệu qua redux
       dispatch(DataSearchProduct(stateProduct));
       dispatch(IsloadingSearchProduct(isLoadingProducts));
@@ -86,9 +107,17 @@ export default function ProductHome() {
           <Image src={product1}  preview={false} height="250px" width={'100%'}/>
           </Col>
         </Row>
-        <div style={{marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent:'space-around',flexWrap: 'wrap'}}>
-          {products?.data?.map((product)=> {
+
+        {isLoadingProductsLimit ? (
+          <IsLoadingCardComponent></IsLoadingCardComponent>
+        ): (
+          <>
+          <div style={{marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent:'space-around',flexWrap: 'wrap'}}>
+        
+          { productsLimit?.data?.map((product)=> {
             return (
+              <>
+              
               <CardComponent
               key={product._id}
               counInStock ={product.counInStock}
@@ -101,11 +130,23 @@ export default function ProductHome() {
               discount = {product.discount}
               selled = {product.selled}
               />
+              </>
             )
           })}
+
+
         </div>
+          {isPreviousData ? (
+            <IsLoadingCardComponent style={{marginTop: '10px'}}></IsLoadingCardComponent>
+          ): ''}
+        </>
+        )}
+        
+        {/* </IsLoadingComponent> */}
         <div style={{width:'100%', display: 'flex', justifyContent: 'center',marginTop: '10px'}}>
-          <WapperButton size='ouline'>Xem thêm</WapperButton>
+          <WapperButton 
+          disabled={productsLimit?.total === productsLimit?.data?.length}
+          size='ouline' onClick={() =>  setLimit((prev) =>prev+ 6 )}>Xem thêm</WapperButton>
         </div>
     </div>
   )

@@ -1,4 +1,4 @@
-import { Col, Row, Image, Space, InputNumber, Button } from "antd";
+import { Col, Row, Image, Space, InputNumber, Button,Rate } from "antd";
 import React, { useState, useEffect, useRef } from "react";
 import Slider from "react-slick";
 import { StarFilled,ShoppingCartOutlined} from "@ant-design/icons";
@@ -17,7 +17,9 @@ import {
   WapperStyleBlockProductBottom,
   WapperStyleButtonAddProduct,
 } from "./style";
-
+import {ProductService} from '../../services/index'
+import {useQuery} from '@tanstack/react-query'
+import IsLoadingComponent from '../LoadComponent/Loading'
 export const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;
   return (
@@ -40,9 +42,11 @@ export const SamplePrevArrow = (props) => {
   );
 };
 
-export default function ProductDetail() {
+export default function ProductDetail({idProduct}) {
+  const[numberProduct, setNumberProduct] = useState(1)
   const onChange = (value) => {
-    console.log("changed", value);
+    setNumberProduct(value + 1 )
+    console.log(numberProduct)
   };
   const settings1 = {
     nextArrow: <SampleNextArrow />,
@@ -64,7 +68,22 @@ export default function ProductDetail() {
     setNav1(sliderRef1);
     setNav2(sliderRef2);
   }, []);
+
+
+  const fetchGetDetailsProduct = async (context) => {
+    const id = context?.queryKey[1]
+    
+    if(id) {
+      const res = await ProductService.getDetailProduct(id)
+      return res.data
+    }
+  }
+
+  const {data: productDetail, isLoading: IsLoadingProductDetail} = useQuery({queryKey: ['products-detail', idProduct], queryFn: fetchGetDetailsProduct, enabled: !!idProduct});
+
+
   return (
+    <IsLoadingComponent isLoading={IsLoadingProductDetail}>
     <Row>
       <Col style={{ padding: "30px" }} span={9}>
         <Slider
@@ -101,31 +120,17 @@ export default function ProductDetail() {
       <Col span={15} style={{ marginTop: "10px", paddingRight: "20px" }}>
         <WapperStyleBlockProduct>
           <WapperStyleNameProduct>
-            Combo 2 Sữa rửa mặt Simple giúp kiềm dầu và ngừa mụn hiệu quả - cho
-            da mụn nhạy cảm 150ml [CHÍNH HÃNG ĐỘC QUYỀN] [DIỆN MẠO MỚI]
+          {productDetail?.name}
           </WapperStyleNameProduct>
 
           <div>
-            <StarFilled
-              style={{ fontSize: "15px", color: "yellow", marginTop: "4px" }}
-            />
-            <StarFilled
-              style={{ fontSize: "15px", color: "yellow", marginTop: "4px" }}
-            />
-            <StarFilled
-              style={{ fontSize: "15px", color: "yellow", marginTop: "4px" }}
-            />
-            <StarFilled
-              style={{ fontSize: "15px", color: "yellow", marginTop: "4px" }}
-            />
-            <StarFilled
-              style={{ fontSize: "15px", color: "yellow", marginTop: "4px" }}
-            />
+          <Rate allowHalf  defaultValue={productDetail?.rating} style={{ fontSize: "15px", color: "yellow", marginTop: "4px" }} />
+
             <span>(Xem 5 đánh giá) | Đã bán 34</span>
           </div>
 
           <WapperStylePriceProduct>
-            <WapperStyleTextPriceProduct>200.000 đ</WapperStyleTextPriceProduct>
+            <WapperStyleTextPriceProduct>{productDetail?.price.toLocaleString()} đ</WapperStyleTextPriceProduct>
           </WapperStylePriceProduct>
         </WapperStyleBlockProduct>
 
@@ -166,6 +171,7 @@ export default function ProductDetail() {
                 max={100000}
                 defaultValue={1}
                 onChange={onChange}
+                value={numberProduct}
               />
             </Space>
           </div>
@@ -197,5 +203,6 @@ export default function ProductDetail() {
         </WapperStyleButtonAddProduct>
       </Col>
     </Row>
+    </IsLoadingComponent>
   );
 }

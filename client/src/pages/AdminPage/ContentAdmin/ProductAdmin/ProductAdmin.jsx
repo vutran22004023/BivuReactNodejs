@@ -156,9 +156,10 @@ export default function ProductAdmin() {
     return res.data
   });
   // api get all products
-  const fetchProductAll = async() => {
-    
-    const res =  await ProductService.getAllProduct()
+  const fetchProductAll = async(context) => {
+    const search = ''
+    const limit = ''
+    const res =  await ProductService.getAllProduct(limit,search)
     return res
   }
 
@@ -201,11 +202,11 @@ export default function ProductAdmin() {
 // các biến dữ liệu
   const { data, isPending, isSuccess, isError } = mutation;
   const queryProduct = useQuery({queryKey: ['products'], queryFn: fetchProductAll, retryDelay: 1000, staleTime: 1000});
-  const { isPending:isLoadingProducts, data:products } =queryProduct
+  const { isLoading:isLoadingProducts, data:products } =queryProduct
   const dataAllProduct = products?.data
-  const { data: dataUpdate, isPending: dataUpdateisLoading } = mutationUpdate;
-  const {data: dataDelete, isPending: dataDeleteisLoading } =mutationDelete;
-  const {data:dataDeleteMany, isPending: dataDeleteisLoadingMany} =mutationDeleteMany
+  const { data: dataUpdate, isLoading: dataUpdateisLoading } = mutationUpdate;
+  const {data: dataDelete, isLoading: dataDeleteisLoading } =mutationDelete;
+  const {data:dataDeleteMany, isLoading: dataDeleteisLoadingMany} =mutationDeleteMany
 
   // xử lý search trong table
   const [searchText, setSearchText] = useState('');

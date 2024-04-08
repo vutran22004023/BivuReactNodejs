@@ -10,22 +10,30 @@ import { StyleNameProduct,
    
    } from "./style";
 import { StarFilled } from "@ant-design/icons";
+import { useNavigate } from 'react-router-dom';
+
 
 
 
 
 const CardComponent =(props) => {
-  const {counInStock, description, image, name, price,rating,type,discount,selled} = props
-  
+  const {counInStock, description, image, name, price,rating,type,discount,selled,id} = props
+  const navigate = useNavigate()
+  const handleDetailsProduct =(id) => {
+    navigate(`/chi-tiet/${id}`)
+  }
   return (
     <WapperCardStyled
       hoverable
       bodyStyle={{ padding: "13px" }}
+      onClick={()=> handleDetailsProduct(id)}
       cover={
         <img
           alt="example"
           loading="lazy"
-          src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
+          src={image}
+          width='100%'
+          height='250px'
         />
       }
     >

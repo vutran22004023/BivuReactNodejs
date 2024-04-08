@@ -167,6 +167,21 @@ const deleteProductMany = async(ids) => {
   }
 }
 
+const getAllTypeProduct = async() => {
+  try {
+
+    const allType = await ProductModel.distinct('type');
+    return {
+      status: 200,
+      message: `Xóa thành công`,
+      data: allType
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
+
 
 export default {
     createProduct,
@@ -174,5 +189,6 @@ export default {
     deleteProduct,
     getAllProduct,
     getDetailProduct,
-    deleteProductMany
+    deleteProductMany,
+    getAllTypeProduct
 }

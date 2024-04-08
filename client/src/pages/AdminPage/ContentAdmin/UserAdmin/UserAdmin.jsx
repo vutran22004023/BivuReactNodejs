@@ -312,12 +312,12 @@ export default function UserAdmin() {
 
     // các biên show dữ liệu ra client
     const queryUser = useQuery({queryKey: ['AllUser'], queryFn: fetchUserAll, retryDelay: 1000, staleTime: 1000});
-    const {data,isPending} = mutation;
-    const {data:Users, isPending: isLoadingUserAll} = queryUser
+    const {data,isLoading} = mutation;
+    const {data:Users, isLoading: isLoadingUserAll} = queryUser
     const dataAllUser = Users?.data.allUser
-    const {data:UsersUpdateDetail,isPending: isLoadingUpdateUserDetail} = mutationUpdate
-    const {data:DeleteUser, isPending: isLoadingDeleteUser} = mutationDelete
-    const {data:dataDeleteMany, isPending: dataDeleteisLoadingMany} =mutationDeleteMany
+    const {data:UsersUpdateDetail,isLoading: isLoadingUpdateUserDetail} = mutationUpdate
+    const {data:DeleteUser, isLoading: isLoadingDeleteUser} = mutationDelete
+    const {data:dataDeleteMany, isLoading: dataDeleteisLoadingMany} =mutationDeleteMany
     // show status khi submit dữ liệu tới server
     useEffect(() => {
         if(data?.status === 200) {
@@ -504,7 +504,7 @@ export default function UserAdmin() {
           onCancel={handleCancel}
           okText="Submit"
         >
-          <LoadingComponent isLoading = {isPending}>
+          <LoadingComponent isLoading = {isLoading}>
           <Form
             name="basic"
             labelCol={{

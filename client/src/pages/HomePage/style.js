@@ -36,14 +36,13 @@ export const WrapperHeaderSpan = styled.span`
 `
 
 export const WrapperHeaderTypeProduct = styled.div`
-    display: flex;
-    align-items: center;
+    /* align-items: center;
     gap: 16px;
     justify-content: flex-start;
     padding: 0 130px;
     background-color: #60609B;
     height: 50px;
-    color: #fff
+    color: #fff */
 `
 
 

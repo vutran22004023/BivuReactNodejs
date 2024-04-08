@@ -1,5 +1,5 @@
 import { Avatar, Col, Image,List } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useRef } from "react";
 import {
   WrapperHeaderTop,
   WrapperHeaderMid,
@@ -47,19 +47,59 @@ import RegisterComponent from "../Login-RegisterComponent/Register";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
 import IsLoadingComponent from '../LoadComponent/Loading'
+import {useDebounce} from '../../hooks/UseMutationHook'
+import {ProductService}from '../../services/index'
+import {useQuery} from '@tanstack/react-query'
+import Slider from "react-slick";
+
+
+export const SampleNextArrow = (props) => {
+  const { className, style, onClick } = props;
+  return (
+    <div
+      className={className}
+      style={{ ...style, display: "block" }}
+      onClick={onClick}
+    />
+  );
+};
+
+export const SamplePrevArrow = (props) => {
+  const { className, style, onClick } = props;
+  return (
+    <div
+      className={className}
+      style={{ ...style, display: "block" }}
+      onClick={onClick}
+    />
+  );
+};
+
+
 export default function headerHome() {
+  const settings = {
+    infinite: true,
+    slidesToShow: 10,
+    slidesToScroll: 10,
+    nextArrow: <SampleNextArrow />,
+    prevArrow: <SamplePrevArrow />,
+  };
+  //các biến 
+  const refSearch = useRef()
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
-  const productSearch = useSelector((state) => state.product);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState("");
   const [userAvatar, setUserAvatar] = useState("");
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("1");
-  const [search,setSearch] = useState('')
+  const [searchInput,setSearch] = useState('')
   const [showList, setShowList] = useState(false);
   const [isInputEmpty, setIsInputEmpty] = useState(true);
+  const searchDebouned = useDebounce(searchInput, 500)
+  const [limit, setLimit] = useState(6)
+  // đóng mở List trong search
   const handleSearchInputFocus = () => {
     setShowList(true);
   };
@@ -72,7 +112,29 @@ export default function headerHome() {
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
+  // api lấy dữ liệu search
+  const fetchProductAll = async (context) => {
+    const limit = context.queryKey[1]
+    const search = context.queryKey[2]
+      const res = await ProductService.getAllProduct(limit,search);
+      return res;
+  };
 
+  const fetchTypeProduct = async () => {
+      const res = await ProductService.getAllTypeProduct();
+      return res;
+  };
+
+    useEffect(() => {
+    if (refSearch.current) {
+      fetchProductAll(searchDebouned)
+
+    }
+    refSearch.current = true;
+  }, [searchDebouned]);
+
+  const { data:products,isLoading:isLoadingProducts } = useQuery({queryKey: ['products', limit,searchDebouned], queryFn: fetchProductAll});
+  const { data:productType,isLoading:isLoadingProductType } = useQuery({queryKey: ['productsType'], queryFn: fetchTypeProduct});
   //Xử lý phần Loading Logout
   const handLogout = async () => {
     localStorage.removeItem("access_Token");
@@ -216,19 +278,13 @@ export default function headerHome() {
     </Box>
   );
 
-
+// onchange nhập input 
   const handleSearchInput = (e) => {
     setSearch(e.target.value)
-    dispatch(SearchProduct(e.target.value))
-    setIsInputEmpty(e.target.value.trim() === ''); 
   } 
-  useEffect(()=> {
-    // setIsInputEmpty(isInputEmpty)
-  },[isInputEmpty])
-  dispatch(SearchisInputEmpty(isInputEmpty))
 
-
-  const dataSearch = productSearch?.dataSearch?.map((item, index) => {
+// biến dữ liệu của search
+  const dataSearch = products?.data?.map((item, index) => {
     return {
       title: item.name, 
     };
@@ -274,7 +330,7 @@ export default function headerHome() {
     onBlur={handleSearchInputBlur}
   />
   {showList && (
-    <IsLoadingComponent isLoading={productSearch?.isLoadingData ||productSearch?.isLoadingDebounce }>
+    <IsLoadingComponent isLoading={isLoadingProducts}>
   <List
     ordered
     dataSource={dataSearch}
@@ -359,11 +415,21 @@ export default function headerHome() {
           </WrapperHeaderCart>
         </Col>
       </WrapperHeaderMid>
-
-      <WrapperHeaderTypeProduct>
-        {arr.map((item) => {
-          return <TypeProduct name={item} key={item} />;
+      <WrapperHeaderTypeProduct style={{alignItems: 'center',
+    gap: '16px',
+    justifyContent: 'flex-start',
+    padding: '0 160px',
+    backgroundColor: '#60609B',
+    height: '50px',
+    color: '#fff',
+    }}>
+      <Slider {...settings}>
+        {productType?.data?.map((item) => {
+          return (
+              <TypeProduct  name={item} key={item} />
+          )
         })}
+        </Slider>
       </WrapperHeaderTypeProduct>
     </div>
   );

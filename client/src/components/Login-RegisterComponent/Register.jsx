@@ -44,7 +44,7 @@ export default function Register() {
 
   //Api login
   const mutation = useMutationHooks((data) => UserService.RegistUser(data));
-  const { data, isPending, isSuccess, isError } = mutation;
+  const { data, isLoading, isSuccess, isError } = mutation;
   console.log(mutation)
   useEffect(() => {
     if (data?.status == 200) {
@@ -135,7 +135,7 @@ export default function Register() {
           {data?.message}
         </div>
       )}
-      <IsLoadingComponent isLoading={isPending}>
+      <IsLoadingComponent isLoading={isLoading}>
       <ButtonFrom
         disabled={
           !name.length ||

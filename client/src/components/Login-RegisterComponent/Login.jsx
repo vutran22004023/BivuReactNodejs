@@ -29,7 +29,7 @@ export default function Login() {
 
   //Api login
   const mutation = useMutationHooks((data) => UserService.loginUser(data));
-  const { data, isPending, isSuccess, isError } = mutation;
+  const { data, isLoading: LoginIsLoading, isSuccess, isError } = mutation;
 
   useEffect(() => {
     if (data?.status == 200) {
@@ -81,7 +81,7 @@ export default function Login() {
               {data?.message}
             </div>
           )}
-          <IsLoadingComponent isLoading={isPending}>
+          <IsLoadingComponent isLoading={LoginIsLoading}>
           <ButtonFrom
             onClick={handleSignUp}
             disabled={!email.length || !password.length}

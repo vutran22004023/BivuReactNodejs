@@ -78,7 +78,7 @@ export const SamplePrevArrow = (props) => {
 
 export default function headerHome() {
   const settings = {
-    infinite: true,
+    infinite: false,
     slidesToShow: 10,
     slidesToScroll: 10,
     nextArrow: <SampleNextArrow />,
@@ -420,13 +420,13 @@ export default function headerHome() {
     justifyContent: 'flex-start',
     padding: '0 160px',
     backgroundColor: '#60609B',
-    height: '50px',
+    height: '48px',
     color: '#fff',
     }}>
       <Slider {...settings}>
-        {productType?.data?.map((item) => {
+         {productType?.data?.map((item, index) => {
           return (
-              <TypeProduct  name={item} key={item} />
+              <TypeProduct  name={item} />
           )
         })}
         </Slider>

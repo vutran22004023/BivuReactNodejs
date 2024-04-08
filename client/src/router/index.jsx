@@ -23,7 +23,7 @@ const HomePage = React.lazy(() => import("../pages/HomePage"));
 //   import("../pages/HomePage/ContentHome/ProductHome/ProductHome")
 // );
 const CategoryHome = React.lazy(() =>
-  import("../pages/HomePage/ContentHome/ProductHome/ProductHome")
+  import("../pages/HomePage/ContentHome/CategoryHome/CategoryHome.jsx")
 );
 const DetailProduct = React.lazy(() =>
   import("../pages/HomePage/ContentHome/DetailsProduct/DetailProduct.jsx")
@@ -128,7 +128,7 @@ export default createBrowserRouter([
           },
           {
             element: <CategoryHome />,
-            path: "/danh-muc",
+            path: "/danh-muc/:typename",
           },
           {
             element: <DetailProduct />,

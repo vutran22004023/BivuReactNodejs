@@ -42,3 +42,20 @@ export function openSidebar() {
       }
     }
   }
+
+  export const renderOptions = (arr) => {
+    let results = []; // Sử dụng let thay cho const
+    if (arr) {
+      results = arr?.map((opt) => {
+        return {
+          value: opt,
+          label: opt,
+        };
+      });
+    }
+    results.push({
+      label: 'Thêm type',
+      value: 'add_type',
+    });
+    return results;
+  };

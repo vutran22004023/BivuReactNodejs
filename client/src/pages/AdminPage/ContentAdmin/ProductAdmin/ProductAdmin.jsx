@@ -1,51 +1,60 @@
-import React, { useState, useEffect,useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useMutationHooks } from "../../../../hooks/UseMutationHook.js";
 import OrderTable from "../../../../components/AdminPageComponent/OrderTable.jsx";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import { Outlet } from "react-router-dom";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import { Modal, Form, Input, Upload, Avatar,Space  } from "antd";
-import { SearchOutlined } from '@ant-design/icons';
+import { Modal, Form, Input, Upload, Avatar, Space, Select } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import { getBase64 } from "../../../../utils.js";
 import { UploadOutlined, WarningOutlined } from "@ant-design/icons";
 import { ProductService } from "../../../../services/index.js";
 import { useSelector, useDispatch } from "react-redux";
-import axios from 'axios'
-import {useQuery} from '@tanstack/react-query'
-import IconButton, { iconButtonClasses } from '@mui/joy/IconButton';
-import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
-import {Menu,MenuButton,Dropdown, MenuItem, Divider,Button,Link,Typography,Box,Breadcrumbs } from '@mui/joy';
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
+import IconButton, { iconButtonClasses } from "@mui/joy/IconButton";
+import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
+import {
+  Menu,
+  MenuButton,
+  Dropdown,
+  MenuItem,
+  Divider,
+  Button,
+  Link,
+  Typography,
+  Box,
+  Breadcrumbs,
+} from "@mui/joy";
 import {
   success,
   error,
   warning,
 } from "../../../../components/MessageComponents/Message.jsx";
-import DrawerComponent from '../../../../components/DrawerComponent/Drawer.jsx'
-import LoadingComponent from '../../../../components/LoadComponent/Loading.jsx'
-import ModalComponent from '../../../../components/ModalComponent/Modal.jsx'
-
-
-
-
+import DrawerComponent from "../../../../components/DrawerComponent/Drawer.jsx";
+import LoadingComponent from "../../../../components/LoadComponent/Loading.jsx";
+import ModalComponent from "../../../../components/ModalComponent/Modal.jsx";
+import { renderOptions } from "../../../../utils.js";
 
 export default function ProductAdmin() {
-
   //button thêm sửa xóa
   const RowMenu = () => (
     <Dropdown>
       <MenuButton
         slots={{ root: IconButton }}
-        slotProps={{ root: { variant: 'plain', color: 'neutral', size: 'sm' } }}
+        slotProps={{ root: { variant: "plain", color: "neutral", size: "sm" } }}
       >
         <MoreHorizRoundedIcon />
       </MenuButton>
       <Menu size="sm" sx={{ minWidth: 140 }}>
-        <MenuItem onClick = {handleDetailProduct} >Chỉnh sửa</MenuItem>
+        <MenuItem onClick={handleDetailProduct}>Chỉnh sửa</MenuItem>
         {/* <MenuItem>Rename</MenuItem>
         <MenuItem>Move</MenuItem> */}
         <Divider />
-        <MenuItem color="danger" onClick={handleModalDelete}>Delete</MenuItem>
+        <MenuItem color="danger" onClick={handleModalDelete}>
+          Delete
+        </MenuItem>
       </Menu>
     </Dropdown>
   );
@@ -57,6 +66,7 @@ export default function ProductAdmin() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false);
+  const [typeSelect, setTypeSelect] = useState("");
   const [stateProduct, setStateProduct] = useState({
     name: "",
     image: "",
@@ -76,9 +86,7 @@ export default function ProductAdmin() {
     description: "",
   });
 
-  const [RowSelected,setRowSelected] = useState('')
-
-  
+  const [RowSelected, setRowSelected] = useState("");
 
   //trạng thái mở modal
   const showModal = () => {
@@ -98,7 +106,7 @@ export default function ProductAdmin() {
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
-// ochange dữ liệu khi nhập vào imput
+  // ochange dữ liệu khi nhập vào imput
   const handleOnchanges = (e) => {
     setStateProduct({
       ...stateProduct,
@@ -112,7 +120,7 @@ export default function ProductAdmin() {
       [e.target.name]: e.target.value,
     });
   };
-// xử lý phần file ảnh
+  // xử lý phần file ảnh
   const handleOnchangeAvatar = async ({ fileList }) => {
     const file = fileList[0];
     if (!file.url && !file.preview) {
@@ -134,83 +142,102 @@ export default function ProductAdmin() {
     });
   };
 
-
   const onFinish = () => {
     mutation.mutate(stateProduct, {
       onSettled: () => {
-        queryProduct.refetch()
-      }
+        queryProduct.refetch();
+      },
     });
   };
 
-
-
-//Api create product
-  const mutation =  useMutationHooks(async (data) => {
-    const access_Token =  user.access_Token.split("=")[1];
-        const res = await axios.post(`${import.meta.env.REACT_APP_API_URL}/product/create-product`,data,{
+  //Api create product
+  const mutation = useMutationHooks(async (data) => {
+    const access_Token = user.access_Token.split("=")[1];
+    const res = await axios.post(
+      `${import.meta.env.REACT_APP_API_URL}/product/create-product`,
+      data,
+      {
         headers: {
-            token: `Beare ${access_Token}`,
-        }
-    })
-    return res.data
+          token: `Beare ${access_Token}`,
+        },
+      }
+    );
+    return res.data;
   });
   // api get all products
-  const fetchProductAll = async(context) => {
-    const search = ''
-    const limit = ''
-    const res =  await ProductService.getAllProduct(limit,search)
-    return res
-  }
+  const fetchProductAll = async (context) => {
+    const search = "";
+    const limit = "";
+    const res = await ProductService.getAllProduct(limit, search);
+    return res;
+  };
 
   // api update product id
-  const mutationUpdate= useMutationHooks((data) => {
-    const {id, ...rests} = data;
-    const access_Token =  user?.access_Token.split("=")[1];
-    const res = ProductService.updatedDetailProduct(RowSelected, data,access_Token)
+  const mutationUpdate = useMutationHooks((data) => {
+    const { id, ...rests } = data;
+    const access_Token = user?.access_Token.split("=")[1];
+    const res = ProductService.updatedDetailProduct(
+      RowSelected,
+      data,
+      access_Token
+    );
     return res;
-  }
-  )
+  });
 
   //api delete product
-  const mutationDelete= useMutationHooks(() => {
-
-    const access_Token =  user?.access_Token.split("=")[1];
-    const res = ProductService.DeleteDetailProduct(RowSelected,access_Token)
+  const mutationDelete = useMutationHooks(() => {
+    const access_Token = user?.access_Token.split("=")[1];
+    const res = ProductService.DeleteDetailProduct(RowSelected, access_Token);
 
     return res;
-  })
+  });
   // api delete many products
-  const mutationDeleteMany= useMutationHooks((data) => {
-    const {access_Token, ...id} = data
-    const res = ProductService.DeleteManyProduct(id,access_Token)
+  const mutationDeleteMany = useMutationHooks((data) => {
+    const { access_Token, ...id } = data;
+    const res = ProductService.DeleteManyProduct(id, access_Token);
     return res;
-  })
-  
+  });
 
   const handleDeleteMany = (ids) => {
     // console.log('_id', {_id})
-    const access_Token =  user?.access_Token.split("=")[1];
-    mutationDeleteMany.mutate({id: ids, access_Token: access_Token},{
-      onSettled: () => {
-        queryProduct.refetch()
+    const access_Token = user?.access_Token.split("=")[1];
+    mutationDeleteMany.mutate(
+      { id: ids, access_Token: access_Token },
+      {
+        onSettled: () => {
+          queryProduct.refetch();
+        },
       }
-    })
-  }
+    );
+  };
 
+  const fetchTypeProduct = async () => {
+    const res = await ProductService.getAllTypeProduct();
+    return res;
+  };
 
-// các biến dữ liệu
-  const { data, isPending, isSuccess, isError } = mutation;
-  const queryProduct = useQuery({queryKey: ['products'], queryFn: fetchProductAll, retryDelay: 1000, staleTime: 1000});
-  const { isLoading:isLoadingProducts, data:products } =queryProduct
-  const dataAllProduct = products?.data
+  // các biến dữ liệu
+  const { data, isLoading: isLoadingCreateProduct, isSuccess, isError } = mutation;
+  const queryProduct = useQuery({
+    queryKey: ["products"],
+    queryFn: fetchProductAll,
+    retryDelay: 1000,
+    staleTime: 1000,
+  });
+  const { isLoading: isLoadingProducts, data: products } = queryProduct;
+  const dataAllProduct = products?.data;
   const { data: dataUpdate, isLoading: dataUpdateisLoading } = mutationUpdate;
-  const {data: dataDelete, isLoading: dataDeleteisLoading } =mutationDelete;
-  const {data:dataDeleteMany, isLoading: dataDeleteisLoadingMany} =mutationDeleteMany
+  const { data: dataDelete, isLoading: dataDeleteisLoading } = mutationDelete;
+  const { data: dataDeleteMany, isLoading: dataDeleteisLoadingMany } =
+    mutationDeleteMany;
+  const { data: productType, isLoading: isLoadingProductType } = useQuery({
+    queryKey: ["productsType"],
+    queryFn: fetchTypeProduct,
+  });
 
   // xử lý search trong table
-  const [searchText, setSearchText] = useState('');
-  const [searchedColumn, setSearchedColumn] = useState('');
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -219,11 +246,17 @@ export default function ProductAdmin() {
   };
   const handleReset = (clearFilters) => {
     clearFilters();
-    setSearchText('');
+    setSearchText("");
   };
 
   const getColumnSearchProps = (dataIndex) => ({
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+      close,
+    }) => (
       <div
         style={{
           padding: 8,
@@ -234,11 +267,13 @@ export default function ProductAdmin() {
           ref={searchInput}
           placeholder={`Search ${dataIndex}`}
           value={selectedKeys[0]}
-          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
           onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
           style={{
             marginBottom: 8,
-            display: 'block',
+            display: "block",
           }}
         />
         <Space>
@@ -277,7 +312,7 @@ export default function ProductAdmin() {
     filterIcon: (filtered) => (
       <SearchOutlined
         style={{
-          color: filtered ? '#1677ff' : undefined,
+          color: filtered ? "#1677ff" : undefined,
         }}
       />
     ),
@@ -304,39 +339,36 @@ export default function ProductAdmin() {
     //   ),
   });
 
-
-
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
+      title: "Name",
+      dataIndex: "name",
       sorter: (a, b) => a.name.length - b.name.length,
-      ...getColumnSearchProps('name')
+      ...getColumnSearchProps("name"),
     },
     {
-      title: 'Price',
-      dataIndex: 'price',
+      title: "Price",
+      dataIndex: "price",
       sorter: (a, b) => a.price - b.price,
-      ...getColumnSearchProps('price')
+      ...getColumnSearchProps("price"),
     },
     {
-      title: 'Rating',
-      dataIndex: 'rating',
+      title: "Rating",
+      dataIndex: "rating",
       sorter: (a, b) => a.rating - b.rating,
-      ...getColumnSearchProps('rating')
+      ...getColumnSearchProps("rating"),
     },
     {
-      title: 'Action',
-      dataIndex: 'action',
-      render: RowMenu 
-    }
+      title: "Action",
+      dataIndex: "action",
+      render: RowMenu,
+    },
   ];
-
 
   // thông báo status khi submit
   const [form] = Form.useForm();
   useEffect(() => {
-    if(data?.status === 200) {
+    if (data?.status === 200) {
       success();
       setStateProduct({
         name: "",
@@ -348,117 +380,118 @@ export default function ProductAdmin() {
         description: "",
       });
       setIsModalOpen(false);
-    }if(data?.status ==='ERR') {
-      error();
-
     }
-  },[data?.status])
+    if (data?.status === "ERR") {
+      error();
+    }
+  }, [data?.status]);
 
   // thông báo status khi submit bên update
   useEffect(() => {
-    if(dataUpdate?.status === 200) {
+    if (dataUpdate?.status === 200) {
       success();
-      setIsOpenDrawer(false)
-    }else if(dataUpdate?.status ==='ERR') {
+      setIsOpenDrawer(false);
+    } else if (dataUpdate?.status === "ERR") {
       error();
-
     }
-  },[dataUpdate?.status])
+  }, [dataUpdate?.status]);
 
   useEffect(() => {
-    if(dataDeleteMany?.status === 200) {
+    if (dataDeleteMany?.status === 200) {
       success();
-    }else if(dataDeleteMany?.status ==='ERR') {
+    } else if (dataDeleteMany?.status === "ERR") {
       error();
     }
-  },[dataDeleteMany?.status])
-  
+  }, [dataDeleteMany?.status]);
 
   //thông báo status khi xóa product
   useEffect(() => {
-    if(dataDelete?.status === 200) {
+    if (dataDelete?.status === 200) {
       success();
       setIsModalOpenDelete(false);
-    }else if(dataDelete?.status ==='ERR') {
+    } else if (dataDelete?.status === "ERR") {
       error();
-
     }
-  },[dataDelete?.status])
-  
-  //reset lại null sau khi create product thành công 
+  }, [dataDelete?.status]);
+
+  //reset lại null sau khi create product thành công
   useEffect(() => {
-    form.setFieldsValue(stateProduct)
-  },[form, stateProduct])
+    form.setFieldsValue(stateProduct);
+  }, [form, stateProduct]);
 
-  
-
-
-    // show  sản phẩm của id và cập nhập lại product
-    const fetchGetDetailsProduct = async () => {
-      const res = await ProductService.getDetailProduct(RowSelected)
-      // console.log('res.data', res)
-      if(res?.data) {
-        setStateProductDetail ({
-          name: res?.data?.name,
-          image: res?.data?.image,
-          type: res?.data?.type,
-          price: res?.data?.price,
-          counInStock: res?.data?.counInStock,
-          rating: res?.data?.rating,
-          description: res?.data?.description,
-        })
-      }
-      setIsLoadingUpdate(false)
+  // show  sản phẩm của id và cập nhập lại product
+  const fetchGetDetailsProduct = async () => {
+    const res = await ProductService.getDetailProduct(RowSelected);
+    // console.log('res.data', res)
+    if (res?.data) {
+      setStateProductDetail({
+        name: res?.data?.name,
+        image: res?.data?.image,
+        type: res?.data?.type,
+        price: res?.data?.price,
+        counInStock: res?.data?.counInStock,
+        rating: res?.data?.rating,
+        description: res?.data?.description,
+      });
     }
+    setIsLoadingUpdate(false);
+  };
 
-    // console.log('setStateProductDetail', stateProductDetail)
+  // console.log('setStateProductDetail', stateProductDetail)
 
-    //sao khi bấm vào cập nhập thì input có thể hiện thị thông tin
-    useEffect(() => {
-      form.setFieldsValue(stateProductDetail);
+  //sao khi bấm vào cập nhập thì input có thể hiện thị thông tin
+  useEffect(() => {
+    form.setFieldsValue(stateProductDetail);
   }, [form, stateProductDetail]);
 
-
-    const handleDetailProduct = () => {
-      if(RowSelected) {
-        setIsLoadingUpdate(true)
-        fetchGetDetailsProduct()
-        setIsOpenDrawer(true)
-      }
-      // console.log("handleDetailProduct",RowSelected)
+  const handleDetailProduct = () => {
+    if (RowSelected) {
+      setIsLoadingUpdate(true);
+      fetchGetDetailsProduct();
+      setIsOpenDrawer(true);
     }
+    // console.log("handleDetailProduct",RowSelected)
+  };
 
+  // xử lý khi bấm vào submit update product
+  const onUpdateProduct = () => {
+    mutationUpdate.mutate(stateProductDetail, {
+      onSettled: () => {
+        queryProduct.refetch();
+      },
+    });
+  };
 
-    // xử lý khi bấm vào submit update product
-    const onUpdateProduct = () => {
-      mutationUpdate.mutate(stateProductDetail,{
-        onSettled: () => {
-          queryProduct.refetch()
-        }
-      })
+  //phần về delete product
+  const handleModalDelete = () => {
+    if (RowSelected) {
+      setIsModalOpenDelete(true);
+      // console.log("handleModalDelete",RowSelected)
     }
+  };
 
+  const handleOkDelete = () => {
+    mutationDelete.mutate(RowSelected, {
+      onSettled: () => {
+        queryProduct.refetch();
+      },
+    });
+  };
 
-    //phần về delete product
-    const handleModalDelete = () => {
-      if(RowSelected) {
-        setIsModalOpenDelete(true);
-        // console.log("handleModalDelete",RowSelected)
-      }
-    };
-  
-    const handleOkDelete = () => {
-      mutationDelete.mutate(RowSelected,{
-        onSettled: () => {
-          queryProduct.refetch()
-        }
-      })
-    };
-  
-    const handleCancelDelete = () => {
-      setIsModalOpenDelete(false);
-    };
+  const handleCancelDelete = () => {
+    setIsModalOpenDelete(false);
+  };
 
+  const handleChangeSelect = (value) => {
+    if (value !== "add_type") {
+      setStateProduct({
+        ...stateProduct,
+        type: value,
+      });
+    } else {
+      setTypeSelect(value);
+    }
+  };
 
 
   return (
@@ -524,245 +557,276 @@ export default function ProductAdmin() {
           onCancel={handleCancel}
           okText="Submit"
         >
-          <LoadingComponent isLoading = {isLoading}>
-          <Form
-            name="basic"
-            labelCol={{
-              span: 6,
-            }}
-            wrapperCol={{
-              span: 18,
-            }}
-            style={{
-              maxWidth: 600,
-            }}
-            initialValues={{
-              remember: true,
-            }}
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-            form= {form}
-          >
-            <Form.Item
-              label="Tên sản phẩm"
-              name="name"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng điền tên sản phẩm",
-                },
-              ]}
+          <LoadingComponent isLoading={isLoadingCreateProduct}>
+            <Form
+              name="basic"
+              labelCol={{
+                span: 6,
+              }}
+              wrapperCol={{
+                span: 18,
+              }}
+              style={{
+                maxWidth: 600,
+              }}
+              initialValues={{
+                remember: true,
+              }}
+              onFinish={onFinish}
+              onFinishFailed={onFinishFailed}
+              form={form}
             >
-              <Input
-                value={stateProduct.name}
-                onChange={handleOnchanges}
+              <Form.Item
+                label="Tên sản phẩm"
                 name="name"
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="Thể Loại"
-              name="type"
-              rules={[
-                {
-                  required: true,
-                  message: "vui lòng nhập thể loại",
-                },
-              ]}
-            >
-              <Input
-                value={stateProduct.type}
-                onChange={handleOnchanges}
-                name="type"
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="Mô tả"
-              name="description"
-              rules={[
-                {
-                  required: true,
-                  message: "vui lòng nhập Mô tả sản phẩm",
-                },
-              ]}
-            >
-              <Input
-                value={stateProduct.description}
-                onChange={handleOnchanges}
-                name="description"
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="Giá sản phẩm"
-              name="price"
-              rules={[
-                {
-                  required: true,
-                  message: "vui lòng nhập giá sản phẩm",
-                },
-              ]}
-            >
-              <Input
-                value={stateProduct.price}
-                onChange={handleOnchanges}
-                name="price"
-              />
-            </Form.Item>
-            <Form.Item>
-              {data?.status ==='ERR' && (
-                <div
-                  style={{ color: "red", fontSize: "14px", paddingTop: "10px" }}
-                >
-                  {data?.message}
-                </div>
-              )} 
-
-               {data?.status === 200 && (
-                <div
-                  style={{
-                    color: "#4fba69",
-                    fontSize: "14px",
-                    paddingTop: "10px",
-                  }}
-                >
-                  {data?.message}
-                </div>
-              )}
-            </Form.Item>
-
-            <Form.Item
-              name="image"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng thêm ảnh sản phẩm",
-                },
-              ]}
-            >
-              <Upload
-                onChange={handleOnchangeAvatar}
-                listType="picture"
-                defaultFileList={stateProduct?.image}
-                maxCount={1}
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng điền tên sản phẩm",
+                  },
+                ]}
               >
-                <Button style={{ marginTop: "10px" }} icon={<UploadOutlined />}>
-                  Click thêm ảnh sản phẩm
-                </Button>
-                {/* {stateProduct?.image && (
+                <Input
+                  value={stateProduct.name}
+                  onChange={handleOnchanges}
+                  name="name"
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Thể Loại"
+                name="type"
+                rules={[
+                  {
+                    required: true,
+                    message: "vui lòng nhập thể loại",
+                  },
+                ]}
+              >
+                <Select
+                  onChange={handleChangeSelect}
+                  name={productType !== "add_type" ? "type" : ""}
+                  value={productType?.type}
+                  options={renderOptions(productType?.data)}
+                />
+                {typeSelect === "add_type" ? (
+                  <Input
+                    style={{marginTop: '5px'}}
+                    value={stateProduct.type}
+                    onChange={handleOnchanges}
+                    name="type"
+                  />
+                ): (
+                  <Input
+                    style={{display: 'none'}}
+                    value={stateProduct.type}
+                    onChange={handleOnchanges}
+                    name="type"
+                  />
+                )}
+              </Form.Item>
+
+              <Form.Item
+                label="Mô tả"
+                name="description"
+                rules={[
+                  {
+                    required: true,
+                    message: "vui lòng nhập Mô tả sản phẩm",
+                  },
+                ]}
+              >
+                <Input
+                  value={stateProduct.description}
+                  onChange={handleOnchanges}
+                  name="description"
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Giá sản phẩm"
+                name="price"
+                rules={[
+                  {
+                    required: true,
+                    message: "vui lòng nhập giá sản phẩm",
+                  },
+                ]}
+              >
+                <Input
+                  value={stateProduct.price}
+                  onChange={handleOnchanges}
+                  name="price"
+                />
+              </Form.Item>
+              <Form.Item>
+                {data?.status === "ERR" && (
+                  <div
+                    style={{
+                      color: "red",
+                      fontSize: "14px",
+                      paddingTop: "10px",
+                    }}
+                  >
+                    {data?.message}
+                  </div>
+                )}
+
+                {data?.status === 200 && (
+                  <div
+                    style={{
+                      color: "#4fba69",
+                      fontSize: "14px",
+                      paddingTop: "10px",
+                    }}
+                  >
+                    {data?.message}
+                  </div>
+                )}
+              </Form.Item>
+
+              <Form.Item
+                name="image"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng thêm ảnh sản phẩm",
+                  },
+                ]}
+              >
+                <Upload
+                  onChange={handleOnchangeAvatar}
+                  listType="picture"
+                  defaultFileList={stateProduct?.image}
+                  maxCount={1}
+                >
+                  <Button
+                    style={{ marginTop: "10px" }}
+                    icon={<UploadOutlined />}
+                  >
+                    Click thêm ảnh sản phẩm
+                  </Button>
+                  {/* {stateProduct?.image && (
                 <Avatar src={stateProduct?.image} shape="square" size={200} />
               )} */}
-              </Upload>
-            </Form.Item>
-          </Form>
+                </Upload>
+              </Form.Item>
+            </Form>
           </LoadingComponent>
         </Modal>
 
-        <DrawerComponent width={720} title="Chỉnh sửa thông tin sản phẩm" isOpen={isOpenDrawer} onClose={() => setIsOpenDrawer(false)} 
-        extra={
-          <Space>
-            <Button onClick={() => setIsOpenDrawer(false)}>Cancel</Button>
-            <Button onClick={onUpdateProduct} type="primary">
-              Cập Nhập
-            </Button>
-          </Space>
-        }
-         >
-         <LoadingComponent isLoading = {isLoadingUpdate ||dataUpdateisLoading}>
-          <Form
-            name="basic"
-            labelCol={{
-              span: 6,
-            }}
-            wrapperCol={{
-              span: 18,
-            }}
-            style={{
-              maxWidth: 600,
-            }}
-            initialValues={{
-              remember: true,
-            }}
-            form={form}
-          >
-            <Form.Item
-              label="Tên sản phẩm"
-              name="name"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng điền tên sản phẩm",
-                },
-              ]}
+        <DrawerComponent
+          width={720}
+          title="Chỉnh sửa thông tin sản phẩm"
+          isOpen={isOpenDrawer}
+          onClose={() => setIsOpenDrawer(false)}
+          extra={
+            <Space>
+              <Button onClick={() => setIsOpenDrawer(false)}>Cancel</Button>
+              <Button onClick={onUpdateProduct} type="primary">
+                Cập Nhập
+              </Button>
+            </Space>
+          }
+        >
+          <LoadingComponent isLoading={isLoadingUpdate || dataUpdateisLoading}>
+            <Form
+              name="basic"
+              labelCol={{
+                span: 6,
+              }}
+              wrapperCol={{
+                span: 18,
+              }}
+              style={{
+                maxWidth: 600,
+              }}
+              initialValues={{
+                remember: true,
+              }}
+              form={form}
             >
-              <Input
-                value={stateProductDetail.name}
-                onChange={handleOnchangeDetails}
+              <Form.Item
+                label="Tên sản phẩm"
                 name="name"
-              />
-            </Form.Item>
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng điền tên sản phẩm",
+                  },
+                ]}
+              >
+                <Input
+                  value={stateProductDetail.name}
+                  onChange={handleOnchangeDetails}
+                  name="name"
+                />
+              </Form.Item>
 
-            <Form.Item
-              label="Thể Loại"
-              name="type"
-              rules={[
-                {
-                  required: true,
-                  message: "vui lòng nhập thể loại",
-                },
-              ]}
-            >
-              <Input
-                value={stateProductDetail.type}
-                onChange={handleOnchangeDetails}
+              <Form.Item
+                label="Thể Loại"
                 name="type"
-              />
-            </Form.Item>
+                rules={[
+                  {
+                    required: true,
+                    message: "vui lòng nhập thể loại",
+                  },
+                ]}
+              >
+                <Input
+                  value={stateProductDetail.type}
+                  onChange={handleOnchangeDetails}
+                  name="type"
+                />
+              </Form.Item>
 
-            <Form.Item
-              label="Mô tả"
-              name="description"
-              rules={[
-                {
-                  required: true,
-                  message: "vui lòng nhập Mô tả sản phẩm",
-                },
-              ]}
-            >
-              <Input
-                value={stateProductDetail.description}
-                onChange={handleOnchangeDetails}
+              <Form.Item
+                label="Mô tả"
                 name="description"
-              />
-            </Form.Item>
+                rules={[
+                  {
+                    required: true,
+                    message: "vui lòng nhập Mô tả sản phẩm",
+                  },
+                ]}
+              >
+                <Input
+                  value={stateProductDetail.description}
+                  onChange={handleOnchangeDetails}
+                  name="description"
+                />
+              </Form.Item>
 
-            <Form.Item
-              label="Giá sản phẩm"
-              name="price"
-              rules={[
-                {
-                  required: true,
-                  message: "vui lòng nhập giá sản phẩm",
-                },
-              ]}
-            >
-              <Input
-                value={stateProductDetail.price}
-                onChange={handleOnchangeDetails}
+              <Form.Item
+                label="Giá sản phẩm"
                 name="price"
-              />
-            </Form.Item>
-            <Form.Item>
-              {dataUpdate?.status ==='ERR' && (
-                <div
-                  style={{ color: "red", fontSize: "14px", paddingTop: "10px" }}
-                >
-                  {dataUpdate?.message}
-                </div>
-              )} 
+                rules={[
+                  {
+                    required: true,
+                    message: "vui lòng nhập giá sản phẩm",
+                  },
+                ]}
+              >
+                <Input
+                  value={stateProductDetail.price}
+                  onChange={handleOnchangeDetails}
+                  name="price"
+                />
+              </Form.Item>
+              <Form.Item>
+                {dataUpdate?.status === "ERR" && (
+                  <div
+                    style={{
+                      color: "red",
+                      fontSize: "14px",
+                      paddingTop: "10px",
+                    }}
+                  >
+                    {dataUpdate?.message}
+                  </div>
+                )}
 
-               {/* {dataUpdate?.status === 200 && (
+                {/* {dataUpdate?.status === 200 && (
                 <div
                   style={{
                     color: "#4fba69",
@@ -773,54 +837,65 @@ export default function ProductAdmin() {
                   {dataUpdate?.message}
                 </div>
               )} */}
-            </Form.Item>
+              </Form.Item>
 
-            <Form.Item
-              name="image"
-              rules={[
-                {
-                  required: true,
-                  message: "Vui lòng thêm ảnh sản phẩm",
-                },
-              ]}
-            >
-              <Upload
-                onChange={handleOnchangeAvatarDetailProduct}
-                listType="picture"
-                defaultFileList={stateProductDetail?.image}
-                maxCount={1}
+              <Form.Item
+                name="image"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng thêm ảnh sản phẩm",
+                  },
+                ]}
               >
-                <Button style={{ marginTop: "10px" }} icon={<UploadOutlined />}>
-                  Click thêm ảnh sản phẩm
-                </Button>
-              </Upload>
-            </Form.Item>
-          </Form>
+                <Upload
+                  onChange={handleOnchangeAvatarDetailProduct}
+                  listType="picture"
+                  defaultFileList={stateProductDetail?.image}
+                  maxCount={1}
+                >
+                  <Button
+                    style={{ marginTop: "10px" }}
+                    icon={<UploadOutlined />}
+                  >
+                    Click thêm ảnh sản phẩm
+                  </Button>
+                </Upload>
+              </Form.Item>
+            </Form>
           </LoadingComponent>
         </DrawerComponent>
 
-        <ModalComponent  isOpen={isModalOpenDelete} onOk={handleOkDelete} onCancel={handleCancelDelete}>
-        <LoadingComponent isLoading={dataDeleteisLoading}>
-        <div style={{textAlign: "center"}}>
-          <WarningOutlined style={{fontSize: '50px', color: 'red'}} />
-          <p>bạn có chắc chắn xóa dữ liệu này không?</p>
-        </div>
-        </LoadingComponent>
+        <ModalComponent
+          isOpen={isModalOpenDelete}
+          onOk={handleOkDelete}
+          onCancel={handleCancelDelete}
+        >
+          <LoadingComponent isLoading={dataDeleteisLoading}>
+            <div style={{ textAlign: "center" }}>
+              <WarningOutlined style={{ fontSize: "50px", color: "red" }} />
+              <p>bạn có chắc chắn xóa dữ liệu này không?</p>
+            </div>
+          </LoadingComponent>
         </ModalComponent>
-        
+
         <LoadingComponent isLoading={isLoadingProducts}>
-      <OrderTable handleDeleteMany= {handleDeleteMany} dataDeleteisLoadingMany={dataDeleteisLoadingMany} dataDeleteMany={dataDeleteMany} products= {dataAllProduct}  columns= {columns} onRow={(record, rowIndex) => {
-    return {
-      onClick: (event) => {
-        setRowSelected(record._id)
-      }, 
-    };
-  }}  />
-  </LoadingComponent>
-
+          <OrderTable
+            handleDeleteMany={handleDeleteMany}
+            dataDeleteisLoadingMany={dataDeleteisLoadingMany}
+            dataDeleteMany={dataDeleteMany}
+            products={dataAllProduct}
+            columns={columns}
+            onRow={(record, rowIndex) => {
+              return {
+                onClick: (event) => {
+                  setRowSelected(record._id);
+                },
+              };
+            }}
+          />
+        </LoadingComponent>
       </Box>
-
     </>
-    
   );
 }

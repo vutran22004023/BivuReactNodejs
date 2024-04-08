@@ -12,8 +12,8 @@ import {
   } from "../../components/MessageComponents/Message";
   import { useNavigate } from "react-router-dom";
 import IsLoadingComponent from '../LoadComponent/Loading.jsx'
+import {GoogleAuthProvider, signInWithPopup, getAuth} from 'firebase/auth'
 export default function Login() {
-
     const [passwordVisible, setPasswordVisible] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -50,6 +50,39 @@ export default function Login() {
       password,
     });
   };
+
+  // đăng nhập bằng google
+  const [userGoogle, setUserGoogle] = useState()
+  const auth= getAuth()
+  const handleLoginWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+
+    const res =  await signInWithPopup(auth, provider);
+    // console.log(res);
+  }
+
+  useEffect(() => {
+    const unsubcribed = auth.onIdTokenChanged((user) => {
+      console.log('user: ', user)
+      if(user?.uid) {
+        // navigate("/");
+        // window.location.reload();
+        localStorage.setItem('access_Token', JSON.stringify(user?.accessToken))
+        document.cookie = `access_Token=${user?.accessToken}`;
+        setUserGoogle(user)
+      }
+      userGoogle({})
+      localStorage.clear()
+      document.cookie = `access_Token=`;
+    })
+
+    return () => {
+      unsubcribed()
+    }
+  },[auth])
+
+
+
     return (
       <div style={{ margin: "10px" }}>
         <div>
@@ -116,7 +149,8 @@ export default function Login() {
               fontSize: "15px",
               fontWeight: "700",
             }}
-            textButton={"Đăng nhập"}
+            textButton={"Đăng nhập với google"}
+            onClick={handleLoginWithGoogle}
           ></ButtonFrom>
           </div>
       </div>

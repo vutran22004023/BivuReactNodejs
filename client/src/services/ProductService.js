@@ -57,6 +57,11 @@ const getAllTypeProduct= async () => {
     return res.data
 }
 
+const getProductType= async (type) => {
+    const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/all-products?filter=type&filter=${type}`)
+        return res.data
+}
+
 
 export default {
     createProduct,
@@ -65,5 +70,6 @@ export default {
     getDetailProduct,
     DeleteDetailProduct,
     DeleteManyProduct,
-    getAllTypeProduct
+    getAllTypeProduct,
+    getProductType
 }

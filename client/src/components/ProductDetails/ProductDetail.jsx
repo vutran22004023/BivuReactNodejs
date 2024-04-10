@@ -20,6 +20,7 @@ import {
 import {ProductService} from '../../services/index'
 import {useQuery} from '@tanstack/react-query'
 import IsLoadingComponent from '../LoadComponent/Loading'
+import ModalComponent from '../ModalComponent/Modal'
 export const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;
   return (
@@ -41,6 +42,7 @@ export const SamplePrevArrow = (props) => {
     />
   );
 };
+
 
 export default function ProductDetail({idProduct}) {
   const[numberProduct, setNumberProduct] = useState(1)
@@ -81,6 +83,39 @@ export default function ProductDetail({idProduct}) {
 
   const {data: productDetail, isLoading: IsLoadingProductDetail} = useQuery({queryKey: ['products-detail', idProduct], queryFn: fetchGetDetailsProduct, enabled: !!idProduct});
 
+
+  //Modal Login and buy card
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const hangleBuyProduct = () => {
+
+    showModal()
+  }
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+
+  const LoginModal = () => {
+    return (
+      <ModalComponent open={isModalOpen}
+      onOk={handleOk}
+      onCancel={handleCancel}
+      footer= {false}>
+          {/* <p>Some contents...</p>
+          <p>Some contents...</p>
+          <p>Some contents...</p> */}
+      </ModalComponent>
+    )
+  }
 
   return (
     <IsLoadingComponent isLoading={IsLoadingProductDetail}>
@@ -182,7 +217,9 @@ export default function ProductDetail({idProduct}) {
         <Button 
          style={{backgroundColor: 'rgb(255, 66, 78)', height: '60px',width: '100%', marginTop: '10px', color: '#fff'}}
            icon={<ShoppingCartOutlined />}
+           onClick={hangleBuyProduct}
            >Mua ngay</Button>
+           <LoginModal />
         </div>
 
         <div style={{marginRight: '10px',width: '100%'}}>

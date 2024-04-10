@@ -10,10 +10,16 @@ export default function CategoryHome() {
   const {state} = useLocation()
   const [products, setProduct] = useState([])
   const [isLoadingres,setIsLoadingres] = useState(false)
-  const fetchProductType =  async(type) => {
-    const res = await ProductService.getProductType(type)
+  const [panigate, setPanigate] = useState({
+    page : 0,
+    limit: 10,
+    total: 1
+  })
+  const fetchProductType =  async(type, page, limit) => {
+    const res = await ProductService.getProductType(type,page, limit )
     if(res?.status === 200) {
       setProduct(res?.data)
+      setPanigate({...panigate, total: res?.totalPage})
       setIsLoadingres(false)
     }
     return res
@@ -21,9 +27,16 @@ export default function CategoryHome() {
   useEffect(() =>{
     if(state) {
       setIsLoadingres(true)
-      fetchProductType(state)
+      fetchProductType(state, panigate?.page, panigate?.limit)
     }
-  },[state])
+  },[state, panigate?.page,panigate?.limit])
+
+  const onShowSizeChange = (current, pageSize) => {
+    console.log(current, pageSize);
+    setPanigate({...panigate, page: current-1, limit:pageSize} )
+  };
+
+
   return (
     <IsLoadingComponent isLoading={isLoadingres}>
     <div style= {{margin: '10px 100px',backgroundColor: 'rgb(235 232 232)', padding: '10px'}}>
@@ -55,7 +68,7 @@ export default function CategoryHome() {
           })}
       </Col>
     </WapperCategory>
-    <Pagination style={{width: '100%', justifyItems: 'center', textAlign:'center'}} defaultCurrent={6} total={500}/>
+    <Pagination showSizeChanger onShowSizeChange={onShowSizeChange} style={{width: '100%', justifyItems: 'center', textAlign:'center'}} defaultCurrent={panigate?.page + 1} total={panigate?.total}/>
 
     </div>
     </IsLoadingComponent>

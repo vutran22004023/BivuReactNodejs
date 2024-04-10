@@ -125,7 +125,7 @@ const getDetailsUser =async (req, res) => {
             })
         }
         const response = await Userservices.getDetailsUser(userid, token,userisAdmin)
-        return res.status(200).json(response)
+        return res.status(200).json(response).end()
     }catch(e) {
         return res.status(404).json({
             message: e

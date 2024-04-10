@@ -57,8 +57,8 @@ const getAllTypeProduct= async () => {
     return res.data
 }
 
-const getProductType= async (type) => {
-    const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/all-products?filter=type&filter=${type}`)
+const getProductType= async (type,page,limit) => {
+    const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/all-products?filter=type&filter=${type}&limit=${limit}&page=${page}`)
         return res.data
 }
 

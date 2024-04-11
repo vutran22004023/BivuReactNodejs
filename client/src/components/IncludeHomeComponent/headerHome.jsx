@@ -1,4 +1,4 @@
-import { Avatar, Col, Image,List } from "antd";
+import { Avatar, Col, Image,List,Badge } from "antd";
 import React, { useEffect, useState,useRef } from "react";
 import {
   WrapperHeaderTop,
@@ -88,6 +88,7 @@ export default function headerHome() {
   const refSearch = useRef()
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
+  const order = useSelector((state) => state.order)
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState("");
@@ -410,7 +411,9 @@ export default function headerHome() {
             )}
           </WrapperHeaderAccount>
           <WrapperHeaderCart style={{ textAlign: "center" }}>
+          <Badge count={order?.orderItems?.length} >
             <ShoppingCartOutlined style={{ fontSize: "40px" }} />
+          </Badge>
             <WrapperHeaderSpan>Giỏ hàng</WrapperHeaderSpan>
           </WrapperHeaderCart>
         </Col>

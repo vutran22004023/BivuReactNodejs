@@ -16,11 +16,19 @@ import {
   WapperStyleBlockProduct,
   WapperStyleBlockProductBottom,
   WapperStyleButtonAddProduct,
+  WrapperContainerLeft,
+  WrapperContainerRight,
+  WrapperTextLight,
 } from "./style";
 import {ProductService} from '../../services/index'
 import {useQuery} from '@tanstack/react-query'
 import IsLoadingComponent from '../LoadComponent/Loading'
 import ModalComponent from '../ModalComponent/Modal'
+import LoginComponent from "../Login-RegisterComponent/Login";
+import { useSelector, useDispatch } from "react-redux";
+import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { AddOrderProduct } from "../../redux/Slides/orderProductSlide";
 export const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;
   return (
@@ -46,6 +54,10 @@ export const SamplePrevArrow = (props) => {
 
 export default function ProductDetail({idProduct}) {
   const[numberProduct, setNumberProduct] = useState(1)
+  const user = useSelector((state) => state.user)
+  const location = useLocation()
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const onChange = (value) => {
     setNumberProduct(value + 1 )
     console.log(numberProduct)
@@ -87,8 +99,40 @@ export default function ProductDetail({idProduct}) {
   //Modal Login and buy card
   const [isModalOpen, setIsModalOpen] = useState(false);
   const hangleBuyProduct = () => {
-
-    showModal()
+    if(!user?.id) {
+      showModal()
+    }else {
+    //   oderItems: [
+    //     {
+    //         name: {
+    //             type: String,
+    //             required: true,
+    //         },
+    //         amount: {
+    //             type: Number,
+    //             required: true,
+    //         },
+    //         image: {
+    //             type: String,
+    //             required: true,
+    //         },
+    //         product: {
+    //             type: mongoose.Schema.Types.ObjectId,
+    //             ref:'Product',
+    //             required: true,
+    //         }
+    //     }
+    // ],
+      dispatch(AddOrderProduct({
+        orderItem: {
+          name: productDetail?.name,
+          amount: numberProduct,
+          image: productDetail?.image,
+          price: productDetail?.price,
+          product: productDetail?._id
+        }
+      }))
+    }
   }
 
   const showModal = () => {
@@ -109,10 +153,37 @@ export default function ProductDetail({idProduct}) {
       <ModalComponent open={isModalOpen}
       onOk={handleOk}
       onCancel={handleCancel}
-      footer= {false}>
-          {/* <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p> */}
+      footer= {false} width={950}>
+          <div
+        style={{
+          width: "900px",
+          height: "445px",
+          borderRadius: "6px",
+          background: "#fff",
+          display: "flex",
+        }}
+      >
+        <WrapperContainerLeft>
+          <h1>Xin chào</h1>
+          <p>Đăng nhập và tạo tài khoản</p>
+          {/* login componment */}
+          <LoginComponent />
+          <p>
+            <WrapperTextLight>Quên mật khẩu</WrapperTextLight>
+          </p>
+          <p>
+            Chưa có tài khoản?{" "}
+            <WrapperTextLight>Tạo tài khoản</WrapperTextLight>
+          </p>
+        </WrapperContainerLeft>
+
+        <WrapperContainerRight>
+          <Image 
+          // src={product1}
+           preview={false} height={203} width={203} />
+          <h4>Mua sắm tại Bi Vũ</h4>
+        </WrapperContainerRight>
+      </div>
       </ModalComponent>
     )
   }

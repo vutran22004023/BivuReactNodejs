@@ -70,6 +70,16 @@ export const orderSlice = createSlice({
                 state.orderItems.push(orderItem)
             }
         },
+        increaseAmount: (state, action) => {
+            const {idProduct} = action.payload
+            const index = state.orderItems.findIndex(item => item.product === idProduct)
+            index.amount++
+        },
+        decreaseAmount: (state, action) => {
+            const {idProduct} = action.payload
+            const index = state.orderItems.findIndex(item => item.product === idProduct)
+            index.amount--
+        },
         RemoveOrderProduct:(state, action) => {
             const { idProduct } = action.payload
             const index = state.orderItems.findIndex(item => item.product === idProduct)

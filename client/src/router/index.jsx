@@ -14,7 +14,7 @@ import { updateUser } from "../redux/Slides/userSlide";
 // import OderAdmin from "../pages/AdminPage/ContentAdmin/ProductAdmin/ProductAdmin";
 // import UserAdmin from "../pages/AdminPage/ContentAdmin/UserAdmin/UserAdmin";
 import IsLoadingComponent from "../components/LoadComponent/Loading.jsx";
-
+import "../index.css";
 
 //sử dụng Code Splitting
 

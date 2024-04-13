@@ -1,7 +1,6 @@
-import { Avatar, Col, Image,List,Badge } from "antd";
-import React, { useEffect, useState,useRef } from "react";
+import { Avatar, Col, Image, List, Badge, Dropdown, InputNumber,Row } from "antd";
+import React, { useEffect, useState, useRef } from "react";
 import {
-  WrapperHeaderTop,
   WrapperHeaderMid,
   WrapperHeaderAccount,
   WrapperHeaderCart,
@@ -10,7 +9,7 @@ import {
   WrapperHeaderLink,
 } from "../../pages/HomePage/style";
 import Loading from "../../components/LoadComponent/Loading";
-import { WapperContentPopup } from "./style";
+import { WapperContentPopup, StickyHeader } from "./style";
 import {
   UserOutlined,
   CaretDownOutlined,
@@ -25,7 +24,10 @@ import { useSelector, useDispatch } from "react-redux";
 import { UserService } from "../../services/index";
 import { useNavigate } from "react-router-dom";
 import { resetUser } from "../../redux/Slides/userSlide";
-import {SearchProduct,SearchisInputEmpty} from '../../redux/Slides/productSlide'
+import {
+  SearchProduct,
+  SearchisInputEmpty,
+} from "../../redux/Slides/productSlide";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import {
   Box,
@@ -39,6 +41,7 @@ import {
   ListItemText,
   ListItemIcon,
 } from "@mui/material";
+import Sheet from '@mui/joy/Sheet';
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
@@ -46,12 +49,12 @@ import LoginComponent from "../Login-RegisterComponent/Login";
 import RegisterComponent from "../Login-RegisterComponent/Register";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
-import IsLoadingComponent from '../LoadComponent/Loading'
-import {useDebounce} from '../../hooks/UseMutationHook'
-import {ProductService}from '../../services/index'
-import {useQuery} from '@tanstack/react-query'
+import IsLoadingComponent from "../LoadComponent/Loading";
+import { useDebounce } from "../../hooks/UseMutationHook";
+import { ProductService } from "../../services/index";
+import { useQuery } from "@tanstack/react-query";
 import Slider from "react-slick";
-
+import "../../assets/font-end/css/Home.css";
 
 export const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;
@@ -75,7 +78,6 @@ export const SamplePrevArrow = (props) => {
   );
 };
 
-
 export default function headerHome() {
   const settings = {
     infinite: false,
@@ -84,22 +86,38 @@ export default function headerHome() {
     nextArrow: <SampleNextArrow />,
     prevArrow: <SamplePrevArrow />,
   };
-  //các biến 
-  const refSearch = useRef()
+  //các biến
+  const refSearch = useRef();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
-  const order = useSelector((state) => state.order)
+  const order = useSelector((state) => state.order);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState("");
   const [userAvatar, setUserAvatar] = useState("");
-  const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("1");
-  const [searchInput,setSearch] = useState('')
+  const [open, setOpen] = useState(false);
+  const [openSidebar, setOpenSidebar] = useState(false);
+  const [value, setValue] = useState("1");
+  const [searchInput, setSearch] = useState("");
   const [showList, setShowList] = useState(false);
   const [isInputEmpty, setIsInputEmpty] = useState(true);
-  const searchDebouned = useDebounce(searchInput, 500)
-  const [limit, setLimit] = useState(6)
+  const searchDebouned = useDebounce(searchInput, 500);
+  const [limit, setLimit] = useState(6);
+  const [isSticky, setSticky] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const offset = window.scrollY;
+      const threshold = 65; // Điều kiện để header trở nên dính cố định
+      setSticky(offset > threshold);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isSticky]);
   // đóng mở List trong search
   const handleSearchInputFocus = () => {
     setShowList(true);
@@ -115,27 +133,32 @@ export default function headerHome() {
   };
   // api lấy dữ liệu search
   const fetchProductAll = async (context) => {
-    const limit = context.queryKey[1]
-    const search = context.queryKey[2]
-      const res = await ProductService.getAllProduct(limit,search);
-      return res;
+    const limit = context.queryKey[1];
+    const search = context.queryKey[2];
+    const res = await ProductService.getAllProduct(limit, search);
+    return res;
   };
 
   const fetchTypeProduct = async () => {
-      const res = await ProductService.getAllTypeProduct();
-      return res;
+    const res = await ProductService.getAllTypeProduct();
+    return res;
   };
 
-    useEffect(() => {
+  useEffect(() => {
     if (refSearch.current) {
-      fetchProductAll(searchDebouned)
-
+      fetchProductAll(searchDebouned);
     }
     refSearch.current = true;
   }, [searchDebouned]);
 
-  const { data:products,isLoading:isLoadingProducts } = useQuery({queryKey: ['products', limit,searchDebouned], queryFn: fetchProductAll});
-  const { data:productType,isLoading:isLoadingProductType } = useQuery({queryKey: ['productsType'], queryFn: fetchTypeProduct});
+  const { data: products, isLoading: isLoadingProducts } = useQuery({
+    queryKey: ["products", limit, searchDebouned],
+    queryFn: fetchProductAll,
+  });
+  const { data: productType, isLoading: isLoadingProductType } = useQuery({
+    queryKey: ["productsType"],
+    queryFn: fetchTypeProduct,
+  });
   //Xử lý phần Loading Logout
   const handLogout = async () => {
     localStorage.removeItem("access_Token");
@@ -161,14 +184,12 @@ export default function headerHome() {
 
   const handleItemClickAdmin = () => {
     navigate("/admin");
-  }
+  };
 
   useEffect(() => {
     setUserName(user?.name);
     setUserAvatar(user?.avatar);
   }, [user?.name, user?.avatar]);
-
-  const arr = ["TV", "Tu Lanh", "Dieu hoa"];
 
   const DrawerList = (
     <Box
@@ -190,7 +211,11 @@ export default function headerHome() {
           <div>
             <div>
               <CloseCircleOutlined
-                style={{ cursor: "pointer", fontSize: "30px", marginTop: '10px'}}
+                style={{
+                  cursor: "pointer",
+                  fontSize: "30px",
+                  marginTop: "10px",
+                }}
                 onClick={toggleDrawer(false)}
               />
             </div>
@@ -206,54 +231,62 @@ export default function headerHome() {
           </div>
         </Grid>
         <Grid xs={6}>
-        {user?.access_Token ? (
-          <>
-          {userAvatar ? (
-            <><Avatar src={userAvatar} size={80} style={{marginTop: '10px'}} /> </>
+          {user?.access_Token ? (
+            <>
+              {userAvatar ? (
+                <>
+                  <Avatar
+                    src={userAvatar}
+                    size={80}
+                    style={{ marginTop: "10px" }}
+                  />{" "}
+                </>
+              ) : (
+                <>
+                  <AccountCircleIcon sx={{ fontSize: 80, mt: "10px" }} />{" "}
+                </>
+              )}
+            </>
           ) : (
-           <><AccountCircleIcon sx={{ fontSize: 80,mt: '10px' }} /> </>
+            <>
+              <AccountCircleIcon sx={{ fontSize: 80, mt: "10px" }} />
+            </>
           )}
-          </>
-        ): (
-          <>
-          <AccountCircleIcon sx={{ fontSize: 80,mt: '10px' }} />
-          </>
-        )}  
         </Grid>
       </Grid>
       {user?.access_Token ? (
         <>
           <Divider />
-            <List>
-              <ListItem disablePadding onClick={handleItemClick}>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <PersonIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Thông tin người dùng" />
-                </ListItemButton>
-              </ListItem>
-              {user?.isAdmin === true && (
-                <>
+          <List>
+            <ListItem disablePadding onClick={handleItemClick}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <PersonIcon />
+                </ListItemIcon>
+                <ListItemText primary="Thông tin người dùng" />
+              </ListItemButton>
+            </ListItem>
+            {user?.isAdmin === true && (
+              <>
                 <ListItem disablePadding onClick={handleItemClickAdmin}>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <PersonIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Chỉnh sửa thông tin trang web"/>
-                </ListItemButton>
-              </ListItem>
-                </>
-              )}
-              <ListItem disablePadding onClick={handLogout}>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <LogoutIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Đăng Xuất" />
-                </ListItemButton>
-              </ListItem>
-            </List>
+                  <ListItemButton>
+                    <ListItemIcon>
+                      <PersonIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Chỉnh sửa thông tin trang web" />
+                  </ListItemButton>
+                </ListItem>
+              </>
+            )}
+            <ListItem disablePadding onClick={handLogout}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <LogoutIcon />
+                </ListItemIcon>
+                <ListItemText primary="Đăng Xuất" />
+              </ListItemButton>
+            </ListItem>
+          </List>
         </>
       ) : (
         <>
@@ -279,21 +312,102 @@ export default function headerHome() {
     </Box>
   );
 
-// onchange nhập input 
+  // onchange nhập input
   const handleSearchInput = (e) => {
-    setSearch(e.target.value)
-  } 
+    setSearch(e.target.value);
+  };
 
-// biến dữ liệu của search
+  // biến dữ liệu của search
   const dataSearch = products?.data?.map((item, index) => {
     return {
-      title: item.name, 
+      title: item.name,
     };
   });
+  // dữ liệu giỏ hàng
+  const onChange = (value) => {
+    console.log("changed", value);
+  };
+  const orderItemsExist = order.orderItems;
+  const items = orderItemsExist
+    ? [
+        {
+          type: "group",
+          label: (
+            <div style={{ width: "400px" }}>
+              <div>Tất cả {order?.orderItems?.length} sản phẩm</div>
+              <div
+                style={{
+                  margin: "10px 0",
+                  maxHeight: "300px",
+                  overflow: "auto",
+                }}
+              >
+                {order.orderItems?.map((item) => {
+                  return (
+                    <div style={{ display: "flex", marginBottom: "10px" }}>
+                      <Image width={50} height={60} src={item?.image} />
+                      <div
+                        style={{
+                          marginLeft: "10px",
+                          width: "100%",
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <div>
+                          <div>{item?.name}</div>
+                          <div>{item?.price} đ</div>
+                        </div>
+                        <div
+                          style={{ textAlign: "center", alignItems: "center" }}
+                        >
+                          <InputNumber
+                            min={1}
+                            max={50}
+                            defaultValue={item?.amount}
+                            onChange={onChange}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  bottom: "0",
+                }}
+              >
+                <div>Tổng số tiền:</div>
+                <Button>Thanh Toán</Button>
+              </div>
+            </div>
+          ),
+        },
+      ]
+    : [
+        {
+          type: "group",
+          label: null, // Không hiển thị nội dung nếu không có dữ liệu
+        },
+      ];
+  
+    //show dữ liệu drawer bên left
+      const showDrawer = () => {
+        setOpenSidebar(true);
+      };
+      const onClose = () => {
+        setOpenSidebar(false);
+      };
   return (
-    <div>
-      <WrapperHeaderTop style={{ textAlign: "center" }}>
-        <Col span={4}>
+    <div >
+      <Row
+        className="wrapper-header-top  w-full bg-[#dee2e6] p-[10px 20px] items-center"
+      >
+        <Col span={4} className="">
           Xin Chào Bạn Đã Đến Shop |CẢM ƠN BẠN LÀ KHÁCH HÀNG Của Shop
         </Col>
         <Col span={8}>MỌI THÔNG TIN( Bảo Hành)VỀ SẢN PHẨM VUI LÒNG LIÊN HỆ</Col>
@@ -301,18 +415,27 @@ export default function headerHome() {
           ZALO SHOP: 0943392799 Fanpage : Cửa Hàng Phật Giáo Bi Vũ
         </Col>
         <Col span={4}>col-6</Col>
-      </WrapperHeaderTop>
-
-      <WrapperHeaderMid gutter={16} style={{ textAlign: "center" }}>
+      </Row>
+      <div 
+      className="w-[100%]"
+      style={{
+      textAlign: "center",
+      // transform: isSticky ? "translateY(-100%)" : "translateY(0)",
+      position: isSticky ? "fixed" : "",
+      top: isSticky ? "0": "",
+      zIndex:  isSticky ? "1000": "", 
+      transition:  isSticky ? "top 0.3s": "",
+    }}>
+      <WrapperHeaderMid className=" items-center w-full container mx-auto px-4"  style={{position: isSticky ? "fixed" : ""}}
+        gutter={16}
+      >
         <Col span={4}>
-          <Image
+          <img
             src={Logo1}
-            style={{
-              width: "150px",
-              height: "80px",
-            }}
+            className="w-[150px] h-[80px]"
+
             preview={false}
-          />
+          /> 
         </Col>
         {/* <Col span={9}>
         <img src={Logo2} style={{
@@ -320,41 +443,55 @@ export default function headerHome() {
             height: '80px',
           }}/>
         </Col> */}
-        <Col span={14}>
-        <div style={{ position: 'relative' }}>
-  <ButtonInputSearch
-    size="large"
-    placeholder="Nhập dữ liệu"
-    textButton="Tìm kiếm"
-    onChange={handleSearchInput}
-    onFocus={handleSearchInputFocus}
-    onBlur={handleSearchInputBlur}
-  />
-  {showList && (
-    <IsLoadingComponent isLoading={isLoadingProducts}>
-  <List
-    ordered
-    dataSource={dataSearch}
-    style={{
-    position: 'absolute',
-    top: '100%',
-    left: 0,
-    width: '100%',
-    zIndex: 10000,
-    backgroundColor: '#FFFFFF',
-    padding: 10,
-    marginTop: 1,
-    boxShadow: '10px 0px 15px -10px rgba(0,0,0,0.75), -10px 0px 15px -10px rgba(0,0,0,0.75), 0px 10px 15px -10px rgba(0,0,0,0.75)'
-  }}
-    renderItem={(item,index) => (
-      <List.Item>
-        {item.title}
-      </List.Item>
-    )}
-  />
-  </IsLoadingComponent>
-)}
-</div>
+        <Col span={14} className="text-left md:text-center">
+          <div style={{ position: "relative" }} className="hidden md:block ">
+            <ButtonInputSearch
+              size="large"
+              placeholder="Nhập dữ liệu"
+              textButton="Tìm kiếm"
+              onChange={handleSearchInput}
+              onFocus={handleSearchInputFocus}
+              onBlur={handleSearchInputBlur}
+            />
+            {showList && (
+              <IsLoadingComponent isLoading={isLoadingProducts}>
+                <List
+                  ordered
+                  dataSource={dataSearch}
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    width: "100%",
+                    zIndex: 10000,
+                    backgroundColor: "#FFFFFF",
+                    padding: 10,
+                    marginTop: 1,
+                    boxShadow:
+                      "10px 0px 15px -10px rgba(0,0,0,0.75), -10px 0px 15px -10px rgba(0,0,0,0.75), 0px 10px 15px -10px rgba(0,0,0,0.75)",
+                  }}
+                  renderItem={(item, index) => (
+                    <List.Item>{item.title}</List.Item>
+                  )}
+                />
+              </IsLoadingComponent>
+            )}
+          </div>
+          <div className="block md:hidden  ">
+            <Button type="primary" onClick={showDrawer}>
+            Open
+          </Button>
+          <Drawer
+        title="Basic Drawer"
+        placement='left'
+        onClose={onClose}
+        open={openSidebar}
+      >
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+      </Drawer>
+          </div>
         </Col>
         <Col
           span={6}
@@ -411,29 +548,42 @@ export default function headerHome() {
             )}
           </WrapperHeaderAccount>
           <WrapperHeaderCart style={{ textAlign: "center" }}>
-          <Badge count={order?.orderItems?.length} >
-            <ShoppingCartOutlined style={{ fontSize: "40px" }} />
-          </Badge>
-            <WrapperHeaderSpan>Giỏ hàng</WrapperHeaderSpan>
+            <Dropdown
+              menu={{ items }}
+              placement="bottomRight"
+              trigger={["click"]}
+              arrow
+            >
+              <div style={{ cursor: "pointer" }}>
+                <Badge count={order?.orderItems?.length} showZero>
+                  <ShoppingCartOutlined style={{ fontSize: "50px" }} />
+                </Badge>
+              </div>
+            </Dropdown>
           </WrapperHeaderCart>
         </Col>
       </WrapperHeaderMid>
-      <WrapperHeaderTypeProduct style={{alignItems: 'center',
-    gap: '16px',
-    justifyContent: 'flex-start',
-    padding: '0 160px',
-    backgroundColor: '#60609B',
-    height: '48px',
-    color: '#fff',
-    }}>
-      <Slider {...settings}>
-         {productType?.data?.map((item, index) => {
-          return (
-              <TypeProduct  name={item} />
-          )
-        })}
+      <WrapperHeaderTypeProduct
+        style={{
+          alignItems: "center",
+          // gap: "16px",
+          // justifyContent: "flex-start",
+          padding: "0 160px",
+          backgroundColor: "#60609B",
+          height: "48px",
+          color: "#fff",
+          position: isSticky ? "fixed" : "static",
+          top: isSticky ? "110px" : "",
+          width: isSticky ? "79%" : "",
+        }}
+      >
+        <Slider {...settings} >
+          {productType?.data?.map((item, index) => {
+            return <TypeProduct style name={item} />;
+          })}
         </Slider>
       </WrapperHeaderTypeProduct>
+      </div>
     </div>
   );
 }

@@ -2,20 +2,14 @@ import {Divider, Row} from 'antd'
 import styled from 'styled-components'
 import Anh from  '../../assets/font-end/imgs/logo/go1.png';
 import {Link} from 'react-router-dom'
-export const WrapperHeaderTop = styled(Row)`
-    background-color: #dee2e6;
-    padding: 10px 20px;
-    align-items:center;
-    width: 100%;
-`
 
 export const WrapperHeaderMid = styled(Row)`
-    background-color: #dee2e6;
-    padding: 15px 100px;
+    /* background-color: #dee2e6; */
+    /* padding: 15px 100px; */
     background-image: url('../../assets/font-end/imgs/logo/go1.png');
     background-image: url(${Anh});
-    align-items:center;
-    width: 100.5%;
+    /* align-items:center; */
+    /* width: 100.5%; */
 `
 
 export const WrapperHeaderAccount = styled.div`

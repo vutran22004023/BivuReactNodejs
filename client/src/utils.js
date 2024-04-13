@@ -1,3 +1,4 @@
+import React, { useEffect, useRef, useState } from "react";
 export const isJsonString = (data) => {
     try {
         JSON.parse(data)
@@ -58,4 +59,23 @@ export function openSidebar() {
       value: 'add_type',
     });
     return results;
+  };
+
+  export const handleScroll = (setSticky) => {
+    useEffect(() => {
+      const handleScroll = () => {
+        const topHeight = document.querySelector(".wrapper-header-top")
+          ?.clientHeight || 0;
+        const isStickyHeader = window.pageYOffset > topHeight;
+        setSticky(isStickyHeader);
+      };
+  
+      window.addEventListener("scroll", handleScroll);
+  
+      return () => {
+        window.removeEventListener("scroll", handleScroll);
+      };
+    }, []);
+  
+    return null;
   };

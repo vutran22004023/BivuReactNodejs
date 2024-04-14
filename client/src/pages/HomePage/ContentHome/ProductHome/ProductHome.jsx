@@ -26,23 +26,25 @@ export default function ProductHome() {
   const { data: productsLimit, isLoading: isLoadingProductsLimit, isPreviousData } = useQuery({ queryKey: ['productsLimit', limit], queryFn: fetchProductAllLimit,keepPreviousData: true, retry:3, retryDelay: 1000 });
 
   return (
-    <div id='container' style={{padding: ' 0 130px', marginTop: '20px' }}>
+    <div id='container' className='p-pad-sm md:p-pad-md mt-4 bg-[rgb(235 232 232)]'>
         <Row>
-          <Col span={16} style={{padding: '10px 20px'}}><SiderConponent arrImage = {[Sider1,Sider2]}/></Col>
-          <Col span={8} style={{width: '100px', padding: '10px'}}>
-              <Image src={product1}  preview={false} height="200px" width={'100%'}/>
-              <Image src={product1}  preview={false} height="200px" width={'100%'}/>
+          <Col span={16} style={{padding: '0 25px'}}>
+            <SiderConponent arrImage = {[Sider1,Sider2]}/>
+          </Col>
+          <Col span={8} style={{width: '100px'}}>
+              <img src={product1}  preview={false} className='w-full h-[50px] md:h-[200px]'/>
+              <img src={product1}  preview={false} className='w-full h-[50px] md:h-[200px]'/>
           </Col>
         </Row>
         <Row style={{marginTop:'10px'}}>
           <Col span={8}>
-          <Image src={product1}  preview={false} height="250px" width={'100%'}/>
+          <img src={product1}  preview={false} className='w-full h-[75px] md:h-[200px]'/>
           </Col>
           <Col span={8}>
-          <Image src={product1}  preview={false} height="250px" width={'100%'}/>
+          <img src={product1}  preview={false} className='w-full h-[75px] md:h-[200px]'/>
           </Col>
           <Col span={8}>
-          <Image src={product1}  preview={false} height="250px" width={'100%'}/>
+          <img src={product1}  preview={false} className='w-full h-[75px] md:h-[200px]'/>
           </Col>
         </Row>
 
@@ -50,7 +52,7 @@ export default function ProductHome() {
           <IsLoadingCardComponent></IsLoadingCardComponent>
         ): (
           <>
-          <div style={{marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent:'space-around',flexWrap: 'wrap'}}>
+          <div className='grid grid-cols-3 gap-2 mb-3 md:grid-cols-6 md:gap-4'>
         
           { productsLimit?.data?.map((product,index)=> {
             return (

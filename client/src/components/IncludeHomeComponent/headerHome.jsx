@@ -418,8 +418,30 @@ export default function headerHome() {
       <div className="mt-10  w-full" style={{display: 'flex', justifyContent: 'center'}}> 
         <img src={Logo1} className="mb-5 md:ml-5 w-[100px] h-[50px] md:w-[150px] md:h-[80px]"/> 
       </div>
-      <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-      <List component="nav" aria-label="main mailbox folders">
+
+      <div style={{ position: "relative" }}>
+            <ButtonInputSearch
+              size="large"
+              placeholder="Nhập dữ liệu"
+              textButton="Tìm kiếm"
+              onChange={handleSearchInput}
+              onFocus={handleSearchInputFocus}
+              onBlur={handleSearchInputBlur}
+            />
+            {showList ? (
+              <IsLoadingComponent isLoading={isLoadingProducts}>
+                <AntdList
+                  ordered
+                  dataSource={dataSearch}
+                  className="absolute top-[100%] left-0 w-full z-[100000] bg-[#FFFFFF] p-2 mt-1 shadow-lg"
+                  renderItem={(item, index) => (
+                    <AntdList.Item>{item.title}</AntdList.Item>
+                  )}
+                />
+              </IsLoadingComponent>
+            ): (
+              <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+              <List component="nav" aria-label="main mailbox folders">
         <ListItemButton
           selected={selectedIndex === 0}
           onClick={(event) => handleListItemClick(event, -1, '/')}
@@ -441,16 +463,20 @@ export default function headerHome() {
         })}
       </List>
       </Box>
+            )}
+          </div>
     </div>
   )   
   return (
     <div >
       <Row
-        className="wrapper-header-top  w-full bg-[#dee2e6] p-[10px 20px]"
-        style={{alignItems: 'center'}}
+        className="wrapper-header-top  w-full bg-[#dee2e6]"
+        style={{
+          alignItems: 'center', padding: '10px 20px',
+          }}
       >
         <Col span={4} className="">
-          Xin Chào Bạn Đã Đến Shop |CẢM ƠN BẠN LÀ KHÁCH HÀNG Của Shop
+          Xin Chào Bạn Đã Đến Shop
         </Col>
         <Col span={8}>MỌI THÔNG TIN( Bảo Hành)VỀ SẢN PHẨM VUI LÒNG LIÊN HỆ</Col>
         <Col span={8}>
@@ -459,7 +485,7 @@ export default function headerHome() {
         <Col span={4}>col-6</Col>
       </Row>
       <div 
-      className="w-[100%] text-center"
+      className="w-[100%] text-center "
       style={{
       textAlign: "center",
       // transform: isSticky ? "translateY(-100%)" : "translateY(0)",
@@ -468,8 +494,8 @@ export default function headerHome() {
       zIndex:  isSticky ? "1000": "", 
       transition:  isSticky ? "top 0.3s": "",
     }}>
-      <WrapperHeaderMid className="items-center w-full "  
-      style={{position: isSticky ? "fixed" : "",padding: '10px 0'}}
+      <WrapperHeaderMid className="items-center w-full p-pad-sm md:p-pad-md"  
+      style={{position: isSticky ? "fixed" : ""}}
       >
         <Col  xs={4} md={4}>
           <img
@@ -501,7 +527,7 @@ export default function headerHome() {
                   dataSource={dataSearch}
                   className="absolute top-[100%] left-0 w-full z-[100000] bg-[#FFFFFF] p-2 mt-1 shadow-lg"
                   renderItem={(item, index) => (
-                    <List.Item>{item.title}</List.Item>
+                    <AntdList.Item>{item.title}</AntdList.Item>
                   )}
                 />
               </IsLoadingComponent>

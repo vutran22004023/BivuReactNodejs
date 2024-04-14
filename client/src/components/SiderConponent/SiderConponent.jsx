@@ -15,7 +15,7 @@ export default function SiderConponent({arrImage}) {
     <Slider {...settings}>
         {arrImage.map((image) => {
             return (
-                <Image className='image-sider' width="100%" height="400px" src={image} key={image} alt='slider' preview={false}  />
+                <Image className='image-sider w-full h-[100px] md:h-[400px]' src={image} key={image} alt='slider' preview={false}  />
             )
         }) }
     </Slider>

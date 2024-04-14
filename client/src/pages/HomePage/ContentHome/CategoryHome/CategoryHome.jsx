@@ -39,7 +39,9 @@ export default function CategoryHome() {
 
   return (
     <IsLoadingComponent isLoading={isLoadingres}>
-    <div style= {{margin: '10px 100px',backgroundColor: 'rgb(235 232 232)', padding: '10px'}}>
+    <div 
+    className='md:p-pad-md mt-4 bg-[rgb(235 232 232)]'
+    >
 
       <WapperCategory >
       <Col span={5} style={{width: '100%',backgroundColor: '#fff', marginRight: '10px'}}>

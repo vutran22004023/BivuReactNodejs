@@ -1,13 +1,6 @@
 import styled from 'styled-components'
 import { Card } from "antd";
 export const WapperCardStyled = styled(Card)`
-    width: 191px;
-    &img {
-        height: 200px;
-        width: 200px;
-    };
-    margin-top: 10px;
-    margin-right: 5px;
 `
 
 export const StyleNameProduct = styled.div`

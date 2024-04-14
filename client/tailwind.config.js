@@ -6,12 +6,10 @@ export default {
   ],
   theme: {
     extend: {
-      container: {
-        padding: {
-          'sm': '0 20px',
-          'md': '0 100px'
-        }
-      },
+      padding: {
+        'pad-sm': '0 10px',
+        'pad-md': '0 100px'
+      }
     },
   },
   plugins: [],

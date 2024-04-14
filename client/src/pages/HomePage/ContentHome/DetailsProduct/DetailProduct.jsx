@@ -5,7 +5,7 @@ import ProductDetail from '../../../../components/ProductDetails/ProductDetail'
 export default function DetailProduct() {
   const {id} = useParams()
   return (
-    <div style={{margin: '10px 100px'}}>
+    <div className='md:p-pad-md mt-4'>
       <h5>
         Trang chu
       </h5>

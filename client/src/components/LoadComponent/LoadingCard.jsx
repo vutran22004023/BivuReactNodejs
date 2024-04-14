@@ -3,79 +3,79 @@ import "../../assets/font-end/css/Home.css";
 import { Col, Row } from 'antd';
 export default function LoadingCard() {
   return (
-    <Row gutter={16}>
-      <Col className="gutter-row" span={4}>
-      <div class="movie--isloading">
-      <div class="loading-image"></div>
-      <div class="loading-content">
-        <div class="loading-text-container">
-          <div class="loading-main-text"></div>
-          <div class="loading-sub-text"></div>
+    <div className="grid grid-cols-3 gap-2 md:grid-cols-6 md:gap-4">
+      <div className="gutter-row">
+      <div className="movie--isloading">
+      <div className="loading-image"></div>
+      <div className="loading-content">
+        <div className="loading-text-container">
+          <div className="loading-main-text"></div>
+          <div className="loading-sub-text"></div>
         </div>
 
       </div>
     </div>
-      </Col>
-      <Col className="gutter-row" span={4}>
-      <div class="movie--isloading">
-      <div class="loading-image"></div>
-      <div class="loading-content">
-        <div class="loading-text-container">
-          <div class="loading-main-text"></div>
-          <div class="loading-sub-text"></div>
+      </div>
+      <div className="gutter-row">
+      <div className="movie--isloading">
+      <div className="loading-image"></div>
+      <div className="loading-content">
+        <div className="loading-text-container">
+          <div className="loading-main-text"></div>
+          <div className="loading-sub-text"></div>
         </div>
 
       </div>
     </div>
-      </Col>
-      <Col className="gutter-row" span={4}>
-      <div class="movie--isloading">
-      <div class="loading-image"></div>
-      <div class="loading-content">
-        <div class="loading-text-container">
-          <div class="loading-main-text"></div>
-          <div class="loading-sub-text"></div>
+      </div>
+      <div className="gutter-row">
+      <div className="movie--isloading">
+      <div className="loading-image"></div>
+      <div className="loading-content">
+        <div className="loading-text-container">
+          <div className="loading-main-text"></div>
+          <div className="loading-sub-text"></div>
         </div>
 
       </div>
     </div>
-      </Col>
-      <Col className="gutter-row" span={4}>
-      <div class="movie--isloading">
-      <div class="loading-image"></div>
-      <div class="loading-content">
-        <div class="loading-text-container">
-          <div class="loading-main-text"></div>
-          <div class="loading-sub-text"></div>
+      </div>
+      <div className="gutter-row">
+      <div className="movie--isloading">
+      <div className="loading-image"></div>
+      <div className="loading-content">
+        <div className="loading-text-container">
+          <div className="loading-main-text"></div>
+          <div className="loading-sub-text"></div>
         </div>
 
       </div>
     </div>
-      </Col>
-      <Col className="gutter-row" span={4}>
-      <div class="movie--isloading">
-      <div class="loading-image"></div>
-      <div class="loading-content">
-        <div class="loading-text-container">
-          <div class="loading-main-text"></div>
-          <div class="loading-sub-text"></div>
+      </div>
+      <div className="gutter-row">
+      <div className="movie--isloading">
+      <div className="loading-image"></div>
+      <div className="loading-content">
+        <div className="loading-text-container">
+          <div className="loading-main-text"></div>
+          <div className="loading-sub-text"></div>
         </div>
 
       </div>
     </div>
-      </Col>
-      <Col className="gutter-row" span={4}>
-      <div class="movie--isloading">
-      <div class="loading-image"></div>
-      <div class="loading-content">
-        <div class="loading-text-container">
-          <div class="loading-main-text"></div>
-          <div class="loading-sub-text"></div>
+      </div>
+      <div className="gutter-row">
+      <div className="movie--isloading">
+      <div className="loading-image"></div>
+      <div className="loading-content">
+        <div className="loading-text-container">
+          <div className="loading-main-text"></div>
+          <div className="loading-sub-text"></div>
         </div>
 
       </div>
     </div>
-      </Col>
-    </Row>
+      </div>
+    </div>
   );
 }

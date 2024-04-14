@@ -1,6 +1,5 @@
 import React from "react";
 import { Card } from "antd";
-const { Meta } = Card;
 import "../../assets/font-end/css/Home.css";
 import { StyleNameProduct,
    WrapperReporText,
@@ -23,17 +22,16 @@ const CardComponent =(props) => {
     navigate(`/chi-tiet/${id}`)
   }
   return (
-    <WapperCardStyled
+    <Card
       hoverable
-      bodyStyle={{ padding: "13px" }}
       onClick={()=> handleDetailsProduct(id)}
+      bodyStyle={{padding:'5px'}}
       cover={
         <img
           alt="example"
           loading="lazy"
           src={image}
-          width='100%'
-          height='250px'
+          className="w-full h-[150px] md:h-[250px]"
         />
       }
     >
@@ -51,7 +49,7 @@ const CardComponent =(props) => {
       <span>{price.toLocaleString()} đ</span>
         <span><WrapperDisscountText>-5%</WrapperDisscountText></span>
       </WrapperPriceText>
-    </WapperCardStyled>
+    </Card>
   );
 
 }

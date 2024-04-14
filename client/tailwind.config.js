@@ -6,9 +6,12 @@ export default {
   ],
   theme: {
     extend: {
-      padding: {
-        '15px 100px': '15px 100px',
-      }
+      container: {
+        padding: {
+          'sm': '0 20px',
+          'md': '0 100px'
+        }
+      },
     },
   },
   plugins: [],

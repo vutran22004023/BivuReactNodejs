@@ -6,7 +6,6 @@ import {Link} from 'react-router-dom'
 export const WrapperHeaderMid = styled(Row)`
     /* background-color: #dee2e6; */
     /* padding: 15px 100px; */
-    background-image: url('../../assets/font-end/imgs/logo/go1.png');
     background-image: url(${Anh});
     /* align-items:center; */
     /* width: 100.5%; */
@@ -29,15 +28,6 @@ export const WrapperHeaderSpan = styled.span`
     font-size: 14px;
 `
 
-export const WrapperHeaderTypeProduct = styled.div`
-    /* align-items: center;
-    gap: 16px;
-    justify-content: flex-start;
-    padding: 0 130px;
-    background-color: #60609B;
-    height: 50px;
-    color: #fff */
-`
 
 
 

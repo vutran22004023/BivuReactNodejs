@@ -1,20 +1,15 @@
-import { Avatar, Col, Image, List, Badge, Dropdown, InputNumber,Row } from "antd";
+import { Avatar, Col, Image, Badge, Dropdown,List as AntdList, InputNumber,Row } from "antd";
 import React, { useEffect, useState, useRef } from "react";
 import {
   WrapperHeaderMid,
   WrapperHeaderAccount,
   WrapperHeaderCart,
-  WrapperHeaderSpan,
-  WrapperHeaderTypeProduct,
-  WrapperHeaderLink,
 } from "../../pages/HomePage/style";
-import Loading from "../../components/LoadComponent/Loading";
-import { WapperContentPopup, StickyHeader } from "./style";
 import {
-  UserOutlined,
-  CaretDownOutlined,
+
   ShoppingCartOutlined,
   CloseCircleOutlined,
+  MenuOutlined,
 } from "@ant-design/icons";
 import Logo1 from "../../assets/font-end/imgs/logo/logo1.png";
 import Logo2 from "../../assets/font-end/imgs/logo/logo2.png";
@@ -34,6 +29,7 @@ import {
   Drawer,
   Button,
   Divider,
+  List,
   Grid,
   Tab,
   ListItem,
@@ -41,7 +37,6 @@ import {
   ListItemText,
   ListItemIcon,
 } from "@mui/material";
-import Sheet from '@mui/joy/Sheet';
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
@@ -54,8 +49,6 @@ import { useDebounce } from "../../hooks/UseMutationHook";
 import { ProductService } from "../../services/index";
 import { useQuery } from "@tanstack/react-query";
 import Slider from "react-slick";
-import "../../assets/font-end/css/Home.css";
-
 export const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;
   return (
@@ -85,6 +78,15 @@ export default function headerHome() {
     slidesToScroll: 10,
     nextArrow: <SampleNextArrow />,
     prevArrow: <SamplePrevArrow />,
+    responsive: [
+      {
+        breakpoint: 950,
+        settings: {
+          slidesToShow: 5,
+          slidesToScroll: 5,
+        }
+      }
+    ]
   };
   //các biến
   const refSearch = useRef();
@@ -333,7 +335,7 @@ export default function headerHome() {
         {
           type: "group",
           label: (
-            <div style={{ width: "400px" }}>
+            <div className="w-[250px] md:w-[400px]">
               <div>Tất cả {order?.orderItems?.length} sản phẩm</div>
               <div
                 style={{
@@ -396,16 +398,56 @@ export default function headerHome() {
       ];
   
     //show dữ liệu drawer bên left
+
+    const [selectedIndex, setSelectedIndex] = useState(-1);
+
+  const handleListItemClick = (event, index,url) => {
+    setSelectedIndex(index);
+    if(index === -1) {
+      navigate(url)
+    }
+  };
       const showDrawer = () => {
         setOpenSidebar(true);
       };
       const onClose = () => {
         setOpenSidebar(false);
       };
+  const drawersleft =  (
+    <div style={{width: '250px'}}>
+      <div className="mt-10  w-full" style={{display: 'flex', justifyContent: 'center'}}> 
+        <img src={Logo1} className="mb-5 md:ml-5 w-[100px] h-[50px] md:w-[150px] md:h-[80px]"/> 
+      </div>
+      <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+      <List component="nav" aria-label="main mailbox folders">
+        <ListItemButton
+          selected={selectedIndex === 0}
+          onClick={(event) => handleListItemClick(event, -1, '/')}
+        >
+          <ListItemText primary="Trang Chủ" />
+        </ListItemButton>
+        {productType?.data?.map((item, index) => {
+          return (
+            
+            <ListItemButton
+            key={index}
+          selected={selectedIndex === index}
+          onClick={(event) => handleListItemClick(event, index,item)}
+          > 
+          <TypeProduct style name={item}>
+          </TypeProduct>
+          </ListItemButton>
+          )
+        })}
+      </List>
+      </Box>
+    </div>
+  )   
   return (
     <div >
       <Row
-        className="wrapper-header-top  w-full bg-[#dee2e6] p-[10px 20px] items-center"
+        className="wrapper-header-top  w-full bg-[#dee2e6] p-[10px 20px]"
+        style={{alignItems: 'center'}}
       >
         <Col span={4} className="">
           Xin Chào Bạn Đã Đến Shop |CẢM ƠN BẠN LÀ KHÁCH HÀNG Của Shop
@@ -417,7 +459,7 @@ export default function headerHome() {
         <Col span={4}>col-6</Col>
       </Row>
       <div 
-      className="w-[100%]"
+      className="w-[100%] text-center"
       style={{
       textAlign: "center",
       // transform: isSticky ? "translateY(-100%)" : "translateY(0)",
@@ -426,15 +468,14 @@ export default function headerHome() {
       zIndex:  isSticky ? "1000": "", 
       transition:  isSticky ? "top 0.3s": "",
     }}>
-      <WrapperHeaderMid className=" items-center w-full container mx-auto px-4"  style={{position: isSticky ? "fixed" : ""}}
-        gutter={16}
+      <WrapperHeaderMid className="items-center w-full "  
+      style={{position: isSticky ? "fixed" : "",padding: '10px 0'}}
       >
-        <Col span={4}>
+        <Col  xs={4} md={4}>
           <img
             src={Logo1}
-            className="w-[150px] h-[80px]"
-
-            preview={false}
+            onClick={()=> navigate('/')}
+            className="md:ml-5 w-[100px] h-[50px] md:w-[150px] md:h-[80px] cursor-pointer"
           /> 
         </Col>
         {/* <Col span={9}>
@@ -443,7 +484,7 @@ export default function headerHome() {
             height: '80px',
           }}/>
         </Col> */}
-        <Col span={14} className="text-left md:text-center">
+        <Col  xs={7} md={14} className="text-left md:text-center">
           <div style={{ position: "relative" }} className="hidden md:block ">
             <ButtonInputSearch
               size="large"
@@ -455,21 +496,10 @@ export default function headerHome() {
             />
             {showList && (
               <IsLoadingComponent isLoading={isLoadingProducts}>
-                <List
+                <AntdList
                   ordered
                   dataSource={dataSearch}
-                  style={{
-                    position: "absolute",
-                    top: "100%",
-                    left: 0,
-                    width: "100%",
-                    zIndex: 10000,
-                    backgroundColor: "#FFFFFF",
-                    padding: 10,
-                    marginTop: 1,
-                    boxShadow:
-                      "10px 0px 15px -10px rgba(0,0,0,0.75), -10px 0px 15px -10px rgba(0,0,0,0.75), 0px 10px 15px -10px rgba(0,0,0,0.75)",
-                  }}
+                  className="absolute top-[100%] left-0 w-full z-[100000] bg-[#FFFFFF] p-2 mt-1 shadow-lg"
                   renderItem={(item, index) => (
                     <List.Item>{item.title}</List.Item>
                   )}
@@ -479,7 +509,7 @@ export default function headerHome() {
           </div>
           <div className="block md:hidden  ">
             <Button type="primary" onClick={showDrawer}>
-            Open
+            <MenuOutlined  style={{fontSize: '25px'}}/>
           </Button>
           <Drawer
         title="Basic Drawer"
@@ -487,33 +517,32 @@ export default function headerHome() {
         onClose={onClose}
         open={openSidebar}
       >
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
+        {drawersleft}
       </Drawer>
           </div>
         </Col>
         <Col
-          span={6}
-          style={{ textAlign: "left", display: "flex", gap: "10px" }}
-        >
-          <WrapperHeaderAccount>
+          xs={13} md={6}
+          style={{ textAlign: 'right'}}
+        > 
+          <div className="ml-[60px] flex md:ml-0">
+          <WrapperHeaderAccount style={{textAlign: 'center'}}>
             {user?.access_Token ? (
               <>
                 <div>
                   <Button
                     onClick={toggleDrawer(true)}
-                    style={{ border: "1px solid #7487f24a" }}
+                    style={{padding: '5px'}}
                   >
                     {userAvatar ? (
                       <>
-                        <Avatar src={userAvatar} size={40} />
-                        <span style={{ fontSize: "12px" }}>{user?.name}</span>
+                        <Avatar src={userAvatar}  className="text-[25px] md:text-[40px]" />
+                        <span className="hidden md:block md:text-[12px] ">{user?.name}</span>
                       </>
                     ) : (
                       <>
-                        <AccountCircleIcon sx={{ fontSize: 40 }} />
-                        <span style={{ fontSize: "12px" }}>{user?.name}</span>
+                        <AccountCircleIcon className="text-[25px] md:text-[40px] ml-5" />
+                        <span className="hidden md:block text-[9px] md:text-[12px]">{user?.name}</span>
                       </>
                     )}
                   </Button>
@@ -531,10 +560,11 @@ export default function headerHome() {
               <div>
                 <Button
                   onClick={toggleDrawer(true)}
-                  style={{ border: "1px solid #7487f24a" }}
+                  style={{  padding: '5px' }}
+                  className="ml-0 md:ml-3"
                 >
-                  <AccountCircleIcon sx={{ fontSize: 40 }} />
-                  <span style={{ fontSize: "12px" }}>Đăng nhập/Đăng kí</span>
+                  <AccountCircleIcon sx={{ fontSize: { xs: '25px', md: '30px' } }}  />
+                  <span className="text-[9px] md:text-[12px]">Đăng nhập/Đăng kí</span>
                 </Button>
                 <Drawer
                   open={open}
@@ -547,34 +577,32 @@ export default function headerHome() {
               </div>
             )}
           </WrapperHeaderAccount>
-          <WrapperHeaderCart style={{ textAlign: "center" }}>
+          <WrapperHeaderCart style={{ textAlign: "center", alignContent: 'center' }}>
             <Dropdown
               menu={{ items }}
               placement="bottomRight"
               trigger={["click"]}
               arrow
             >
-              <div style={{ cursor: "pointer" }}>
+              <div style={{ cursor: "pointer", marginRight: '20px' }} className="md:mr-0" >
                 <Badge count={order?.orderItems?.length} showZero>
-                  <ShoppingCartOutlined style={{ fontSize: "50px" }} />
+                  <ShoppingCartOutlined className="text-[40px] md:text-[40px]" />
                 </Badge>
               </div>
             </Dropdown>
           </WrapperHeaderCart>
+          </div>
         </Col>
       </WrapperHeaderMid>
-      <WrapperHeaderTypeProduct
+      <div
+        className="align-center hidden  md:block  bg-[#60609B] text-white"
         style={{
-          alignItems: "center",
-          // gap: "16px",
-          // justifyContent: "flex-start",
-          padding: "0 160px",
-          backgroundColor: "#60609B",
-          height: "48px",
-          color: "#fff",
+          height: "auto",
+          zIndex: "1000",
           position: isSticky ? "fixed" : "static",
-          top: isSticky ? "110px" : "",
-          width: isSticky ? "79%" : "",
+          top: isSticky ? "80px" : "",
+          width: isSticky ? "100%" : "",
+          padding: '0 160px'
         }}
       >
         <Slider {...settings} >
@@ -582,7 +610,7 @@ export default function headerHome() {
             return <TypeProduct style name={item} />;
           })}
         </Slider>
-      </WrapperHeaderTypeProduct>
+      </div>
       </div>
     </div>
   );

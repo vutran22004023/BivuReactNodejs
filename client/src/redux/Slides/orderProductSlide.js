@@ -22,6 +22,7 @@ const initialState = {
         //     }
         // }
     ],
+    orderItemsSlected: [],
     shippingAddress: {
         // fullName: {
         //     type: String,
@@ -62,7 +63,7 @@ export const orderSlice = createSlice({
     reducers: {
         AddOrderProduct:(state, action) => {
             const {orderItem} = action.payload
-            const index = state.orderItems.findIndex(item => item.product === orderItem.product)
+            const index = state?.orderItems.findIndex(item => item.product === orderItem.product)
             console.log(state?.orderItems)
             if(index !== -1) {
                 state.orderItems[index].amount += orderItem.amount
@@ -70,26 +71,43 @@ export const orderSlice = createSlice({
                 state.orderItems.push(orderItem)
             }
         },
-        increaseAmount: (state, action) => {
+        IncreaseAmount: (state, action) => {
             const {idProduct} = action.payload
-            const index = state.orderItems.findIndex(item => item.product === idProduct)
-            index.amount++
-        },
-        decreaseAmount: (state, action) => {
-            const {idProduct} = action.payload
-            const index = state.orderItems.findIndex(item => item.product === idProduct)
-            index.amount--
-        },
-        RemoveOrderProduct:(state, action) => {
-            const { idProduct } = action.payload
-            const index = state.orderItems.findIndex(item => item.product === idProduct)
-            if(index !== -1) {
-                state.orderItems.splice(index, 1)
+            const itemOrder = state?.orderItems?.find((item) => item?.product === idProduct)
+            const itemOrderSelected = state?.orderItemsSlected?.find((item) => item?.product === idProduct)
+            itemOrder.amount++;
+            if(itemOrderSelected) {
+              itemOrderSelected.amount++;
             }
+          },
+          DecreaseAmount: (state, action) => {
+            const {idProduct} = action.payload
+            const itemOrder = state?.orderItems?.find((item) => item?.product === idProduct)
+            const itemOrderSelected = state?.orderItemsSlected?.find((item) => item?.product === idProduct)
+            itemOrder.amount--;
+            if(itemOrderSelected) {
+              itemOrderSelected.amount--;
+            }
+          },
+        RemoveOrderProduct:(state, action) => {
+            const {idProduct} = action.payload
+            const itemOrders = state?.orderItems?.filter((item) => !idProduct.includes(item?.product))
+            const itemOrdersSelected = state?.orderItems?.filter((item) => !idProduct.includes(item?.product))
+            state.orderItems = itemOrders
+            state.orderItemsSlected = itemOrdersSelected
         },
+        removeAllOrderProduct: (state, action) => {
+            const {listChecked} = action.payload
+            
+            const itemOrders = state?.orderItems?.filter((item) => !listChecked.includes(item.product))
+            const itemOrdersSelected = state?.orderItems?.filter((item) => !listChecked.includes(item.product))
+            state.orderItems = itemOrders
+            state.orderItemsSlected = itemOrdersSelected
+      
+          },
     }
 })
 
-export const {AddOrderProduct} =orderSlice.actions
+export const {AddOrderProduct,IncreaseAmount,DecreaseAmount,RemoveOrderProduct,removeAllOrderProduct} =orderSlice.actions
 
 export default orderSlice.reducer

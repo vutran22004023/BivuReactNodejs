@@ -59,8 +59,7 @@ export default function ProductDetail({idProduct}) {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const onChange = (value) => {
-    setNumberProduct(value + 1 )
-    console.log(numberProduct)
+    setNumberProduct(value)
   };
   const settings1 = {
     nextArrow: <SampleNextArrow />,

@@ -39,6 +39,10 @@ const UserAdmin = React.lazy(() =>
   import("../pages/AdminPage/ContentAdmin/UserAdmin/UserAdmin")
 );
 
+const CartProduct = React.lazy(() =>
+  import("../pages/HomePage/ContentHome/CartProduct/CartProduct.jsx")
+);
+
 
 
 
@@ -137,6 +141,10 @@ export default createBrowserRouter([
           {
             element: <ProFileUser />,
             path: "/profile-user",
+          },
+          {
+            element: <CartProduct />,
+            path: "/gio-hang",
           },
         ],
       },

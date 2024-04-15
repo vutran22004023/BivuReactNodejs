@@ -1,4 +1,13 @@
-import { Avatar, Col, Image, Badge, Dropdown,List as AntdList, InputNumber,Row } from "antd";
+import {
+  Avatar,
+  Col,
+  Image,
+  Badge,
+  Dropdown,
+  List as AntdList,
+  InputNumber,
+  Row,
+} from "antd";
 import React, { useEffect, useState, useRef } from "react";
 import {
   WrapperHeaderMid,
@@ -6,7 +15,6 @@ import {
   WrapperHeaderCart,
 } from "../../pages/HomePage/style";
 import {
-
   ShoppingCartOutlined,
   CloseCircleOutlined,
   MenuOutlined,
@@ -23,6 +31,7 @@ import {
   SearchProduct,
   SearchisInputEmpty,
 } from "../../redux/Slides/productSlide";
+import {IncreaseAmount,DecreaseAmount} from "../../redux/Slides/orderProductSlide";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import {
   Box,
@@ -84,9 +93,9 @@ export default function headerHome() {
         settings: {
           slidesToShow: 5,
           slidesToScroll: 5,
-        }
-      }
-    ]
+        },
+      },
+    ],
   };
   //các biến
   const refSearch = useRef();
@@ -102,7 +111,7 @@ export default function headerHome() {
   const [value, setValue] = useState("1");
   const [searchInput, setSearch] = useState("");
   const [showList, setShowList] = useState(false);
-  const [isInputEmpty, setIsInputEmpty] = useState(true);
+  const [isInputEmpty, setIsInputEmpty] = useState(1);
   const searchDebouned = useDebounce(searchInput, 500);
   const [limit, setLimit] = useState(6);
   const [isSticky, setSticky] = useState(false);
@@ -325,10 +334,8 @@ export default function headerHome() {
       title: item.name,
     };
   });
-  // dữ liệu giỏ hàng
-  const onChange = (value) => {
-    console.log("changed", value);
-  };
+
+
   const orderItemsExist = order.orderItems;
   const items = orderItemsExist
     ? [
@@ -356,19 +363,13 @@ export default function headerHome() {
                           justifyContent: "space-between",
                         }}
                       >
-                        <div>
+                        <div className="flex justify-between w-full">
                           <div>{item?.name}</div>
                           <div>{item?.price} đ</div>
                         </div>
                         <div
                           style={{ textAlign: "center", alignItems: "center" }}
                         >
-                          <InputNumber
-                            min={1}
-                            max={50}
-                            defaultValue={item?.amount}
-                            onChange={onChange}
-                          />
                         </div>
                       </div>
                     </div>
@@ -383,8 +384,8 @@ export default function headerHome() {
                   bottom: "0",
                 }}
               >
-                <div>Tổng số tiền:</div>
-                <Button>Thanh Toán</Button>
+                <div></div>
+                <Button onClick={()=> navigate('gio-hang')}>Xem giỏ hàng</Button>
               </div>
             </div>
           ),
@@ -396,84 +397,91 @@ export default function headerHome() {
           label: null, // Không hiển thị nội dung nếu không có dữ liệu
         },
       ];
-  
-    //show dữ liệu drawer bên left
 
-    const [selectedIndex, setSelectedIndex] = useState(-1);
+  //show dữ liệu drawer bên left
 
-  const handleListItemClick = (event, index,url) => {
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+
+  const handleListItemClick = (event, index, url) => {
     setSelectedIndex(index);
-    if(index === -1) {
-      navigate(url)
+    if (index === -1) {
+      navigate(url);
     }
   };
-      const showDrawer = () => {
-        setOpenSidebar(true);
-      };
-      const onClose = () => {
-        setOpenSidebar(false);
-      };
-  const drawersleft =  (
-    <div style={{width: '250px'}}>
-      <div className="mt-10  w-full" style={{display: 'flex', justifyContent: 'center'}}> 
-        <img src={Logo1} className="mb-5 md:ml-5 w-[100px] h-[50px] md:w-[150px] md:h-[80px]"/> 
+  const showDrawer = () => {
+    setOpenSidebar(true);
+  };
+  const onClose = () => {
+    setOpenSidebar(false);
+  };
+  const drawersleft = (
+    <div style={{ width: "250px" }}>
+      <div
+        className="mt-10  w-full"
+        style={{ display: "flex", justifyContent: "center" }}
+      >
+        <img
+          src={Logo1}
+          className="mb-5 h-[50px] w-[100px] md:ml-5 md:h-[80px] md:w-[150px]"
+        />
       </div>
 
       <div style={{ position: "relative" }}>
-            <ButtonInputSearch
-              size="large"
-              placeholder="Nhập dữ liệu"
-              textButton="Tìm kiếm"
-              onChange={handleSearchInput}
-              onFocus={handleSearchInputFocus}
-              onBlur={handleSearchInputBlur}
+        <ButtonInputSearch
+          size="large"
+          placeholder="Nhập dữ liệu"
+          textButton="Tìm kiếm"
+          onChange={handleSearchInput}
+          onFocus={handleSearchInputFocus}
+          onBlur={handleSearchInputBlur}
+        />
+        {showList ? (
+          <IsLoadingComponent isLoading={isLoadingProducts}>
+            <AntdList
+              ordered
+              dataSource={dataSearch}
+              className="absolute left-0 top-[100%] z-[100000] mt-1 w-full bg-[#FFFFFF] p-2 shadow-lg"
+              renderItem={(item, index) => (
+                <AntdList.Item>{item.title}</AntdList.Item>
+              )}
             />
-            {showList ? (
-              <IsLoadingComponent isLoading={isLoadingProducts}>
-                <AntdList
-                  ordered
-                  dataSource={dataSearch}
-                  className="absolute top-[100%] left-0 w-full z-[100000] bg-[#FFFFFF] p-2 mt-1 shadow-lg"
-                  renderItem={(item, index) => (
-                    <AntdList.Item>{item.title}</AntdList.Item>
-                  )}
-                />
-              </IsLoadingComponent>
-            ): (
-              <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-              <List component="nav" aria-label="main mailbox folders">
-        <ListItemButton
-          selected={selectedIndex === 0}
-          onClick={(event) => handleListItemClick(event, -1, '/')}
-        >
-          <ListItemText primary="Trang Chủ" />
-        </ListItemButton>
-        {productType?.data?.map((item, index) => {
-          return (
-            
-            <ListItemButton
-            key={index}
-          selected={selectedIndex === index}
-          onClick={(event) => handleListItemClick(event, index,item)}
-          > 
-          <TypeProduct style name={item}>
-          </TypeProduct>
-          </ListItemButton>
-          )
-        })}
-      </List>
-      </Box>
-            )}
-          </div>
+          </IsLoadingComponent>
+        ) : (
+          <Box
+            sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
+          >
+            <List component="nav" aria-label="main mailbox folders">
+              <ListItemButton
+                selected={selectedIndex === 0}
+                onClick={(event) => handleListItemClick(event, -1, "/")}
+              >
+                <ListItemText primary="Trang Chủ" />
+              </ListItemButton>
+              {productType?.data?.map((item, index) => {
+                return (
+                  <ListItemButton
+                    key={index}
+                    selected={selectedIndex === index}
+                    onClick={(event) => handleListItemClick(event, index, item)}
+                  >
+                    <TypeProduct style name={item}></TypeProduct>
+                  </ListItemButton>
+                );
+              })}
+            </List>
+          </Box>
+        )}
+      </div>
     </div>
-  )   
+  );
   return (
-    <div >
+    <div>
       <Row
         className="wrapper-header-top  w-full bg-[#dee2e6]"
         style={{
-          alignItems: 'center', padding: '10px 20px',
-          }}
+          alignItems: "center",
+          padding: "10px 20px",
+        }}
       >
         <Col span={4} className="">
           Xin Chào Bạn Đã Đến Shop
@@ -484,159 +492,174 @@ export default function headerHome() {
         </Col>
         <Col span={4}>col-6</Col>
       </Row>
-      <div 
-      className="w-[100%] text-center "
-      style={{
-      textAlign: "center",
-      // transform: isSticky ? "translateY(-100%)" : "translateY(0)",
-      position: isSticky ? "fixed" : "",
-      top: isSticky ? "0": "",
-      zIndex:  isSticky ? "1000": "", 
-      transition:  isSticky ? "top 0.3s": "",
-    }}>
-      <WrapperHeaderMid className="items-center w-full p-pad-sm md:p-pad-md"  
-      style={{position: isSticky ? "fixed" : ""}}
+      <div
+        className="w-[100%] text-center "
+        style={{
+          textAlign: "center",
+          // transform: isSticky ? "translateY(-100%)" : "translateY(0)",
+          position: isSticky ? "fixed" : "",
+          top: isSticky ? "0" : "",
+          zIndex: isSticky ? "1000" : "",
+          transition: isSticky ? "top 0.3s" : "",
+        }}
       >
-        <Col  xs={4} md={4}>
-          <img
-            src={Logo1}
-            onClick={()=> navigate('/')}
-            className="md:ml-5 w-[100px] h-[50px] md:w-[150px] md:h-[80px] cursor-pointer"
-          /> 
-        </Col>
-        {/* <Col span={9}>
+        <WrapperHeaderMid
+          className="w-full items-center p-pad-sm md:p-pad-md"
+          style={{ position: isSticky ? "fixed" : "" }}
+        >
+          <Col xs={4} md={4}>
+            <img
+              src={Logo1}
+              onClick={() => navigate("/")}
+              className="h-[50px] w-[100px] cursor-pointer md:ml-5 md:h-[80px] md:w-[150px]"
+            />
+          </Col>
+          {/* <Col span={9}>
         <img src={Logo2} style={{
             width: '290px',
             height: '80px',
           }}/>
         </Col> */}
-        <Col  xs={7} md={14} className="text-left md:text-center">
-          <div style={{ position: "relative" }} className="hidden md:block ">
-            <ButtonInputSearch
-              size="large"
-              placeholder="Nhập dữ liệu"
-              textButton="Tìm kiếm"
-              onChange={handleSearchInput}
-              onFocus={handleSearchInputFocus}
-              onBlur={handleSearchInputBlur}
-            />
-            {showList && (
-              <IsLoadingComponent isLoading={isLoadingProducts}>
-                <AntdList
-                  ordered
-                  dataSource={dataSearch}
-                  className="absolute top-[100%] left-0 w-full z-[100000] bg-[#FFFFFF] p-2 mt-1 shadow-lg"
-                  renderItem={(item, index) => (
-                    <AntdList.Item>{item.title}</AntdList.Item>
-                  )}
-                />
-              </IsLoadingComponent>
-            )}
-          </div>
-          <div className="block md:hidden  ">
-            <Button type="primary" onClick={showDrawer}>
-            <MenuOutlined  style={{fontSize: '25px'}}/>
-          </Button>
-          <Drawer
-        title="Basic Drawer"
-        placement='left'
-        onClose={onClose}
-        open={openSidebar}
-      >
-        {drawersleft}
-      </Drawer>
-          </div>
-        </Col>
-        <Col
-          xs={13} md={6}
-          style={{ textAlign: 'right'}}
-        > 
-          <div className="ml-[60px] flex md:ml-0">
-          <WrapperHeaderAccount style={{textAlign: 'center'}}>
-            {user?.access_Token ? (
-              <>
-                <div>
-                  <Button
-                    onClick={toggleDrawer(true)}
-                    style={{padding: '5px'}}
-                  >
-                    {userAvatar ? (
-                      <>
-                        <Avatar src={userAvatar}  className="text-[25px] md:text-[40px]" />
-                        <span className="hidden md:block md:text-[12px] ">{user?.name}</span>
-                      </>
-                    ) : (
-                      <>
-                        <AccountCircleIcon className="text-[25px] md:text-[40px] ml-5" />
-                        <span className="hidden md:block text-[9px] md:text-[12px]">{user?.name}</span>
-                      </>
+          <Col xs={7} md={14} className="text-left md:text-center">
+            <div style={{ position: "relative" }} className="hidden md:block ">
+              <ButtonInputSearch
+                size="large"
+                placeholder="Nhập dữ liệu"
+                textButton="Tìm kiếm"
+                onChange={handleSearchInput}
+                onFocus={handleSearchInputFocus}
+                onBlur={handleSearchInputBlur}
+              />
+              {showList && (
+                <IsLoadingComponent isLoading={isLoadingProducts}>
+                  <AntdList
+                    ordered
+                    dataSource={dataSearch}
+                    className="absolute left-0 top-[100%] z-[100000] mt-1 w-full bg-[#FFFFFF] p-2 shadow-lg"
+                    renderItem={(item, index) => (
+                      <AntdList.Item>{item.title}</AntdList.Item>
                     )}
-                  </Button>
-                  <Drawer
-                    open={open}
-                    onClose={toggleDrawer(false)}
-                    variant="outlined"
-                    anchor="right"
+                  />
+                </IsLoadingComponent>
+              )}
+            </div>
+            <div className="block md:hidden  ">
+              <Button type="primary" onClick={showDrawer}>
+                <MenuOutlined style={{ fontSize: "25px" }} />
+              </Button>
+              <Drawer
+                title="Basic Drawer"
+                placement="left"
+                onClose={onClose}
+                open={openSidebar}
+              >
+                {drawersleft}
+              </Drawer>
+            </div>
+          </Col>
+          <Col xs={13} md={6} style={{ textAlign: "right" }}>
+            <div className="ml-[60px] flex md:ml-0">
+              <WrapperHeaderAccount style={{ textAlign: "center" }}>
+                {user?.access_Token ? (
+                  <>
+                    <div>
+                      <Button
+                        onClick={toggleDrawer(true)}
+                        style={{ padding: "5px" }}
+                      >
+                        {userAvatar ? (
+                          <>
+                            <Avatar
+                              src={userAvatar}
+                              className="text-[25px] md:text-[40px]"
+                            />
+                            <span className="hidden md:block md:text-[12px] ">
+                              {user?.name}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <AccountCircleIcon className="ml-5 text-[25px] md:text-[40px]" />
+                            <span className="hidden text-[9px] md:block md:text-[12px]">
+                              {user?.name}
+                            </span>
+                          </>
+                        )}
+                      </Button>
+                      <Drawer
+                        open={open}
+                        onClose={toggleDrawer(false)}
+                        variant="outlined"
+                        anchor="right"
+                      >
+                        {DrawerList}
+                      </Drawer>
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                    <Button
+                      onClick={toggleDrawer(true)}
+                      style={{ padding: "5px" }}
+                      className="ml-0 md:ml-3"
+                    >
+                      <AccountCircleIcon
+                        sx={{ fontSize: { xs: "25px", md: "30px" } }}
+                      />
+                      <span className="text-[9px] md:text-[12px]">
+                        Đăng nhập/Đăng kí
+                      </span>
+                    </Button>
+                    <Drawer
+                      open={open}
+                      onClose={toggleDrawer(false)}
+                      variant="outlined"
+                      anchor="right"
+                    >
+                      {DrawerList}
+                    </Drawer>
+                  </div>
+                )}
+              </WrapperHeaderAccount>
+              <WrapperHeaderCart
+                style={{ textAlign: "center", alignContent: "center" }}
+              >
+                <Dropdown
+                  menu={{ items }}
+                  placement="bottomRight"
+                  trigger={["click"]}
+                  arrow
+                >
+                  <div
+                    style={{ cursor: "pointer", marginRight: "20px" }}
+                    className="md:mr-0"
                   >
-                    {DrawerList}
-                  </Drawer>
-                </div>
-              </>
-            ) : (
-              <div>
-                <Button
-                  onClick={toggleDrawer(true)}
-                  style={{  padding: '5px' }}
-                  className="ml-0 md:ml-3"
-                >
-                  <AccountCircleIcon sx={{ fontSize: { xs: '25px', md: '30px' } }}  />
-                  <span className="text-[9px] md:text-[12px]">Đăng nhập/Đăng kí</span>
-                </Button>
-                <Drawer
-                  open={open}
-                  onClose={toggleDrawer(false)}
-                  variant="outlined"
-                  anchor="right"
-                >
-                  {DrawerList}
-                </Drawer>
-              </div>
-            )}
-          </WrapperHeaderAccount>
-          <WrapperHeaderCart style={{ textAlign: "center", alignContent: 'center' }}>
-            <Dropdown
-              menu={{ items }}
-              placement="bottomRight"
-              trigger={["click"]}
-              arrow
-            >
-              <div style={{ cursor: "pointer", marginRight: '20px' }} className="md:mr-0" >
-                <Badge count={order?.orderItems?.length} showZero>
-                  <ShoppingCartOutlined className="text-[40px] md:text-[40px]" />
-                </Badge>
-              </div>
-            </Dropdown>
-          </WrapperHeaderCart>
-          </div>
-        </Col>
-      </WrapperHeaderMid>
-      <div
-        className="align-center hidden  md:block  bg-[#60609B] text-white"
-        style={{
-          height: "auto",
-          zIndex: "1000",
-          position: isSticky ? "fixed" : "static",
-          top: isSticky ? "80px" : "",
-          width: isSticky ? "100%" : "",
-          padding: '0 160px'
-        }}
-      >
-        <Slider {...settings} >
-          {productType?.data?.map((item, index) => {
-            return <TypeProduct style name={item} />;
-          })}
-        </Slider>
-      </div>
+                    <Badge count={order?.orderItems?.length} showZero>
+                      <ShoppingCartOutlined className="text-[40px] md:text-[40px]" />
+                    </Badge>
+                  </div>
+                </Dropdown>
+              </WrapperHeaderCart>
+            </div>
+          </Col>
+        </WrapperHeaderMid>
+        <div
+          className="align-center hidden  bg-[#60609B]  text-white md:block"
+          style={{
+            height: "auto",
+            zIndex: "1000",
+            position: isSticky ? "fixed" : "static",
+            top: isSticky ? "80px" : "",
+            width: isSticky ? "100%" : "",
+            padding: "0 160px",
+          }}
+        >
+          <Slider {...settings}>
+            {productType?.data?.map((item, index) => {
+              return <TypeProduct style name={item} />;
+            })}
+          </Slider>
+        </div>
       </div>
     </div>
   );

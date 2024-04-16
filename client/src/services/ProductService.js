@@ -42,13 +42,14 @@ const getDetailProduct= async (id) => {
     return res.data
 }
 
-const getAllProduct = async (limit,search) => {
+const getAllProduct = async (limit,search,page) => {
     if(search.length > 0) {
         const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/all-products?filter=name&filter=${search}`)
         return res.data
 
     }else {
-        const res =await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/all-products?limit=${limit}`)
+        console.log(page)
+        const res =await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/all-products?limit=${limit}&page=${page}`)
         return res.data
     }
 }

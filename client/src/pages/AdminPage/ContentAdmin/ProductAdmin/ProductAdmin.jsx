@@ -61,12 +61,19 @@ export default function ProductAdmin() {
 
   // các biến dữ liệu
   const user = useSelector((state) => state.user);
+  const pages = useSelector((state) => state.pagination);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false);
   const [typeSelect, setTypeSelect] = useState("");
+  const [typePage,setTypePage] = useState(0)
+  useEffect(() => {
+    if (pages) { // Đảm bảo pages không phải là undefined hoặc null
+        setTypePage(pages.page)
+    }
+}, [pages?.page]);
   const [stateProduct, setStateProduct] = useState({
     name: "",
     image: "",
@@ -168,7 +175,8 @@ export default function ProductAdmin() {
   const fetchProductAll = async (context) => {
     const search = "";
     const limit = "";
-    const res = await ProductService.getAllProduct(limit, search);
+    const page = context.queryKey[1]
+    const res = await ProductService.getAllProduct(limit, search,page);
     return res;
   };
 
@@ -219,7 +227,7 @@ export default function ProductAdmin() {
   // các biến dữ liệu
   const { data, isLoading: isLoadingCreateProduct, isSuccess, isError } = mutation;
   const queryProduct = useQuery({
-    queryKey: ["products"],
+    queryKey: ["products",typePage],
     queryFn: fetchProductAll,
     retryDelay: 1000,
     staleTime: 1000,
@@ -886,6 +894,9 @@ export default function ProductAdmin() {
             dataDeleteMany={dataDeleteMany}
             products={dataAllProduct}
             columns={columns}
+            total={products?.total}
+            pageCurrent={products?.pageCurrent}
+            totalPages={products?.totalPage}
             onRow={(record, rowIndex) => {
               return {
                 onClick: (event) => {

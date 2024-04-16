@@ -10,6 +10,7 @@ import { StyleNameProduct,
    } from "./style";
 import { StarFilled } from "@ant-design/icons";
 import { useNavigate } from 'react-router-dom';
+import { convertPrice } from "../../utils";
 
 
 
@@ -46,7 +47,7 @@ const CardComponent =(props) => {
         <span>| Đã Bán 1000+</span>
       </WrapperReporText>
       <WrapperPriceText>
-      <span>{price.toLocaleString()} đ</span>
+      <span>{convertPrice(price)}</span>
         <span><WrapperDisscountText>-5%</WrapperDisscountText></span>
       </WrapperPriceText>
     </Card>

@@ -88,7 +88,6 @@ const getAllProduct = async(limit = 10, page =0,sort ,filter) => {
         if (sort) {
           const sortObject = {};
           sortObject[sort[1]] = sort[0];
-          console.log(sortObject);
 
           const allProductSort = await ProductModel.find().limit(limit).skip(page * limit).sort(sortObject)
           return {

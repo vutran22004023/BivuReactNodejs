@@ -5,8 +5,11 @@ import { Button, Dropdown, Space } from 'antd';
 import ModalComponent from '../../components/ModalComponent/Modal.jsx'
 import LoadingComponent from '../../components/LoadComponent/Loading.jsx'
 import { UploadOutlined, WarningOutlined } from "@ant-design/icons";
+import { useSelector, useDispatch } from "react-redux";
+import {paginationPage} from '../../redux/Slides/pagination.js'
 export default function  OrderTable  (props) {
-  const {products, columns, handleDeleteMany,dataDeleteisLoadingMany, dataDeleteMany} =props
+  const dispathch = useDispatch()
+  const {products, columns, handleDeleteMany,dataDeleteisLoadingMany, dataDeleteMany,total,pageCurrent,totalPages} =props
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [rowSelectedKeys, setRowSelectedKeys] = useState([])
@@ -79,6 +82,12 @@ export default function  OrderTable  (props) {
     ],
   };
 
+  const onPageChange = (page) => {
+    if(page) {
+      dispathch(paginationPage({page}))
+    }
+  }
+
   const items = [
     {
       key: '1',
@@ -103,8 +112,12 @@ export default function  OrderTable  (props) {
       >
         <Button style={{marginBottom: 10}} >Lựa chọn</Button>
       </Dropdown>
-    <Table rowSelection={rowSelection} columns={columns} dataSource={data} pagination={{
-      pageSize: 50,
+    <Table rowSelection={rowSelection} columns={columns} dataSource={data} 
+    pagination={{
+      pageSize: 10,
+      total: total,
+      current:pageCurrent - 1,
+      onChange: onPageChange
     }}
     scroll={{
       y: 450,

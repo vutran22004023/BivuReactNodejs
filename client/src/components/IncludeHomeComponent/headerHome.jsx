@@ -58,6 +58,7 @@ import { useDebounce } from "../../hooks/UseMutationHook";
 import { ProductService } from "../../services/index";
 import { useQuery } from "@tanstack/react-query";
 import Slider from "react-slick";
+import { convertPrice } from "../../utils";
 export const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;
   return (
@@ -365,7 +366,7 @@ export default function headerHome() {
                       >
                         <div className="flex justify-between w-full">
                           <div>{item?.name}</div>
-                          <div>{item?.price} đ</div>
+                          <div>{convertPrice(item?.price)}</div>
                         </div>
                         <div
                           style={{ textAlign: "center", alignItems: "center" }}
@@ -415,7 +416,7 @@ export default function headerHome() {
     setOpenSidebar(false);
   };
   const drawersleft = (
-    <div style={{ width: "250px" }}>
+    <div style={{ width: "250px"}}>
       <div
         className="mt-10  w-full"
         style={{ display: "flex", justifyContent: "center" }}

@@ -5,6 +5,7 @@ import ButtonComponent from '../../../../components/ButtonSearch/Button'
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { useSelector, useDispatch } from "react-redux";
 import {IncreaseAmount,DecreaseAmount,RemoveOrderProduct,removeAllOrderProduct} from "../../../../redux/Slides/orderProductSlide";
+import { convertPrice } from "../../../../utils";
 
 export default function CartProduct() {
     const[numberProduct, setNumberProduct] = useState(1)
@@ -68,12 +69,11 @@ export default function CartProduct() {
             <div className="w-32 flex-auto">Đơn giá</div>
             <div className="w-32 flex-auto">Số Lượng</div>
             <div className="w-32 flex-auto">Thành tiền</div>
-            <div className="w-20 flex-auto text-center">
-            <DeleteOutlined style={{fontSize: '20px'}} onClick={handleChangeDeleteCheckAll} />
+            <div className="w-20 flex-auto text-center cursor-pointer hover:text-[red]" onClick={handleChangeDeleteCheckAll}>
+            <DeleteOutlined style={{fontSize: '20px'}} />
             </div>
           </div>
           {order.orderItems?.map((item) => {
-            console.log(item);
             return (
                 <div className="mt-2 flex bg-[#e9d5d5] p-4 text-center items-center">
                 <div className="w-5 flex-auto">
@@ -85,8 +85,8 @@ export default function CartProduct() {
               </div>
               <div className="ml-1">{item?.name}</div>
             </div>
-            <div className="w-32 flex-auto">{item?.price} đ</div>
-            <div className="w-32 flex-auto flex">
+            <div className="w-32 flex-auto">{convertPrice(item?.price)}</div> 
+            <div className="w-32 flex-auto flex" style={{justifyContent:'center'}}>
             <button style={{ border:'1px solid #000',background: '#fff', cursor: 'pointer',borderRadius: '5px 0 0 5px', padding: '0 5px' }}
               onClick={() => handleChangeCount('decrease',item?.product, item?.amount === 1)}
              >
@@ -99,8 +99,8 @@ export default function CartProduct() {
                         <PlusOutlined style={{ color: '#000', fontSize: '15px' }}/>
                     </button>
             </div>
-            <div className="w-32 flex-auto">312312312</div>
-            <div className="w-20 flex-auto cursor-pointer" onClick={() => handleDeteteOrder(item?.product)}><DeleteOutlined style={{fontSize: '20px'}} /></div>
+            <div className="w-32 flex-auto">{convertPrice(item?.price * item?.amount)}</div>
+            <div className="w-20 flex-auto cursor-pointer" onClick={() => handleDeteteOrder(item?.product)}><DeleteOutlined className="hover:text-[red]" style={{fontSize: '20px'}} /></div>
           </div>
             )
           })}
@@ -109,7 +109,7 @@ export default function CartProduct() {
           <div className="ml-2 h-auto w-full rounded-md bg-[#e9d5d5] p-4" >
             <div className="flex justify-between">
                 <div>Tạm tính</div>
-                <div>0</div>
+                <div>{convertPrice(item?.price * item?.amount)}</div>
             </div>
             <div className="flex justify-between">
                 <div>Giảm giá</div>

@@ -1,6 +1,6 @@
 import { ProductModel } from "../model/index.js";
 const createProduct = async (newProduct) => {
-        const {name,image,type,price,counInStock,rating,description} =  newProduct
+        const {name,image,type,price,counInStock,rating,description,discount} =  newProduct
         try {
             const checkProduct = await ProductModel.findOne({
                 name: name,
@@ -19,7 +19,8 @@ const createProduct = async (newProduct) => {
                 price,
                 counInStock,
                 rating,
-                description
+                description,
+                discount
             })
             if(createProduct) {
                 return {
@@ -95,7 +96,7 @@ const getAllProduct = async(limit = 10, page =0,sort ,filter) => {
               message: "Xem tất cả sản phẩm",
               data: allProductSort,
               total: totalProduct,
-              pageCurrent: Number(page) + 1,
+              pageCurrent: Number(page),
               totalPage: Math.ceil(totalProduct / limit)
           };
           
@@ -118,7 +119,7 @@ const getAllProduct = async(limit = 10, page =0,sort ,filter) => {
               message: "Xem tất cả sản phẩm",
               data: allProductSort,
               total: totalProduct,
-              pageCurrent: Number(page) + 1,
+              pageCurrent: Number(page),
               totalPage: Math.ceil(totalProduct / limit)
           };
       }

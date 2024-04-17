@@ -188,6 +188,7 @@ export default function UserAdmin() {
 
     //checkbox modal create use
     const user = useSelector((state) => state.user);
+    const pages = useSelector((state) => state.pagination);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [passwordVisible1, setPasswordVisible1] = useState(false);
@@ -198,6 +199,12 @@ export default function UserAdmin() {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
+    const [typePage,setTypePage] = useState(0)
+    useEffect(() => {
+      if (pages) { // Đảm bảo pages không phải là undefined hoặc null
+          setTypePage(pages.page)
+      }
+  }, [pages?.page]);
     const [stateUser, setStateUser] = useState({
         name: '',
         email: '',
@@ -283,9 +290,10 @@ export default function UserAdmin() {
         return res
     })
 
-    const fetchUserAll = async() => {
+    const fetchUserAll = async(context) => {
         const access_Token =  user.access_Token.split("=")[1];
-        const res =await UserService.getALLUser(access_Token)
+        const page = context.queryKey[1]
+        const res =await UserService.getALLUser(access_Token,page)
         return res
     }
 
@@ -311,7 +319,7 @@ export default function UserAdmin() {
     // end Xử lý api create, getAllUser user api
 
     // các biên show dữ liệu ra client
-    const queryUser = useQuery({queryKey: ['AllUser'], queryFn: fetchUserAll, retryDelay: 1000, staleTime: 1000});
+    const queryUser = useQuery({queryKey: ['AllUser',typePage], queryFn: fetchUserAll, retryDelay: 1000, staleTime: 1000});
     const {data,isLoading} = mutation;
     const {data:Users, isLoading: isLoadingUserAll} = queryUser
     const dataAllUser = Users?.data.allUser
@@ -842,7 +850,14 @@ export default function UserAdmin() {
 
 
         <LoadingComponent isLoading={isLoadingUserAll}>
-      <OrderTable products={dataAllUser} dataDeleteMany={dataDeleteMany} dataDeleteisLoadingMany={dataDeleteisLoadingMany}  columns= {columns} handleDeleteMany= {handleDeleteMany}
+      <OrderTable
+      products={dataAllUser}
+      dataDeleteMany={dataDeleteMany} 
+      dataDeleteisLoadingMany={dataDeleteisLoadingMany}  
+      total={Users?.total}
+      pageCurrent={Users?.pageCurrent}
+      totalPages={Users?.totalPage}
+      columns= {columns} handleDeleteMany= {handleDeleteMany}
       onRow={(record, rowIndex) => {
         return {
       onClick: (event) => {

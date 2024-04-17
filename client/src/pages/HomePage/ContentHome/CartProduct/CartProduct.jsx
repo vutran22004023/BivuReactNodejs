@@ -1,17 +1,18 @@
-import React, { useState } from "react";
+import React, { useState,useMemo,useEffect } from "react";
 import { Col,Space, Divider, Row,InputNumber,Checkbox } from "antd";
 import product1 from "../../../../assets/font-end/imgs/Product/product1.png";
 import ButtonComponent from '../../../../components/ButtonSearch/Button'
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { useSelector, useDispatch } from "react-redux";
-import {IncreaseAmount,DecreaseAmount,RemoveOrderProduct,removeAllOrderProduct} from "../../../../redux/Slides/orderProductSlide";
+import {IncreaseAmount,DecreaseAmount,RemoveOrderProduct,removeAllOrderProduct,selectedOrder} from "../../../../redux/Slides/orderProductSlide";
 import { convertPrice } from "../../../../utils";
-
+import ModalComponent from '../../../../components/ModalComponent/Modal'
 export default function CartProduct() {
-    const[numberProduct, setNumberProduct] = useState(1)
     const [listChecked, setListChecked] = useState([])
     const dispatch = useDispatch()
     const order = useSelector((state) => state.order);
+    const user = useSelector((state) => state.user)
+    const [isModalUpdateInfo, setIsOpenModalUpdateInfo] = useState(false)
     const handleChangeCount = (type, idProduct, limited) => {
       if(type === 'increase') {
         if(!limited) {
@@ -37,6 +38,10 @@ export default function CartProduct() {
       }
     };
 
+    useEffect(() => {
+      dispatch(selectedOrder({listChecked}))
+    },[listChecked] )
+
     const handleOnchangeCheckAll = (e) => {
       if(e.target.checked) {
         const newListChecked = []
@@ -54,7 +59,40 @@ export default function CartProduct() {
         dispatch(removeAllOrderProduct({listChecked}))
       }
     }
+    const handleAddCard = () => {
+      if(!user?.phone || !user?.address || !user?.name || !user?.city) {
+        setIsOpenModalUpdateInfo(true)
+      }
+    }
 
+    const priceMemo = useMemo(()=> {
+      const result = order?.orderItemsSlected?.reduce((total, cur)=> {
+        return total + ((cur.price * cur.amount))
+      },0)
+      return result
+    },[order])
+
+    const priceDiscountMemo = useMemo(()=> {
+      const result = order?.orderItemsSlected?.reduce((total, cur)=> {
+        return total + ((cur.discount * cur.amount))
+      },0)
+      if(Number(result)) {
+        return result
+      }
+      return 0
+    },[order])
+
+    const diliveryPriceMemo = useMemo(()=> {
+      if(priceMemo> 100000) {
+        return 35000
+      }else if(priceMemo){
+        return 20000
+      }
+      return 0
+    },[priceMemo])
+    const totalPriceMemo = useMemo(()=> {
+      return Number(priceMemo)  - Number(priceDiscountMemo) + Number(diliveryPriceMemo)
+    },[priceMemo,priceDiscountMemo,diliveryPriceMemo])
   return (
     <div className="mt-5 p-pad-sm md:p-pad-md">
       <Row>
@@ -73,7 +111,7 @@ export default function CartProduct() {
             <DeleteOutlined style={{fontSize: '20px'}} />
             </div>
           </div>
-          {order.orderItems?.map((item) => {
+          {order?.orderItems?.map((item) => {
             return (
                 <div className="mt-2 flex bg-[#e9d5d5] p-4 text-center items-center">
                 <div className="w-5 flex-auto">
@@ -109,25 +147,21 @@ export default function CartProduct() {
           <div className="ml-2 h-auto w-full rounded-md bg-[#e9d5d5] p-4" >
             <div className="flex justify-between">
                 <div>Tạm tính</div>
-                <div>{convertPrice(item?.price * item?.amount)}</div>
+                <div>{convertPrice(priceMemo)}</div>
             </div>
             <div className="flex justify-between">
                 <div>Giảm giá</div>
-                <div>0</div>
-            </div>
-            <div className="flex justify-between">
-                <div>Thuế</div>
-                <div>0</div>
+                <div>{`${priceDiscountMemo } %`}</div>
             </div>
             <div className="flex justify-between">
                 <div>Phí giao hàng</div>
-                <div>0</div>
+                <div>{convertPrice(diliveryPriceMemo)}</div>
             </div>
 
             <div className=" flex  justify-between">
                 <div className="mt-4">Tổng tiền</div>
                 <div>
-                    <div className="text-[30px] text-[#f55050]">0213</div>
+                    <div className="text-[30px] text-[#f55050]">{convertPrice(totalPriceMemo)}</div>
                     <div>(Đã bao gồm VAT nếu có)</div>
                 </div>
             </div>
@@ -139,20 +173,28 @@ export default function CartProduct() {
             styleButton={{
               background:'red',
               height: "40px",
-              width: "300px",
+              width: "100%",
               border: "none",
               borderRadius: "4px",
               color: "#fff",
               fontSize: "15px",
               fontWeight: "700",
               marginTop: '2px',
+              marginLeft: '10px'
             }}
+            onClick={handleAddCard}
             ></ButtonComponent>
           </div>
         
 
         </Col>
       </Row>
+      <ModalComponent  isOpen={isModalUpdateInfo}
+      //  onOk={} 
+      onCancel={() => setIsOpenModalUpdateInfo(false)}
+       >
+        
+      </ModalComponent>
     </div>
   );
 }

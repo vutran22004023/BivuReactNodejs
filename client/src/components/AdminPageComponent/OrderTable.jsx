@@ -116,7 +116,7 @@ export default function  OrderTable  (props) {
     pagination={{
       pageSize: 10,
       total: total,
-      current:pageCurrent - 1,
+      current:pageCurrent ,
       onChange: onPageChange
     }}
     scroll={{

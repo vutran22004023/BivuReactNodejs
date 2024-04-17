@@ -33,7 +33,6 @@ const DeleteManyProduct= async (id,access_Token) => {
             token: `Beare ${access_Token}`,
         }
     })
-    console.log(access_Token)
     return res.data
 }
 
@@ -48,7 +47,6 @@ const getAllProduct = async (limit,search,page) => {
         return res.data
 
     }else {
-        console.log(page)
         const res =await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/all-products?limit=${limit}&page=${page}`)
         return res.data
     }

@@ -25,8 +25,8 @@ const getDetailUser = async (id,access_Token) => {
     return res.data
 }
 
-const getALLUser = async (access_Token) => {
-    const res = await axiosJWT.get(`${import.meta.env.REACT_APP_API_URL}/user/all-user`,{
+const getALLUser = async (access_Token,page) => {
+    const res = await axiosJWT.get(`${import.meta.env.REACT_APP_API_URL}/user/all-user?page=${page}`,{
         headers: {
             token: `Beare ${access_Token}`
         }

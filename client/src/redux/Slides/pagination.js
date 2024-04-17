@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-    page: [],
+    page: 0,
 }
 
 export const paginationSlices = createSlice({

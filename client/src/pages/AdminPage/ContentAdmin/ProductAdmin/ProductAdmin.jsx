@@ -5,7 +5,7 @@ import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import { Outlet } from "react-router-dom";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import { Modal, Form, Input, Upload, Avatar, Space, Select } from "antd";
+import { Modal, Form, Input, Upload, Avatar, Space, Select,Image } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { getBase64 } from "../../../../utils.js";
 import { UploadOutlined, WarningOutlined } from "@ant-design/icons";
@@ -82,6 +82,7 @@ export default function ProductAdmin() {
     counInStock: "",
     rating: "",
     description: "",
+    discount:""
   });
   const [stateProductDetail, setStateProductDetail] = useState({
     name: "",
@@ -91,6 +92,7 @@ export default function ProductAdmin() {
     counInStock: "",
     rating: "",
     description: "",
+    discount: "",
   });
 
   const [RowSelected, setRowSelected] = useState("");
@@ -430,7 +432,6 @@ export default function ProductAdmin() {
   // show  sản phẩm của id và cập nhập lại product
   const fetchGetDetailsProduct = async () => {
     const res = await ProductService.getDetailProduct(RowSelected);
-    // console.log('res.data', res)
     if (res?.data) {
       setStateProductDetail({
         name: res?.data?.name,
@@ -440,6 +441,7 @@ export default function ProductAdmin() {
         counInStock: res?.data?.counInStock,
         rating: res?.data?.rating,
         description: res?.data?.description,
+        discount: res?.data?.discount
       });
     }
     setIsLoadingUpdate(false);
@@ -667,6 +669,22 @@ export default function ProductAdmin() {
                   name="price"
                 />
               </Form.Item>
+              <Form.Item
+                label="Giảm giá sản phẩm"
+                name="discount"
+                rules={[
+                  {
+                    required: false,
+                    message: "vui lòng nhập giá sản phẩm",
+                  },
+                ]}
+              >
+                <Input
+                  value={stateProduct.discount}
+                  onChange={handleOnchanges}
+                  name="discount"
+                />
+              </Form.Item>
               <Form.Item>
                 {data?.status === "ERR" && (
                   <div
@@ -819,6 +837,23 @@ export default function ProductAdmin() {
                   value={stateProductDetail.price}
                   onChange={handleOnchangeDetails}
                   name="price"
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Giảm giá sản phẩm"
+                name="discount"
+                rules={[
+                  {
+                    required: true,
+                    message: "vui lòng nhập giảm giá sản phẩm",
+                  },
+                ]}
+              >
+                <Input
+                  value={stateProductDetail.discount}
+                  onChange={handleOnchangeDetails}
+                  name="discount"
                 />
               </Form.Item>
               <Form.Item>

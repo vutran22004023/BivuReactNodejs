@@ -158,11 +158,11 @@ export default function CartProduct() {
                 <div>{convertPrice(diliveryPriceMemo)}</div>
             </div>
 
-            <div className=" flex  justify-between">
-                <div className="mt-4">Tổng tiền: <span className="text-[20px] md:hidden text-[#f55050]">{convertPrice(totalPriceMemo)}</span> </div>
-                <div>
-                    <div className=" md:text-[30px] text-[#f55050] hidden md:block">{convertPrice(totalPriceMemo)}</div>
-                    <div className="hidden md:block">(Đã bao gồm VAT nếu có)</div>
+            <div className=" flex  justify-between w-full">
+                <div className="mt-4 ">Tổng tiền: <span className="text-[20px] md:hidden text-[#f55050]">{convertPrice(totalPriceMemo)}</span> </div>
+                <div className="flex-1">
+                    <div className=" md:text-[30px] text-[#f55050] hidden md:block text-right ">{convertPrice(totalPriceMemo)}</div>
+                    <div className="hidden md:block text-right">(Đã bao gồm VAT nếu có)</div>
                 </div>
             <ButtonComponent
             textButton='Mua hàng'

@@ -96,7 +96,7 @@ export default function CartProduct() {
   return (
     <div className="mt-5 p-pad-sm md:p-pad-md">
       <Row>
-        <Col xs={15} sm={15}>
+        <Col xs={24} sm={15}>
           <div className="flex rounded-md bg-[#e9d5d5] p-4 text-center">
             <div className="w-5 flex-auto">
             <Checkbox onChange={handleOnchangeCheckAll} checked={listChecked?.length === order?.orderItems?.length}></Checkbox>
@@ -143,8 +143,8 @@ export default function CartProduct() {
             )
           })}
         </Col>
-        <Col xs={8} sm={8}>
-          <div className="ml-2 h-auto w-full rounded-md bg-[#e9d5d5] p-4" >
+        <Col xs={24} sm={8}>
+          <div className="mt-3 md:mt-0 ml-0 md:ml-2 h-auto w-full rounded-md bg-[#e9d5d5] p-2 md:p-4 " >
             <div className="flex justify-between">
                 <div>Tạm tính</div>
                 <div>{convertPrice(priceMemo)}</div>
@@ -159,15 +159,32 @@ export default function CartProduct() {
             </div>
 
             <div className=" flex  justify-between">
-                <div className="mt-4">Tổng tiền</div>
+                <div className="mt-4">Tổng tiền: <span className="text-[20px] md:hidden text-[#f55050]">{convertPrice(totalPriceMemo)}</span> </div>
                 <div>
-                    <div className="text-[30px] text-[#f55050]">{convertPrice(totalPriceMemo)}</div>
-                    <div>(Đã bao gồm VAT nếu có)</div>
+                    <div className=" md:text-[30px] text-[#f55050] hidden md:block">{convertPrice(totalPriceMemo)}</div>
+                    <div className="hidden md:block">(Đã bao gồm VAT nếu có)</div>
                 </div>
+            <ButtonComponent
+            textButton='Mua hàng'
+            className='md:hidden '
+            styleButton={{
+              background:'red',
+              height: "40px",
+              width: "100%",
+              border: "none",
+              borderRadius: "4px",
+              color: "#fff",
+              fontSize: "15px",
+              fontWeight: "700",
+              marginTop: '10px',
+
+            }}
+            onClick={handleAddCard}
+            ></ButtonComponent>
             </div>
           </div>
 
-          <div className="mt-2 text-center">
+          <div className="mt-2 text-center hidden md:block">
             <ButtonComponent
             textButton='Mua hàng' 
             styleButton={{

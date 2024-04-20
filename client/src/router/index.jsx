@@ -43,6 +43,10 @@ const CartProduct = React.lazy(() =>
   import("../pages/HomePage/ContentHome/CartProduct/CartProduct.jsx")
 );
 
+const PayProduct = React.lazy(() =>
+  import("../pages/HomePage/ContentHome/PayProduct/PayProduct.jsx")
+);
+
 
 
 
@@ -145,6 +149,10 @@ export default createBrowserRouter([
           {
             element: <CartProduct />,
             path: "/gio-hang",
+          },
+          {
+            element: <PayProduct />,
+            path: "/mua-hang",
           },
         ],
       },

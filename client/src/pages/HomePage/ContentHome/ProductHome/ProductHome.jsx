@@ -21,7 +21,7 @@ export default function ProductHome() {
     const search = ''
       const res = await ProductService.getAllProduct(limit,search);
       return res; 
-    }
+  }
 
   const { data: productsLimit, isLoading: isLoadingProductsLimit, isPreviousData } = useQuery({ queryKey: ['productsLimit', limit], queryFn: fetchProductAllLimit,keepPreviousData: true, retry:3, retryDelay: 1000 });
 

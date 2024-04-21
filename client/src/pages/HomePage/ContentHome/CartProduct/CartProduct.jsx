@@ -6,11 +6,12 @@ import { DeleteOutlined, MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { useSelector, useDispatch } from "react-redux";
 import {IncreaseAmount,DecreaseAmount,RemoveOrderProduct,removeAllOrderProduct,selectedOrder} from "../../../../redux/Slides/orderProductSlide";
 import { convertPrice } from "../../../../utils";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation  } from "react-router-dom";
 export default function CartProduct() {
     const navigate = useNavigate()
     const [listChecked, setListChecked] = useState([])
     const dispatch = useDispatch()
+    const location = useLocation();
     const order = useSelector((state) => state.order);
     const handleChangeCount = (type, idProduct, limited) => {
       if(type === 'increase') {
@@ -23,11 +24,6 @@ export default function CartProduct() {
         }
       }
     }
-
-    const handleDeteteOrder = (idProduct) => {
-      dispatch(RemoveOrderProduct({idProduct}))
-    }
-
     const onChange = (e) => {
       if(listChecked.includes(e.target.value)){
         const newListChecked = listChecked.filter((item) => item !== e.target.value)
@@ -40,6 +36,12 @@ export default function CartProduct() {
     useEffect(() => {
       dispatch(selectedOrder({listChecked}))
     },[listChecked] )
+
+    useEffect(() => {
+      if(location.state?.listChecked) {
+        setListChecked([...listChecked, location.state?.listChecked])
+      }
+    },[location.state?.listChecked])
 
     const handleOnchangeCheckAll = (e) => {
       if(e.target.checked) {
@@ -92,6 +94,10 @@ export default function CartProduct() {
     const totalPriceMemo = useMemo(()=> {
       return Number(priceMemo)  - Number(priceDiscountMemo) + Number(diliveryPriceMemo)
     },[priceMemo,priceDiscountMemo,diliveryPriceMemo])
+
+    const handleDeteteOrder =(idProduct) => {
+      dispatch(RemoveOrderProduct({idProduct}))
+    }
   return (
     <div className="mt-5 p-pad-sm md:p-pad-md">
       <Row>

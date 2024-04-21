@@ -58,6 +58,7 @@ export default function ProductDetail({idProduct}) {
   const location = useLocation()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [listChecked, setListChecked] = useState([])
   const onChange = (value) => {
     setNumberProduct(value)
   };
@@ -105,7 +106,7 @@ export default function ProductDetail({idProduct}) {
           image: productDetail?.image,
           price: productDetail?.price,
           product: productDetail?._id
-        }
+        },
       }))
   }
   const hangleBuyProduct = () => {
@@ -121,7 +122,7 @@ export default function ProductDetail({idProduct}) {
           product: productDetail?._id
         }
       }))
-      navigate('/gio-hang')
+      navigate('/gio-hang',{ state: { listChecked: idProduct }})
     }
   }
 

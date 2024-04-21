@@ -6,13 +6,12 @@ import { DeleteOutlined, MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { useSelector, useDispatch } from "react-redux";
 import {IncreaseAmount,DecreaseAmount,RemoveOrderProduct,removeAllOrderProduct,selectedOrder} from "../../../../redux/Slides/orderProductSlide";
 import { convertPrice } from "../../../../utils";
-import ModalComponent from '../../../../components/ModalComponent/Modal'
+import { useNavigate } from "react-router-dom";
 export default function CartProduct() {
+    const navigate = useNavigate()
     const [listChecked, setListChecked] = useState([])
     const dispatch = useDispatch()
     const order = useSelector((state) => state.order);
-    const user = useSelector((state) => state.user)
-    const [isModalUpdateInfo, setIsOpenModalUpdateInfo] = useState(false)
     const handleChangeCount = (type, idProduct, limited) => {
       if(type === 'increase') {
         if(!limited) {
@@ -60,8 +59,8 @@ export default function CartProduct() {
       }
     }
     const handleAddCard = () => {
-      if(!user?.phone || !user?.address || !user?.name || !user?.city) {
-        setIsOpenModalUpdateInfo(true)
+      if(order?.orderItemsSlected?.length) {
+        navigate('/mua-hang')
       }
     }
 
@@ -166,9 +165,10 @@ export default function CartProduct() {
                 </div>
             <ButtonComponent
             textButton='Mua hàng'
-            className='md:hidden '
+            className='md:hidden'
+            disabled={!order?.orderItemsSlected?.length }
             styleButton={{
-              background:'red',
+              background:!order?.orderItemsSlected?.length ? "#ccc" : "rgb(255, 57,69)",
               height: "40px",
               width: "100%",
               border: "none",
@@ -186,9 +186,10 @@ export default function CartProduct() {
 
           <div className="mt-2 text-center hidden md:block">
             <ButtonComponent
+            disabled={!order?.orderItemsSlected?.length }
             textButton='Mua hàng' 
             styleButton={{
-              background:'red',
+              background:!order?.orderItemsSlected?.length ? "#ccc" : "rgb(255, 57,69)",
               height: "40px",
               width: "100%",
               border: "none",
@@ -206,12 +207,12 @@ export default function CartProduct() {
 
         </Col>
       </Row>
-      <ModalComponent  isOpen={isModalUpdateInfo}
+      {/* <ModalComponent  isOpen={isModalUpdateInfo}
       //  onOk={} 
       onCancel={() => setIsOpenModalUpdateInfo(false)}
        >
         
-      </ModalComponent>
+      </ModalComponent> */}
     </div>
   );
 }

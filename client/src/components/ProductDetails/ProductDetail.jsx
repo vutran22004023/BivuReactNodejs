@@ -97,31 +97,7 @@ export default function ProductDetail({idProduct}) {
 
   //Modal Login and buy card
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const hangleBuyProduct = () => {
-    if(!user?.id) {
-      showModal()
-    }else {
-    //   oderItems: [
-    //     {
-    //         name: {
-    //             type: String,
-    //             required: true,
-    //         },
-    //         amount: {
-    //             type: Number,
-    //             required: true,
-    //         },
-    //         image: {
-    //             type: String,
-    //             required: true,
-    //         },
-    //         product: {
-    //             type: mongoose.Schema.Types.ObjectId,
-    //             ref:'Product',
-    //             required: true,
-    //         }
-    //     }
-    // ],
+  const hangleAddCartProduct = () => {
       dispatch(AddOrderProduct({
         orderItem: {
           name: productDetail?.name,
@@ -131,6 +107,21 @@ export default function ProductDetail({idProduct}) {
           product: productDetail?._id
         }
       }))
+  }
+  const hangleBuyProduct = () => {
+    if(!user?.id) {
+      showModal()
+    }else {
+      dispatch(AddOrderProduct({
+        orderItem: {
+          name: productDetail?.name,
+          amount: numberProduct,
+          image: productDetail?.image,
+          price: productDetail?.price,
+          product: productDetail?._id
+        }
+      }))
+      navigate('/gio-hang')
     }
   }
 
@@ -305,6 +296,7 @@ export default function ProductDetail({idProduct}) {
          style={{ height: '60px',width: '100%', marginTop: '10px'}}
            icon={<ShoppingCartOutlined />}
            className="buttonAddProduct"
+           onClick={hangleAddCartProduct}
            >Thêm vào giỏ hàng</Button>
         </div>
         </WapperStyleButtonAddProduct>

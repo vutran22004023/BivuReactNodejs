@@ -6,7 +6,6 @@ const apiGetAllCity= async () => {
 }
 
 const apiDetailAllDistrict= async (province_id) => {
-    console.log(province_id)
     const res = await axios.get(`https://vapi.vnappmob.com/api/province/district/${province_id}`)
     return res.data
 }

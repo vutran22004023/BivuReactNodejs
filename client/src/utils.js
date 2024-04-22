@@ -2,11 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 export const isJsonString = (data) => {
     try {
         JSON.parse(data)
+        return data
     }catch (e) {
         return false;
     }
     return true
 }
+
+
+
 
 export const getBase64 = (file) =>
 new Promise((resolve, reject) => {

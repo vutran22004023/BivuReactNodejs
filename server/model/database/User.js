@@ -20,7 +20,7 @@ const UserSchema =  new mongoose.Schema(
         required: true,
     },
     phone: {
-        type: Number,
+        type: String,
         required: true,
     },
     address: {
@@ -28,7 +28,29 @@ const UserSchema =  new mongoose.Schema(
     },
     avatar: {
         type: String,
+    },
+    city: {
+        type: String,
+    },
+    district: {
+        type: String,
+    },
+    rard: {
+        type: String,
+    },
+    nameCity: {
+        type: String,
+    },
+    nameDistrict: {
+        type: String,
+    },
+    nameRard: {
+        type: String,
+    },
+    specific_address: {
+        type:String,
     }
+    
 },{
     timestamps: true,
 }

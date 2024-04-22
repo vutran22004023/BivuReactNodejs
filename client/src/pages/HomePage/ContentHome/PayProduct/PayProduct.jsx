@@ -11,10 +11,15 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
-import { ProvinceVn } from "../../../../services/index";
+import { ProvinceVn,UserService } from "../../../../services/index";
 import { useQuery } from "@tanstack/react-query";
 import { useMutationHooks } from "../../../../hooks/UseMutationHook";
-
+import {
+  success,
+  error,
+  warning,
+} from "../../../../components/MessageComponents/Message.jsx";
+import IsLoadingComponent from "../../../../components/LoadComponent/Loading.jsx"
 export default function PayProduct() {
   const [value, setValue] = useState("1");
   const order = useSelector((state) => state.order);
@@ -42,6 +47,21 @@ export default function PayProduct() {
 
   const handleOpenModal = () => {
     setIsOpenModalUpdateInfo(true);
+    if(user) {
+      setStateUserDetail({
+        ...stateUserDetail,
+        name: user?.name ,
+        phone:String(user.phone),
+        address:user?.address,
+        city: user?.city,
+        district: user?.district,
+        rard: user?.rard,
+        nameCity: user?.nameCity,
+        nameDistrict: user?.nameDistrict,
+        nameRard: user?.nameRard,
+        specific_address: user?.specific_address
+      })
+    }
   };
 
   const handleOnchangeDetails = (e) => {
@@ -58,6 +78,12 @@ export default function PayProduct() {
   const handleButtonPay = () => {
     if (!user?.phone || !user?.address || !user?.name || !user?.city) {
     }
+
+  };
+
+
+  const handleUpdateModal = () => {
+    mutationUpdate.mutate(stateUserDetail)
   };
 
   const fetchProvincevn = async () => {
@@ -74,6 +100,14 @@ export default function PayProduct() {
     const res = await ProvinceVn.apiGetDetaiAllRard(district);
     return res;
   });
+
+  const mutationUpdate = useMutationHooks ((data) => {
+    const {...rests} = data;
+    const access_Token =  user.access_Token.split("=")[1];
+    const id = user?.id;
+    const res = UserService.updateUser(id,data,access_Token)
+    return res
+})
 
   useEffect(() => {
     if (stateUserDetail?.city) {
@@ -93,7 +127,14 @@ export default function PayProduct() {
   });
   const { data: getDetailAllDistrict } = fetchDetailDistrict;
   const { data: getDetailAllRard } = fetchDetailRard;
-
+  const {data:UsersUpdateDetail,isLoading: isLoadingUpdateUserDetail} = mutationUpdate
+  useEffect(() => {
+    if(UsersUpdateDetail?.status === 200) {
+        success()
+    }else if(UsersUpdateDetail?.status === 'ERR') {
+        error()
+    }
+},[UsersUpdateDetail?.status])
   // lấy tên tỉnh thành
   useEffect(() => {
     if (stateUserDetail?.city) {
@@ -105,6 +146,7 @@ export default function PayProduct() {
       }
     }
   }, [stateUserDetail?.city, getAllCity?.results]);
+
   // lấy tên của huyện
   useEffect(() => {
     if (stateUserDetail?.district) {
@@ -127,10 +169,6 @@ export default function PayProduct() {
       }
     }
   }, [stateUserDetail?.rard, getDetailAllRard?.results]);
-
-  const handleUpdateModal = () => {
-    console.log(stateUserDetail);
-  };
 
   const priceMemo = useMemo(() => {
     const result = order?.orderItemsSlected?.reduce((total, cur) => {
@@ -157,9 +195,9 @@ export default function PayProduct() {
       <div className="bg-[#e9d5d5] p-5 md:p-10">
         <h2 className="mb-2 text-[20px]">Địa chỉ nhà Hàng</h2>
         <div className="flex">
-          <div className=""> Vũ Trần (+84 906472426)</div>
+          <div className=""> {user?.name} ({user?.phone})</div>
           <div className="">
-            427 Kinh Dương Vương, Phương Hòa Mình, Quận Liên Chiểu, Đà Nẵng
+            {user?.specific_address}
           </div>
           <span
             className="ml-2 cursor-pointer text-[#727aa4] hover:text-[#3050ec] "
@@ -325,7 +363,8 @@ export default function PayProduct() {
             !stateUserDetail.rard.length ||
             !stateUserDetail.address.length ? true : false,
         }}
-      >
+      > 
+        <IsLoadingComponent isLoading={isLoadingUpdateUserDetail}>
         <div className="mt-5 text-center">
           <FormLabel>
             <div className="flex justify-between">
@@ -501,6 +540,7 @@ export default function PayProduct() {
             </div>
           </FormLabel>
         </div>
+        </IsLoadingComponent>
       </ModalComponent>
     </div>
   );

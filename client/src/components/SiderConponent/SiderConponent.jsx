@@ -1,6 +1,5 @@
 import React from 'react'
 import Slider from "react-slick";
-import {Image} from 'antd'
 
 export default function SiderConponent({arrImage}) {
     var settings = {
@@ -15,7 +14,7 @@ export default function SiderConponent({arrImage}) {
     <Slider {...settings}>
         {arrImage.map((image) => {
             return (
-                <Image className='image-sider w-full h-[100px] md:h-[400px]' src={image} key={image} alt='slider' preview={false}  />
+                <img className='image-sider w-full h-[140px] md:h-[450px]' src={image} key={image} alt='slider' preview={false}  />
             )
         }) }
     </Slider>

@@ -28,23 +28,29 @@ export default function ProductHome() {
   return (
     <div id='container' className='p-pad-sm md:p-pad-md mt-4 bg-[rgb(235 232 232)]'>
         <Row>
-          <Col span={16} style={{padding: '0 25px'}}>
+          <Col span={16} className='px-2 md:px-0 md:pr-1.5 h-[140px] md:h-[450px]'>
             <SiderConponent arrImage = {[Sider1,Sider2]}/>
           </Col>
-          <Col span={8} style={{width: '100px'}}>
-              <img src={product1}  preview={false} className='w-full h-[50px] md:h-[200px]'/>
-              <img src={product1}  preview={false} className='w-full h-[50px] md:h-[200px]'/>
+          <Col span={8} style={{width: '100px'}} className='pl-0 md:pl-2.5'>
+              <img src={product1}  preview={false} className='w-full h-[65px] md:h-[220px] rounded-lg'/>
+              <img src={product1}  preview={false} className='w-full h-[65px] md:h-[215px] rounded-lg mb-2 mt-2.5 md:mt-3'/>
           </Col>
         </Row>
-        <Row style={{marginTop:'10px'}}>
+        <Row style={{marginTop:'10px'}} gutter={[16, 16]}>
           <Col span={8}>
-          <img src={product1}  preview={false} className='w-full h-[75px] md:h-[200px]'/>
+            <div className="rounded-md overflow-hidden">
+              <img src={product1} preview={false} className="w-full h-[75px] md:h-[200px]" />
+            </div>
           </Col>
           <Col span={8}>
-          <img src={product1}  preview={false} className='w-full h-[75px] md:h-[200px]'/>
+            <div className="rounded-md overflow-hidden">
+              <img src={product1} preview={false} className="w-full h-[75px] md:h-[200px]" />
+            </div>
           </Col>
           <Col span={8}>
-          <img src={product1}  preview={false} className='w-full h-[75px] md:h-[200px]'/>
+            <div className="rounded-md overflow-hidden">
+              <img src={product1} preview={false} className="w-full h-[75px] md:h-[200px]" />
+            </div>
           </Col>
         </Row>
 

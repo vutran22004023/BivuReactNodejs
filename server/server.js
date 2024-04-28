@@ -2,7 +2,7 @@ import express  from 'express';
 import * as dotenv from 'dotenv'
 dotenv.config()
 import mongoose from 'mongoose';
-import {userRouters,productRouters} from './routes/index.js'
+import {userRouters,productRouters,orderRouters} from './routes/index.js'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 const app = express();
@@ -15,7 +15,7 @@ const port = process.env.PORT || 3001
 //Router
 app.use('/api/user', userRouters);
 app.use('/api/product',productRouters)
-
+app.use('/api/order-product',orderRouters)
 const url =  `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.wu6bakk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
 app.listen(port,async()=> {
     await mongoose.connect(url)

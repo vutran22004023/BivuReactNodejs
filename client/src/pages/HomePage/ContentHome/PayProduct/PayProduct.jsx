@@ -11,7 +11,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
-import { ProvinceVn,UserService } from "../../../../services/index";
+import { ProvinceVn,UserService, OrderProduct} from "../../../../services/index";
 import { useQuery } from "@tanstack/react-query";
 import { useMutationHooks } from "../../../../hooks/UseMutationHook";
 import {
@@ -20,6 +20,7 @@ import {
   warning,
 } from "../../../../components/MessageComponents/Message.jsx";
 import IsLoadingComponent from "../../../../components/LoadComponent/Loading.jsx"
+import { message } from "antd";
 export default function PayProduct() {
   const [value, setValue] = useState("1");
   const order = useSelector((state) => state.order);
@@ -64,6 +65,24 @@ export default function PayProduct() {
     }
   };
 
+  useEffect(() => {
+    if(user) {
+      setStateUserDetail({
+        ...stateUserDetail,
+        name: user?.name ,
+        phone:String(user.phone),
+        address:user?.address,
+        city: user?.city,
+        district: user?.district,
+        rard: user?.rard,
+        nameCity: user?.nameCity,
+        nameDistrict: user?.nameDistrict,
+        nameRard: user?.nameRard,
+        specific_address: user?.specific_address
+      })
+    }
+  },[user])
+
   const handleOnchangeDetails = (e) => {
     setStateUserDetail({
       ...stateUserDetail,
@@ -76,11 +95,19 @@ export default function PayProduct() {
   };
 
   const handleButtonPay = () => {
-    if (!user?.phone || !user?.address || !user?.name || !user?.city) {
+    if(user?.access_Token && order?.orderItemsSlected && user?.name && user?.specific_address && user?.phone && user?.city && user?.id) {
+      mutationOrderProduct.mutate(
+        {
+          oderItem: order?.orderItemsSlected, fullName: user?.name, address:user?.specific_address,phone: user?.phone, city:user?.city,
+          paymentMethod: 'Nhan hang thanh toan',
+          itemsPrice:priceMemo,
+          shippingPrice: diliveryPriceMemo,
+          totalPrice: TotalpriceMemo,
+          user: user?.id
+        }
+      )
     }
-
   };
-
 
   const handleUpdateModal = () => {
     mutationUpdate.mutate(stateUserDetail)
@@ -109,6 +136,14 @@ export default function PayProduct() {
     return res
 })
 
+const mutationOrderProduct = useMutationHooks ((data) => {
+  const {...rests} = data;
+  const access_Token =  user.access_Token.split("=")[1];
+  const res = OrderProduct.createOrderProduct(access_Token,data)
+  return res
+})
+
+
   useEffect(() => {
     if (stateUserDetail?.city) {
       fetchDetailDistrict.mutate(stateUserDetail?.city);
@@ -128,6 +163,15 @@ export default function PayProduct() {
   const { data: getDetailAllDistrict } = fetchDetailDistrict;
   const { data: getDetailAllRard } = fetchDetailRard;
   const {data:UsersUpdateDetail,isLoading: isLoadingUpdateUserDetail} = mutationUpdate
+  const  {data: orderProductPay, isLoading: isLoadingAddOrder } = mutationOrderProduct
+
+  useEffect(() => {
+    if(orderProductPay?.status === 200) {
+      success('Đặt hàng thành công')
+    }else if(orderProductPay === "ERR") {
+      error()
+    }
+  },[orderProductPay])
   useEffect(() => {
     if(UsersUpdateDetail?.status === 200) {
         success()
@@ -191,6 +235,7 @@ export default function PayProduct() {
   }, [priceMemo, diliveryPriceMemo]);
 
   return (
+    <IsLoadingComponent isLoading={isLoadingAddOrder}>
     <div className="mt-5 w-full p-pad-sm md:p-pad-md">
       <div className="bg-[#e9d5d5] p-5 md:p-10">
         <h2 className="mb-2 text-[20px]">Địa chỉ nhà Hàng</h2>
@@ -543,5 +588,6 @@ export default function PayProduct() {
         </IsLoadingComponent>
       </ModalComponent>
     </div>
+    </IsLoadingComponent>
   );
 }

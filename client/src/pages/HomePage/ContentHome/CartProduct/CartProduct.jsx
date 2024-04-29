@@ -7,12 +7,26 @@ import { useSelector, useDispatch } from "react-redux";
 import {IncreaseAmount,DecreaseAmount,RemoveOrderProduct,removeAllOrderProduct,selectedOrder} from "../../../../redux/Slides/orderProductSlide";
 import { convertPrice } from "../../../../utils";
 import { useNavigate,useLocation  } from "react-router-dom";
+import ModalComponentLogin from '../../../../components/ModalComponent/ModalLogin'
 export default function CartProduct() {
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate()
     const [listChecked, setListChecked] = useState([])
     const dispatch = useDispatch()
     const location = useLocation();
     const order = useSelector((state) => state.order);
+    const user = useSelector((state) => state.user);
+    const showModal = () => {
+      setIsModalOpen(true);
+    };
+  
+    const handleOk = () => {
+      setIsModalOpen(false);
+    };
+  
+    const handleCancel = () => {
+      setIsModalOpen(false);
+    };
     const handleChangeCount = (type, idProduct, limited) => {
       if(type === 'increase') {
         if(!limited) {
@@ -61,8 +75,10 @@ export default function CartProduct() {
       }
     }
     const handleAddCard = () => {
-      if(order?.orderItemsSlected?.length) {
+      if(order?.orderItemsSlected?.length && user?.id) {
         navigate('/mua-hang')
+      }else if(!user?.id) {
+        showModal()
       }
     }
 
@@ -98,6 +114,8 @@ export default function CartProduct() {
     const handleDeteteOrder =(idProduct) => {
       dispatch(RemoveOrderProduct({idProduct}))
     }
+
+    
   return (
     <div className="mt-5 p-pad-sm md:p-pad-md">
       <Row>
@@ -219,6 +237,7 @@ export default function CartProduct() {
        >
         
       </ModalComponent> */}
+      <ModalComponentLogin isModalOpen={isModalOpen} handleOk={handleOk} handleCancel={handleCancel}/>
     </div>
   );
 }

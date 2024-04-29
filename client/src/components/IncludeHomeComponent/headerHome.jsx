@@ -52,6 +52,7 @@ import TabPanel from "@mui/lab/TabPanel";
 import LoginComponent from "../Login-RegisterComponent/Login";
 import RegisterComponent from "../Login-RegisterComponent/Register";
 import PersonIcon from "@mui/icons-material/Person";
+import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import LogoutIcon from "@mui/icons-material/Logout";
 import IsLoadingComponent from "../LoadComponent/Loading";
 import { useDebounce } from "../../hooks/UseMutationHook";
@@ -81,7 +82,7 @@ export const SamplePrevArrow = (props) => {
   );
 };
 
-export default function headerHome() {
+export default function headerHome({isHeaderVisible}) {
   const settings = {
     infinite: false,
     slidesToShow: 10,
@@ -278,6 +279,14 @@ export default function headerHome() {
                 <ListItemText primary="Thông tin người dùng" />
               </ListItemButton>
             </ListItem>
+            <ListItem disablePadding onClick={handleItemClick}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <ShoppingBasketIcon />
+                </ListItemIcon>
+                <ListItemText primary="Đơn hàng của tôi" />
+              </ListItemButton>
+            </ListItem>
             {user?.isAdmin === true && (
               <>
                 <ListItem disablePadding onClick={handleItemClickAdmin}>
@@ -386,7 +395,7 @@ export default function headerHome() {
                 }}
               >
                 <div></div>
-                <Button onClick={()=> navigate('gio-hang')}>Xem giỏ hàng</Button>
+                <Button onClick={()=> navigate("/gio-hang")}>Xem giỏ hàng</Button>
               </div>
             </div>
           ),
@@ -476,7 +485,9 @@ export default function headerHome() {
     </div>
   );
   return (
-    <div>
+    <div style={{
+      display: isHeaderVisible === false ? 'none' : ''
+    }}>
       <Row
         className="wrapper-header-top  w-full bg-[#dee2e6]"
         style={{

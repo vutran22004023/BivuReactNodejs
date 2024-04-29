@@ -19,6 +19,26 @@ const createOrderProduct = async(req, res) => {
     }
 }
 
+const getOrderDetail =  async(req, res)=> {
+    try {
+        const uidorder = req.params.id
+        if(!uidorder) {
+            return  {
+                status: 'ERR',
+                message: 'Không có id của đơn hàng này'
+            }
+        }
+
+        const response =  await OrderProductservices.getOrderDetail(uidorder)
+        return res.status(200).json(response)
+    }catch(e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
+
 export default {
-    createOrderProduct
+    createOrderProduct,
+    getOrderDetail
 }

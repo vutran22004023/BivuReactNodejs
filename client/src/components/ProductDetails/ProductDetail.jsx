@@ -23,12 +23,11 @@ import {
 import {ProductService} from '../../services/index'
 import {useQuery} from '@tanstack/react-query'
 import IsLoadingComponent from '../LoadComponent/Loading'
-import ModalComponent from '../ModalComponent/Modal'
-import LoginComponent from "../Login-RegisterComponent/Login";
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { AddOrderProduct } from "../../redux/Slides/orderProductSlide";
+import ModalComponentLogin from '../ModalComponent/ModalLogin'
 export const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;
   return (
@@ -139,46 +138,6 @@ export default function ProductDetail({idProduct}) {
   };
 
 
-  const LoginModal = () => {
-    return (
-      <ModalComponent open={isModalOpen}
-      onOk={handleOk}
-      onCancel={handleCancel}
-      footer= {false} width={950}>
-          <div
-        style={{
-          width: "900px",
-          height: "445px",
-          borderRadius: "6px",
-          background: "#fff",
-          display: "flex",
-        }}
-      >
-        <WrapperContainerLeft>
-          <h1>Xin chào</h1>
-          <p>Đăng nhập và tạo tài khoản</p>
-          {/* login componment */}
-          <LoginComponent />
-          <p>
-            <WrapperTextLight>Quên mật khẩu</WrapperTextLight>
-          </p>
-          <p>
-            Chưa có tài khoản?{" "}
-            <WrapperTextLight>Tạo tài khoản</WrapperTextLight>
-          </p>
-        </WrapperContainerLeft>
-
-        <WrapperContainerRight>
-          <Image 
-          // src={product1}
-           preview={false} height={203} width={203} />
-          <h4>Mua sắm tại Bi Vũ</h4>
-        </WrapperContainerRight>
-      </div>
-      </ModalComponent>
-    )
-  }
-
   return (
     <IsLoadingComponent isLoading={IsLoadingProductDetail}>
     <Row>
@@ -281,7 +240,7 @@ export default function ProductDetail({idProduct}) {
            icon={<ShoppingCartOutlined />}
            onClick={hangleBuyProduct}
            >Mua ngay</Button>
-           <LoginModal />
+           <ModalComponentLogin isModalOpen={isModalOpen} handleOk={handleOk} handleCancel={handleCancel}/>
         </div>
 
         <div style={{marginRight: '10px',width: '100%'}}>

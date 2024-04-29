@@ -5,11 +5,11 @@ import {
   PrivateUser,
   PrivateRouteAdmin,
   PrivateRoutePay} from './private.jsx'
-import ProductHome from "../pages/HomePage/ContentHome/ProductHome/ProductHome";
+// import ProductHome from "../pages/HomePage/ContentHome/ProductHome/ProductHome";
 import "../index.css";
 //sử dụng Code Splitting
-
-const HomePage = React.lazy(() => import("../pages/HomePage"));
+const ProductHome = React.lazy(() => import("../pages/HomePage/ContentHome/ProductHome/ProductHome"))
+const HomePage = React.lazy(() => import("../pages/HomePage/index.jsx"));
 const CategoryHome = React.lazy(() =>
   import("../pages/HomePage/ContentHome/CategoryHome/CategoryHome.jsx")
 );
@@ -33,6 +33,10 @@ const CartProduct = React.lazy(() =>
 
 const PayProduct = React.lazy(() =>
   import("../pages/HomePage/ContentHome/PayProduct/PayProduct.jsx")
+);
+
+const OrderDetail = React.lazy(() =>
+  import("../pages/HomePage/ContentHome/OrderDetail/OrderDetail.jsx")
 );
 
 export default createBrowserRouter([
@@ -74,6 +78,10 @@ export default createBrowserRouter([
                 path: "/mua-hang",
               },
             ],
+          },
+          {
+            element: <OrderDetail/>,
+            path: '/don-hang'
           }
         ],
       },

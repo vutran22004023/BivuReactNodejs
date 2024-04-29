@@ -40,16 +40,12 @@ const oderSchema =  new mongoose.Schema(
             type: String,
             required: true,
         },
-        country: {
-            type: String,
-            required: true,
-        },
         phone: {
             type: Number,
             required: true,
         }
     },
-    paymentMethord: {
+    paymentMethod: {
         type: String,
         required: true,
     },
@@ -58,10 +54,6 @@ const oderSchema =  new mongoose.Schema(
         required: true,
     },
     shippingPrice: {
-        type: Number,
-        required: true,
-    },
-    taxPrice: {
         type: Number,
         required: true,
     },

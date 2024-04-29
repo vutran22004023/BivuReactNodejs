@@ -24,15 +24,19 @@ const CardComponent =(props) => {
   }
   return (
     <Card
-      hoverable
-      onClick={()=> handleDetailsProduct(id)}
+      hoverable= {counInStock !== 0 ? true: false}
+      onClick={()=> counInStock !== 0 && handleDetailsProduct(id)}
       bodyStyle={{padding:'5px'}}
+      // style={{display: counInStock === 0 ? 'none': ''}}
+      className={counInStock === 0 ? "cursor-not-allowed" : ''}
+      style={{backgroundColor: counInStock === 0 ? '#ccc' :'#fff',}}
       cover={
         <img
           alt="example"
           loading="lazy"
           src={image}
           className="w-full h-[150px] md:h-[250px]"
+          disabled={true}
         />
       }
     >
@@ -44,7 +48,7 @@ const CardComponent =(props) => {
             style={{ fontSize: "12px", color: "yellow", marginTop: "4px" }}
           />
         </span>
-        <span>| Đã Bán 1000+</span>
+        <span>| Đã Bán {selled || null}+</span>
       </WrapperReporText>
       <WrapperPriceText>
       <span>{convertPrice(price)}</span>

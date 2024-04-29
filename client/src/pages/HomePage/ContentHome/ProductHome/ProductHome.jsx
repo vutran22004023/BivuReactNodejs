@@ -76,6 +76,7 @@ export default function ProductHome() {
               discount = {product.discount}
               selled = {product.selled}
               id = {product._id}
+              
               />
               </>
             )

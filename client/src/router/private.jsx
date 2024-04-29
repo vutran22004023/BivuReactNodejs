@@ -73,19 +73,20 @@ export const PrivateUser = () => {
           <Outlet />
         </Suspense>
       );
-    } else if (user?.isAdmin === false || user?.access_Token === "") {
-      return navigate("/");
+    } else if (user?.isAdmin === false || !user?.id) {
+      navigate("/"); // Điều hướng người dùng trở lại trang chủ
+      return null; // Trả về null để không render gì cả
     }
   };
   
   export const PrivateRoutePay = () => {
     const navigate = useNavigate();
+    const order = useSelector((state) => state.order);
     const user = useSelector((state) => state.user);
-    if(user.access_Token === "") {
-      return (
-        navigate("/")
-      )
-    }else if (user.access_Token) {
+    if(!user?.id || !order?.orderItemsSlected?.length) {
+      navigate("/"); // Điều hướng người dùng trở lại trang chủ
+      return null; // Trả về null để không render gì cả
+    }else if (user?.id) {
       return (
         <Suspense fallback={<IsLoadingComponent></IsLoadingComponent>}>
           <Outlet />

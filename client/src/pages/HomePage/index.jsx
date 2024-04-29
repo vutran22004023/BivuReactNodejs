@@ -6,7 +6,7 @@ export default function index() {
   
   return (
     <>
-      <HeaderHome />
+      <HeaderHome/>
       <Outlet />
     </>
   );

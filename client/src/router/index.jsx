@@ -35,6 +35,10 @@ const PayProduct = React.lazy(() =>
   import("../pages/HomePage/ContentHome/PayProduct/PayProduct.jsx")
 );
 
+const OrderDetail = React.lazy(() =>
+  import("../pages/HomePage/ContentHome/OrderDetail/OrderDetail.jsx")
+);
+
 export default createBrowserRouter([
   {
     element: <PrivateUser />,
@@ -74,6 +78,10 @@ export default createBrowserRouter([
                 path: "/mua-hang",
               },
             ],
+          },
+          {
+            element: <OrderDetail/>,
+            path: '/don-hang'
           }
         ],
       },

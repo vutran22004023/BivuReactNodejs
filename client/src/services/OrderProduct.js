@@ -9,6 +9,16 @@ const createOrderProduct= async (access_Token, data) => {
     return res.data
 }
 
+const getDetailOrder= async (id,access_Token) => {
+    const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/order-product/get-order-detail/${id}`,{
+        headers: {
+            token: `Beare ${access_Token}`,
+        }
+    })
+    return res.data
+}
+
 export default {
-    createOrderProduct
+    createOrderProduct,
+    getDetailOrder
 }

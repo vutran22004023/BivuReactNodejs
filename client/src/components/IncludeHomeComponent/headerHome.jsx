@@ -199,6 +199,10 @@ export default function headerHome({isHeaderVisible}) {
     navigate("/admin");
   };
 
+  const handleItemClickOrderDetail = () => {
+    navigate('/don-hang')
+  }
+
   useEffect(() => {
     setUserName(user?.name);
     setUserAvatar(user?.avatar);
@@ -279,7 +283,7 @@ export default function headerHome({isHeaderVisible}) {
                 <ListItemText primary="Thông tin người dùng" />
               </ListItemButton>
             </ListItem>
-            <ListItem disablePadding onClick={handleItemClick}>
+            <ListItem disablePadding onClick={handleItemClickOrderDetail}>
               <ListItemButton>
                 <ListItemIcon>
                   <ShoppingBasketIcon />

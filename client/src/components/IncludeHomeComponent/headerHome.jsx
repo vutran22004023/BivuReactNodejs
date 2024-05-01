@@ -200,8 +200,13 @@ export default function headerHome({isHeaderVisible}) {
   };
 
   const handleItemClickOrderDetail = () => {
-    navigate('/don-hang')
-  }
+    navigate(`/don-hang/${user.id}`, {
+      state: {
+        id: user.id,
+       token:user.access_Token,
+      }
+    })
+  } 
 
   useEffect(() => {
     setUserName(user?.name);

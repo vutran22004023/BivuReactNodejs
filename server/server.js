@@ -9,9 +9,7 @@ import PayOS from "@payos/node";
 import axios from "axios";
 import CryptoJS from "crypto-js";
 import moment from "moment";
-import bodyParser from "body-parser";
 import qs from "qs";
-// npm install moment
 const app = express();
 app.use(cors());
 // app.use(express.static("public"))
@@ -179,7 +177,6 @@ app.post("/order-status-zalopay/:app_trans_id", async (req, res) => {
         return res.status(500).json({ error: "Internal Server Error" });
     }    
 });
-
 // end thanh toán ZaloPay API
 
 const url = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.wu6bakk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;

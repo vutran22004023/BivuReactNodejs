@@ -6,7 +6,7 @@ import TabList from "@mui/lab/TabList";
 import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 import { OrderProduct } from "../../../../services/index";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import Product1 from "../../../../assets/font-end/imgs/Product/product1.png";
 import ButtonFrom from "../../../../components/ButtonSearch/Button";
 
@@ -15,6 +15,7 @@ export default function OrderDetail() {
   const location = useLocation();
   const { state } = location;
   const user = useSelector((state) => state.user);
+  const navigate = useNavigate()
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -31,6 +32,16 @@ export default function OrderDetail() {
     queryFn: fetchOrderDetailUser,
     enabled: Boolean(state?.id && state?.token),
   });
+
+  const handleButtonDetailOrder = (id) => {
+    console.log(id)
+    navigate(`/chi-tiet-don-hang/${id}`,{
+      state: {
+        id: id,
+       token:user?.access_Token,
+      }
+    })
+  }
   
 
   return (
@@ -126,6 +137,7 @@ export default function OrderDetail() {
                           fontWeight: "700",
                           margin: "10px 0",
                         }}
+                        onClick={()=> handleButtonDetailOrder(order?._id)}
                         textButton={"Chi tiết đơn hàng"}
                       ></ButtonFrom>
                     </div>

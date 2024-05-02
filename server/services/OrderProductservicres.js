@@ -90,7 +90,28 @@ const getOrderDetail = async(uidorder) => {
     }
 }
 
+const getOrderDetailProduct = async(uidorder) => {
+    try {
+        const order = await OrderProductModel.findById({
+            _id: uidorder
+        })
+        if(order === null) {
+            return {
+                status: 'ERR',
+                message: 'Không có cái id này'
+            }    
+        }
+        return {
+            status: 200,
+            message: 'Đã show dữ liệu thành công',
+            data: order
+        }
+    }catch(e) {
+
+    }
+}
 export default {
     createOrderProductservices,
-    getOrderDetail
+    getOrderDetail,
+    getOrderDetailProduct
 }

@@ -8,7 +8,7 @@ export default {
     extend: {
       padding: {
         'pad-sm': '0 10px',
-        'pad-md': '0 100px'
+        'pad-md': '0 160px'
       }
     },
   },

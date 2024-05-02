@@ -4,7 +4,8 @@ import { createBrowserRouter } from "react-router-dom";
 import {
   PrivateUser,
   PrivateRouteAdmin,
-  PrivateRoutePay} from './private.jsx'
+  PrivateRoutePay,
+  PrivateRouteUser} from './private.jsx'
 // import ProductHome from "../pages/HomePage/ContentHome/ProductHome/ProductHome";
 import "../index.css";
 //sử dụng Code Splitting
@@ -42,7 +43,6 @@ const OrderDetail = React.lazy(() =>
 export default createBrowserRouter([
   {
     element: <PrivateUser />,
-    path: "/",
     children: [
       {
         element: <HomePage />,
@@ -71,7 +71,6 @@ export default createBrowserRouter([
           },
           {
             element: <PrivateRoutePay/>,
-            path: "/mua-hang",
             children: [
               {
                 element: <PayProduct />,
@@ -80,14 +79,18 @@ export default createBrowserRouter([
             ],
           },
           {
-            element: <OrderDetail/>,
-            path: '/don-hang'
+            element: <PrivateRouteUser/>,
+            children: [
+              {
+                element: <OrderDetail/>,
+                path: '/don-hang/:id'
+              }
+            ]
           }
         ],
       },
       {
         element: <PrivateRouteAdmin />,
-        path: "/admin",
         children: [
           {
             element: <AdminPage />,

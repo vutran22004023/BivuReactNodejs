@@ -94,3 +94,18 @@ export const PrivateUser = () => {
       );
     }
   }
+
+  export const PrivateRouteUser = () => {
+    const navigate = useNavigate();
+    const user = useSelector((state) => state.user);
+    if(!user?.id || !user?.access_Token) {
+      navigate("/"); // Điều hướng người dùng trở lại trang chủ
+      return null; // Trả về null để không render gì cả
+    }else if (user?.id || user?.access_Token) {
+      return (
+        <Suspense fallback={<IsLoadingComponent></IsLoadingComponent>}>
+          <Outlet />
+        </Suspense>
+      );
+    }
+  }

@@ -11,7 +11,11 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
-import { ProvinceVn,UserService, OrderProduct} from "../../../../services/index";
+import {
+  ProvinceVn,
+  UserService,
+  OrderProduct,
+} from "../../../../services/index";
 import { useQuery } from "@tanstack/react-query";
 import { useMutationHooks } from "../../../../hooks/UseMutationHook";
 import {
@@ -19,8 +23,8 @@ import {
   error,
   warning,
 } from "../../../../components/MessageComponents/Message.jsx";
-import IsLoadingComponent from "../../../../components/LoadComponent/Loading.jsx"
-import { message } from "antd";
+import IsLoadingComponent from "../../../../components/LoadComponent/Loading.jsx";
+import { Button, message, Steps, theme } from "antd";
 export default function PayProduct() {
   const [value, setValue] = useState("1");
   const order = useSelector((state) => state.order);
@@ -48,40 +52,40 @@ export default function PayProduct() {
 
   const handleOpenModal = () => {
     setIsOpenModalUpdateInfo(true);
-    if(user) {
+    if (user) {
       setStateUserDetail({
         ...stateUserDetail,
-        name: user?.name ,
-        phone:String(user.phone),
-        address:user?.address,
+        name: user?.name,
+        phone: String(user.phone),
+        address: user?.address,
         city: user?.city,
         district: user?.district,
         rard: user?.rard,
         nameCity: user?.nameCity,
         nameDistrict: user?.nameDistrict,
         nameRard: user?.nameRard,
-        specific_address: user?.specific_address
-      })
+        specific_address: user?.specific_address,
+      });
     }
   };
 
   useEffect(() => {
-    if(user) {
+    if (user) {
       setStateUserDetail({
         ...stateUserDetail,
-        name: user?.name ,
-        phone:String(user.phone),
-        address:user?.address,
+        name: user?.name,
+        phone: String(user.phone),
+        address: user?.address,
         city: user?.city,
         district: user?.district,
         rard: user?.rard,
         nameCity: user?.nameCity,
         nameDistrict: user?.nameDistrict,
         nameRard: user?.nameRard,
-        specific_address: user?.specific_address
-      })
+        specific_address: user?.specific_address,
+      });
     }
-  },[user])
+  }, [user]);
 
   const handleOnchangeDetails = (e) => {
     setStateUserDetail({
@@ -95,22 +99,32 @@ export default function PayProduct() {
   };
 
   const handleButtonPay = () => {
-    if(user?.access_Token && order?.orderItemsSlected && user?.name && user?.specific_address && user?.phone && user?.city && user?.id) {
-      mutationOrderProduct.mutate(
-        {
-          oderItem: order?.orderItemsSlected, fullName: user?.name, address:user?.specific_address,phone: user?.phone, city:user?.city,
-          paymentMethod: 'Nhan hang thanh toan',
-          itemsPrice:priceMemo,
-          shippingPrice: diliveryPriceMemo,
-          totalPrice: TotalpriceMemo,
-          user: user?.id
-        }
-      )
+    if (
+      user?.access_Token &&
+      order?.orderItemsSlected &&
+      user?.name &&
+      user?.specific_address &&
+      user?.phone &&
+      user?.city &&
+      user?.id
+    ) {
+      mutationOrderProduct.mutate({
+        oderItem: order?.orderItemsSlected,
+        fullName: user?.name,
+        address: user?.specific_address,
+        phone: user?.phone,
+        city: user?.city,
+        paymentMethod: "Nhan hang thanh toan",
+        itemsPrice: priceMemo,
+        shippingPrice: diliveryPriceMemo,
+        totalPrice: TotalpriceMemo,
+        user: user?.id,
+      });
     }
   };
 
   const handleUpdateModal = () => {
-    mutationUpdate.mutate(stateUserDetail)
+    mutationUpdate.mutate(stateUserDetail);
   };
 
   const fetchProvincevn = async () => {
@@ -128,21 +142,20 @@ export default function PayProduct() {
     return res;
   });
 
-  const mutationUpdate = useMutationHooks ((data) => {
-    const {...rests} = data;
-    const access_Token =  user.access_Token.split("=")[1];
+  const mutationUpdate = useMutationHooks((data) => {
+    const { ...rests } = data;
+    const access_Token = user.access_Token.split("=")[1];
     const id = user?.id;
-    const res = UserService.updateUser(id,data,access_Token)
-    return res
-})
+    const res = UserService.updateUser(id, data, access_Token);
+    return res;
+  });
 
-const mutationOrderProduct = useMutationHooks ((data) => {
-  const {...rests} = data;
-  const access_Token =  user.access_Token.split("=")[1];
-  const res = OrderProduct.createOrderProduct(access_Token,data)
-  return res
-})
-
+  const mutationOrderProduct = useMutationHooks((data) => {
+    const { ...rests } = data;
+    const access_Token = user.access_Token.split("=")[1];
+    const res = OrderProduct.createOrderProduct(access_Token, data);
+    return res;
+  });
 
   useEffect(() => {
     if (stateUserDetail?.city) {
@@ -162,23 +175,25 @@ const mutationOrderProduct = useMutationHooks ((data) => {
   });
   const { data: getDetailAllDistrict } = fetchDetailDistrict;
   const { data: getDetailAllRard } = fetchDetailRard;
-  const {data:UsersUpdateDetail,isLoading: isLoadingUpdateUserDetail} = mutationUpdate
-  const  {data: orderProductPay, isLoading: isLoadingAddOrder } = mutationOrderProduct
+  const { data: UsersUpdateDetail, isLoading: isLoadingUpdateUserDetail } =
+    mutationUpdate;
+  const { data: orderProductPay, isLoading: isLoadingAddOrder } =
+    mutationOrderProduct;
 
   useEffect(() => {
-    if(orderProductPay?.status === 200) {
-      success('Đặt hàng thành công')
-    }else if(orderProductPay === "ERR") {
-      error()
+    if (orderProductPay?.status === 200) {
+      success("Đặt hàng thành công");
+    } else if (orderProductPay === "ERR") {
+      error();
     }
-  },[orderProductPay])
+  }, [orderProductPay]);
   useEffect(() => {
-    if(UsersUpdateDetail?.status === 200) {
-        success()
-    }else if(UsersUpdateDetail?.status === 'ERR') {
-        error()
+    if (UsersUpdateDetail?.status === 200) {
+      success();
+    } else if (UsersUpdateDetail?.status === "ERR") {
+      error();
     }
-},[UsersUpdateDetail?.status])
+  }, [UsersUpdateDetail?.status]);
   // lấy tên tỉnh thành
   useEffect(() => {
     if (stateUserDetail?.city) {
@@ -234,360 +249,419 @@ const mutationOrderProduct = useMutationHooks ((data) => {
     return priceMemo + diliveryPriceMemo;
   }, [priceMemo, diliveryPriceMemo]);
 
-  return (
-    <IsLoadingComponent isLoading={isLoadingAddOrder}>
-    <div className="mt-5 w-full p-pad-sm md:p-pad-md">
-      <div className="bg-[#e9d5d5] p-5 md:p-10">
-        <h2 className="mb-2 text-[20px]">Địa chỉ nhà Hàng</h2>
-        <div className="flex">
-          <div className=""> {user?.name} ({user?.phone})</div>
-          <div className="">
-            {user?.specific_address}
-          </div>
-          <span
-            className="ml-2 cursor-pointer text-[#727aa4] hover:text-[#3050ec] "
-            onClick={handleOpenModal}
-          >
-            {" "}
-            Thay đổi
-          </span>
-        </div>
-      </div>
-
-      <div className="mt-5 w-full bg-[#e9d5d5] p-5 text-center md:p-10">
-        <div className="flex justify-between">
-          <div className="w-35 flex-auto text-left md:w-32">Sản phẩm</div>
-          <div className="w-5 flex-auto"></div>
-          <div className="flex">
-            <div className="w-20 flex-auto md:w-40">Đơn giá</div>
-            <div className="w-20 flex-auto md:w-40">Số Lượng</div>
-            <div className="w-20 flex-auto text-right md:w-40 ">Thành Tiền</div>
-          </div>
-        </div>
-        {order?.orderItemsSlected?.map((item) => {
-          return (
-            <div className="mt-5 flex justify-between ">
-              <div className="flex">
-                <img src={item?.image} className="h-[70px] w-[70px]" />
-                <div className="w-35 flex-auto text-left md:w-32">
-                  {item?.name}
-                </div>
+  const steps = [
+    {
+      title: "Chi tiết thông tin đơn hàng",
+      content: (
+        <>
+          <div className="bg-[#e9d5d5] p-5 md:p-10">
+            <h2 className="mb-2 text-[20px]">Địa chỉ nhà Hàng</h2>
+            <div className="flex">
+              <div className="">
+                {" "}
+                {user?.name} ({user?.phone})
               </div>
+              <div className="">{user?.specific_address}</div>
+              <span
+                className="ml-2 cursor-pointer text-[#727aa4] hover:text-[#3050ec] "
+                onClick={handleOpenModal}
+              >
+                {" "}
+                Thay đổi
+              </span>
+            </div>
+          </div>
 
-              <div className="w-5 flex-auto">Sản phẩm</div>
+          <div className="mt-5 w-full bg-[#e9d5d5] p-5 text-center md:p-10">
+            <div className="flex justify-between">
+              <div className="w-35 flex-auto text-left md:w-32">Sản phẩm</div>
+              <div className="w-5 flex-auto"></div>
               <div className="flex">
-                <div className="w-20 flex-auto md:w-40">
-                  {convertPrice(item?.price)}
-                </div>
-                <div className="w-20 flex-auto md:w-40">{item?.amount}</div>
+                <div className="w-20 flex-auto md:w-40">Đơn giá</div>
+                <div className="w-20 flex-auto md:w-40">Số Lượng</div>
                 <div className="w-20 flex-auto text-right md:w-40 ">
-                  {convertPrice(item?.price * item?.amount)}
+                  Thành Tiền
                 </div>
               </div>
             </div>
-          );
-        })}
-      </div>
+            {order?.orderItemsSlected?.map((item) => {
+              return (
+                <div className="mt-5 flex justify-between ">
+                  <div className="flex">
+                    <img src={item?.image} className="h-[70px] w-[70px]" />
+                    <div className="w-35 flex-auto text-left md:w-32">
+                      {item?.name}
+                    </div>
+                  </div>
 
-      <div className=" flex border-[1px] border-slate-400 bg-[#e9d5d5]">
-        <div className="w-[600px] border-[1px] border-slate-400 p-5">
-          <span className="">Lời nhắn: </span>
-          <input />
-        </div>
-        <div className="w-full border-[1px] border-slate-400 p-5">
-          <div className="mr-4 flex justify-between">
-            <div className="text-[15px]">Đơn vị vận chuyển: </div>
-            <div>
-              <p>Nhanh</p>
-              <p>Đảm bảo nhận hàng từ 22 Tháng 4 - 23 Tháng 4</p>
-            </div>
-            <div>Thay đổi</div>
-            <div>{convertPrice(diliveryPriceMemo)}</div>
+                  <div className="w-5 flex-auto">Sản phẩm</div>
+                  <div className="flex">
+                    <div className="w-20 flex-auto md:w-40">
+                      {convertPrice(item?.price)}
+                    </div>
+                    <div className="w-20 flex-auto md:w-40">{item?.amount}</div>
+                    <div className="w-20 flex-auto text-right md:w-40 ">
+                      {convertPrice(item?.price * item?.amount)}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        </div>
-      </div>
-      <div className="w-full bg-[#e9d5d5] p-5">
-        <div className=" mr-5 flex" style={{ justifyContent: "right" }}>
-          <div>
-            Tổng số tiền ({order?.orderItemsSlected?.length || "0"} sản phẩm):{" "}
-          </div>
-          <div className="ml-1">{convertPrice(TotalpriceMemo)}</div>
-        </div>
-      </div>
 
-      <div className="mt-5  bg-[#e9d5d5] p-5">
-        <div className="mb-2">Phương thức thanh toán:</div>
-        <TabContext value={value}>
-          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <TabList onChange={handleChange} aria-label="lab API tabs example">
-              <Tab label="Thẻ tính dụng" value="1" />
-              <Tab label="Quét mã QR" value="2" />
-              <Tab label="Thanh toán khi nhận hàng" value="3" />
-            </TabList>
-          </Box>
-          <TabPanel value="1" sx={{ p: 0 }}>
-            <div>tab1</div>
-          </TabPanel>
-          <TabPanel value="2" sx={{ p: 0 }}>
-            <div>Tab2</div>
-          </TabPanel>
-          <TabPanel value="3" sx={{ p: 0 }}>
-            <div>
-              Thanh toán khi nhận hàng Phí thu hộ: ₫0 VNĐ. Ưu đãi về phí vận
-              chuyển (nếu có) áp dụng cả với phí thu hộ.
+          <div className=" flex border-[1px] border-slate-400 bg-[#e9d5d5]">
+            <div className="w-[600px] border-[1px] border-slate-400 p-5">
+              <span className="">Lời nhắn: </span>
+              <input />
             </div>
-          </TabPanel>
-        </TabContext>
-        <div className="w-full">
-          <div className=" flex justify-between">
-            <div></div>
-            <div className="mr-4 w-[300px]">
-              <div className="flex justify-between ">
-                <div>Tổng tiền hàng: </div>
-                <div>{convertPrice(priceMemo)}</div>
-              </div>
-              <div className="flex justify-between">
-                <div>Phí vận chuyển:</div>
+            <div className="w-full border-[1px] border-slate-400 p-5">
+              <div className="mr-4 flex justify-between">
+                <div className="text-[15px]">Đơn vị vận chuyển: </div>
+                <div>
+                  <p>Nhanh</p>
+                  <p>Đảm bảo nhận hàng từ 22 Tháng 4 - 23 Tháng 4</p>
+                </div>
+                <div>Thay đổi</div>
                 <div>{convertPrice(diliveryPriceMemo)}</div>
               </div>
-              <div className="flex justify-between">
-                <div>Tổng thanh Toán:</div>
-                <div>{convertPrice(TotalpriceMemo)}</div>
+            </div>
+          </div>
+          <div className="w-full bg-[#e9d5d5] p-5">
+            <div className=" mr-5 flex" style={{ justifyContent: "right" }}>
+              <div>
+                Tổng số tiền ({order?.orderItemsSlected?.length || "0"} sản
+                phẩm):{" "}
+              </div>
+              <div className="ml-1">{convertPrice(TotalpriceMemo)}</div>
+            </div>
+          </div>
+        </>
+      ),
+    },
+    {
+      title: "Chọn phương thức thanh toán",
+      content: "Second-content",
+    },
+  ];
+  const { token } = theme.useToken();
+  const [current, setCurrent] = useState(0);
+  const next = () => {
+    setCurrent(current + 1);
+  };
+  const prev = () => {
+    setCurrent(current - 1);
+  };
+  const items = steps.map((item) => ({
+    key: item.title,
+    title: item.title,
+  }));
+  return (
+    <IsLoadingComponent isLoading={isLoadingAddOrder}>
+      <div className="mt-5 w-full p-pad-sm md:p-pad-md">
+        <Steps current={current} items={items} />
+        <div>{steps[current].content}</div>
+        <div className="mt-5  bg-[#e9d5d5] p-5">
+          <div className="w-full">
+            <div className=" flex justify-between">
+              <div></div>
+              <div className="mr-4 w-[300px]">
+                <div className="flex justify-between ">
+                  <div>Tổng tiền hàng: </div>
+                  <div>{convertPrice(priceMemo)}</div>
+                </div>
+                <div className="flex justify-between">
+                  <div>Phí vận chuyển:</div>
+                  <div>{convertPrice(diliveryPriceMemo)}</div>
+                </div>
+                <div className="flex justify-between">
+                  <div>Tổng thanh Toán:</div>
+                  <div>{convertPrice(TotalpriceMemo)}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="flex justify-between bg-[#e9d5d5] p-10">
-        <div className="text-[10px]">
-          Nhấn "Đặt hàng" đồng nghĩa với việc bạn đồng ý tuân theo Điều khoản
-          Shopee
+        <div className="flex justify-between bg-[#e9d5d5] p-10">
+          <div className="text-[10px]">
+            Nhấn "Đặt hàng" đồng nghĩa với việc bạn đồng ý tuân theo Điều khoản
+            Shopee
+          </div>
+          <div>
+            {current < steps.length - 1 && (
+              <ButtonComponent
+                textButton="Tiếp tục"
+                styleButton={{
+                  background: "rgb(255, 57,69)",
+                  height: "40px",
+                  width: "100%",
+                  border: "none",
+                  borderRadius: "4px",
+                  color: "#fff",
+                  fontSize: "15px",
+                  fontWeight: "700",
+                  marginTop: "2px",
+                  marginLeft: "10px",
+                }}
+                onClick={() => next()}
+              ></ButtonComponent>
+            )}
+
+            {current === steps.length - 1 && (
+              <ButtonComponent
+                textButton="Mua hàng"
+                disabled={
+                  !user?.phone || !user?.address || !user?.name || !user?.city
+                    ? true
+                    : false
+                }
+                styleButton={{
+                  background:
+                    !user?.phone || !user?.address || !user?.name || !user?.city
+                      ? "#ccc"
+                      : "rgb(255, 57,69)",
+                  height: "40px",
+                  width: "100%",
+                  border: "none",
+                  borderRadius: "4px",
+                  color: "#fff",
+                  fontSize: "15px",
+                  fontWeight: "700",
+                  marginTop: "2px",
+                  marginLeft: "10px",
+                }}
+                onClick={handleButtonPay}
+              ></ButtonComponent>
+            )}
+
+            {current > 0 && (
+              <ButtonComponent
+                textButton="Quay lại"
+                styleButton={{
+                  background: "rgb(255, 57,69)",
+                  height: "40px",
+                  width: "100%",
+                  border: "none",
+                  borderRadius: "4px",
+                  color: "#fff",
+                  fontSize: "15px",
+                  fontWeight: "700",
+                  marginTop: "2px",
+                  marginLeft: "10px",
+                }}
+                onClick={() => prev()}
+              ></ButtonComponent>
+            )}
+          </div>
         </div>
-        <div>
-          <ButtonComponent
-            textButton="Mua hàng"
-            disabled={
-              !user?.phone || !user?.address || !user?.name || !user?.city
+        <ModalComponent
+          title="Cập nhập địa chỉ"
+          isOpen={isModalUpdateInfo}
+          onOk={handleUpdateModal}
+          onCancel={() => setIsOpenModalUpdateInfo(false)}
+          okText="Chỉnh sửa"
+          cancelText="Thoát"
+          okButtonProps={{
+            disabled:
+              !stateUserDetail.name.length ||
+              !stateUserDetail.phone.length ||
+              !stateUserDetail.city.length ||
+              !stateUserDetail.district.length ||
+              !stateUserDetail.rard.length ||
+              !stateUserDetail.address.length
                 ? true
-                : false
-            }
-            styleButton={{
-              background:
-                !user?.phone || !user?.address || !user?.name || !user?.city
-                  ? "#ccc"
-                  : "rgb(255, 57,69)",
-              height: "40px",
-              width: "100%",
-              border: "none",
-              borderRadius: "4px",
-              color: "#fff",
-              fontSize: "15px",
-              fontWeight: "700",
-              marginTop: "2px",
-              marginLeft: "10px",
-            }}
-            onClick={handleButtonPay}
-          ></ButtonComponent>
-        </div>
+                : false,
+          }}
+        >
+          <IsLoadingComponent isLoading={isLoadingUpdateUserDetail}>
+            <div className="mt-5 text-center">
+              <FormLabel>
+                <div className="flex justify-between">
+                  <TextField
+                    id="outlined-basic "
+                    label="Họ và Tên"
+                    variant="outlined"
+                    size="small"
+                    value={stateUserDetail.name}
+                    onChange={handleOnchangeDetails}
+                    name="name"
+                    error={!stateUserDetail.name.length ? true : false}
+                    helperText={
+                      !stateUserDetail.name.length
+                        ? "Vui lòng nhập Họ và Tên"
+                        : ""
+                    }
+                  />
+                  <TextField
+                    id="outlined-basic"
+                    label="Số điện thoại"
+                    variant="outlined"
+                    size="small"
+                    value={stateUserDetail.phone}
+                    onChange={handleOnchangeDetails}
+                    name="phone"
+                    error={!stateUserDetail.phone.length ? true : false}
+                    helperText={
+                      !stateUserDetail.phone.length
+                        ? "Vui lòng nhập Số điện thoại"
+                        : ""
+                    }
+                  />
+                </div>
+                <div className="mt-5 flex justify-between">
+                  <FormControl sx={{ minWidth: 100, left: 0 }} size="small">
+                    <InputLabel id="demo-simple-select-helper-label">
+                      Tỉnh/Thành Phố
+                    </InputLabel>
+                    <Select
+                      labelId="demo-simple-select-helper-label"
+                      id="demo-simple-select-helper"
+                      value={stateUserDetail.city}
+                      label="Tỉnh/Thành Phố"
+                      onChange={handleOnchangeDetails}
+                      style={{ width: "220px" }}
+                      name="city"
+                      error={!stateUserDetail.city.length ? true : false}
+                      helperText={
+                        !stateUserDetail.city.length
+                          ? "Vui lòng chọn Tỉnh/Thành Phố"
+                          : ""
+                      }
+                    >
+                      <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
+                      {getAllCity?.results?.map((item) => {
+                        return (
+                          <MenuItem value={item?.province_id}>
+                            {item?.province_name}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+
+                  <FormControl sx={{ minWidth: 100, left: 0 }} size="small">
+                    <InputLabel id="demo-simple-select-helper-label">
+                      Quận/Huyện
+                    </InputLabel>
+                    <Select
+                      labelId="demo-simple-select-helper-label"
+                      id="demo-simple-select-helper"
+                      value={stateUserDetail.district}
+                      label="Quận/Huyện"
+                      onChange={handleOnchangeDetails}
+                      style={{ width: "220px" }}
+                      disabled={
+                        !getDetailAllDistrict?.results?.length ? true : false
+                      }
+                      name="district"
+                      error={!stateUserDetail.district.length ? true : false}
+                      helperText={
+                        !stateUserDetail.district.length
+                          ? "Vui lòng chọn Tỉnh/Thành Phố"
+                          : ""
+                      }
+                    >
+                      <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
+                      {getDetailAllDistrict?.results?.map((item) => {
+                        return (
+                          <MenuItem value={item?.district_id}>
+                            {item?.district_name}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                </div>
+
+                <div className="mt-5">
+                  <FormControl
+                    sx={{ minWidth: 100, left: 0, width: "100%" }}
+                    size="small"
+                  >
+                    <InputLabel id="demo-simple-select-helper-label">
+                      Phường/Xã
+                    </InputLabel>
+                    <Select
+                      labelId="demo-simple-select-helper-label"
+                      id="demo-simple-select-helper"
+                      value={stateUserDetail.rard}
+                      label="Phường/Xã"
+                      onChange={handleOnchangeDetails}
+                      style={{ width: "100%" }}
+                      disabled={
+                        !getDetailAllRard?.results?.length ? true : false
+                      }
+                      name="rard"
+                      error={!stateUserDetail.rard.length ? true : false}
+                      helperText={
+                        !stateUserDetail.rard.length
+                          ? "Vui lòng chọn Tỉnh/Thành Phố"
+                          : ""
+                      }
+                    >
+                      <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
+                      {getDetailAllRard?.results?.map((item) => {
+                        return (
+                          <MenuItem value={item?.ward_id}>
+                            {item?.ward_name}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                </div>
+
+                <div className="mt-5">
+                  <TextField
+                    id="outlined-basic"
+                    label="Địa chỉ "
+                    variant="outlined"
+                    size="small"
+                    style={{ width: "100%" }}
+                    value={stateUserDetail.address}
+                    onChange={handleOnchangeDetails}
+                    name="address"
+                    error={!stateUserDetail.address.length ? true : false}
+                    helperText={
+                      !stateUserDetail.address.length
+                        ? "Vui lòng nhập Địa chỉ"
+                        : ""
+                    }
+                  />
+                </div>
+
+                <div className="mt-5">
+                  <TextField
+                    id="outlined-multiline-static"
+                    label="Địa chỉ cụ thể"
+                    variant="outlined"
+                    size="small"
+                    style={{ width: "100%" }}
+                    multiline
+                    value={stateUserDetail.specific_address}
+                    onChange={handleOnchangeDetails}
+                    name="specific_address"
+                    error={
+                      !stateUserDetail.specific_address.length ? true : false
+                    }
+                    helperText={
+                      !stateUserDetail.specific_address.length
+                        ? "Vui lòng chọn địa điểm cụ thể"
+                        : ""
+                    }
+                  />
+                </div>
+              </FormLabel>
+            </div>
+          </IsLoadingComponent>
+        </ModalComponent>
       </div>
-
-      <ModalComponent
-        title="Cập nhập địa chỉ"
-        isOpen={isModalUpdateInfo}
-        onOk={handleUpdateModal}
-        onCancel={() => setIsOpenModalUpdateInfo(false)}
-        okText="Chỉnh sửa"
-        cancelText="Thoát"
-        okButtonProps={{
-          disabled:
-            !stateUserDetail.name.length ||
-            !stateUserDetail.phone.length ||
-            !stateUserDetail.city.length ||
-            !stateUserDetail.district.length ||
-            !stateUserDetail.rard.length ||
-            !stateUserDetail.address.length ? true : false,
-        }}
-      > 
-        <IsLoadingComponent isLoading={isLoadingUpdateUserDetail}>
-        <div className="mt-5 text-center">
-          <FormLabel>
-            <div className="flex justify-between">
-              <TextField
-                id="outlined-basic "
-                label="Họ và Tên"
-                variant="outlined"
-                size="small"
-                value={stateUserDetail.name}
-                onChange={handleOnchangeDetails}
-                name="name"
-                error={!stateUserDetail.name.length ? true : false}
-                helperText={
-                  !stateUserDetail.name.length ? "Vui lòng nhập Họ và Tên" : ""
-                }
-              />
-              <TextField
-                id="outlined-basic"
-                label="Số điện thoại"
-                variant="outlined"
-                size="small"
-                value={stateUserDetail.phone}
-                onChange={handleOnchangeDetails}
-                name="phone"
-                error={!stateUserDetail.phone.length ? true : false}
-                helperText={
-                  !stateUserDetail.phone.length
-                    ? "Vui lòng nhập Số điện thoại"
-                    : ""
-                }
-              />
-            </div>
-            <div className="mt-5 flex justify-between">
-              <FormControl sx={{ minWidth: 100, left: 0 }} size="small">
-                <InputLabel id="demo-simple-select-helper-label">
-                  Tỉnh/Thành Phố
-                </InputLabel>
-                <Select
-                  labelId="demo-simple-select-helper-label"
-                  id="demo-simple-select-helper"
-                  value={stateUserDetail.city}
-                  label="Tỉnh/Thành Phố"
-                  onChange={handleOnchangeDetails}
-                  style={{ width: "220px" }}
-                  name="city"
-                  error={!stateUserDetail.city.length ? true : false}
-                  helperText={
-                    !stateUserDetail.city.length
-                      ? "Vui lòng chọn Tỉnh/Thành Phố"
-                      : ""
-                  }
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  {getAllCity?.results?.map((item) => {
-                    return (
-                      <MenuItem value={item?.province_id}>
-                        {item?.province_name}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              </FormControl>
-
-              <FormControl sx={{ minWidth: 100, left: 0 }} size="small">
-                <InputLabel id="demo-simple-select-helper-label">
-                  Quận/Huyện
-                </InputLabel>
-                <Select
-                  labelId="demo-simple-select-helper-label"
-                  id="demo-simple-select-helper"
-                  value={stateUserDetail.district}
-                  label="Quận/Huyện"
-                  onChange={handleOnchangeDetails}
-                  style={{ width: "220px" }}
-                  disabled={
-                    !getDetailAllDistrict?.results?.length ? true : false
-                  }
-                  name="district"
-                  error={!stateUserDetail.district.length ? true : false}
-                  helperText={
-                    !stateUserDetail.district.length
-                      ? "Vui lòng chọn Tỉnh/Thành Phố"
-                      : ""
-                  }
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  {getDetailAllDistrict?.results?.map((item) => {
-                    return (
-                      <MenuItem value={item?.district_id}>
-                        {item?.district_name}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              </FormControl>
-            </div>
-
-            <div className="mt-5">
-              <FormControl
-                sx={{ minWidth: 100, left: 0, width: "100%" }}
-                size="small"
-              >
-                <InputLabel id="demo-simple-select-helper-label">
-                  Phường/Xã
-                </InputLabel>
-                <Select
-                  labelId="demo-simple-select-helper-label"
-                  id="demo-simple-select-helper"
-                  value={stateUserDetail.rard}
-                  label="Phường/Xã"
-                  onChange={handleOnchangeDetails}
-                  style={{ width: "100%" }}
-                  disabled={!getDetailAllRard?.results?.length ? true : false}
-                  name="rard"
-                  error={!stateUserDetail.rard.length ? true : false}
-                  helperText={
-                    !stateUserDetail.rard.length
-                      ? "Vui lòng chọn Tỉnh/Thành Phố"
-                      : ""
-                  }
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  {getDetailAllRard?.results?.map((item) => {
-                    return (
-                      <MenuItem value={item?.ward_id}>
-                        {item?.ward_name}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              </FormControl>
-            </div>
-
-            <div className="mt-5">
-              <TextField
-                id="outlined-basic"
-                label="Địa chỉ "
-                variant="outlined"
-                size="small"
-                style={{ width: "100%" }}
-                value={stateUserDetail.address}
-                onChange={handleOnchangeDetails}
-                name="address"
-                error={!stateUserDetail.address.length ? true : false}
-                helperText={
-                  !stateUserDetail.address.length ? "Vui lòng nhập Địa chỉ" : ""
-                }
-              />
-            </div>
-
-            <div className="mt-5">
-              <TextField
-                id="outlined-multiline-static"
-                label="Địa chỉ cụ thể"
-                variant="outlined"
-                size="small"
-                style={{ width: "100%" }}
-                multiline
-                value={stateUserDetail.specific_address}
-                onChange={handleOnchangeDetails}
-                name="specific_address"
-                error={!stateUserDetail.specific_address.length ? true : false}
-                helperText={
-                  !stateUserDetail.specific_address.length ? "Vui lòng chọn địa điểm cụ thể" : ""
-                }
-              />
-            </div>
-          </FormLabel>
-        </div>
-        </IsLoadingComponent>
-      </ModalComponent>
-    </div>
     </IsLoadingComponent>
   );
 }

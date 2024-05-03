@@ -21,7 +21,6 @@ export default function OrderProductDetail() {
     queryFn: fetchOrderDetailProduct,
     enabled: Boolean(state?.id && state?.token),
   });
-  console.log(order);
 
   return (
     <div className="mt-5 w-full p-pad-sm md:p-pad-md ">

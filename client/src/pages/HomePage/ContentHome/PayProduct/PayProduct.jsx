@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { Box, Tab } from "@mui/material";
 import ButtonComponent from "../../../../components/ButtonSearch/Button";
 import { useSelector, useDispatch } from "react-redux";
 import { convertPrice } from "../../../../utils";
@@ -15,6 +13,7 @@ import {
   ProvinceVn,
   UserService,
   OrderProduct,
+  PaymentService
 } from "../../../../services/index";
 import { useQuery } from "@tanstack/react-query";
 import { useMutationHooks } from "../../../../hooks/UseMutationHook";
@@ -24,9 +23,10 @@ import {
   warning,
 } from "../../../../components/MessageComponents/Message.jsx";
 import IsLoadingComponent from "../../../../components/LoadComponent/Loading.jsx";
-import { Button, message, Steps, theme } from "antd";
+import { Steps, theme, Radio, Space } from "antd";
 export default function PayProduct() {
-  const [value, setValue] = useState("1");
+  const [value, setValue] = useState();
+  const [valueRadio, setValueRadio] = useState();
   const order = useSelector((state) => state.order);
   const user = useSelector((state) => state.user);
   const [SleectNamecity, setSleectNamecity] = useState("");
@@ -45,10 +45,6 @@ export default function PayProduct() {
     nameRard: "",
     specific_address: "",
   });
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
 
   const handleOpenModal = () => {
     setIsOpenModalUpdateInfo(true);
@@ -114,14 +110,23 @@ export default function PayProduct() {
         address: user?.specific_address,
         phone: user?.phone,
         city: user?.city,
-        paymentMethod: "Nhan hang thanh toan",
+        paymentMethod: valueRadio,
         itemsPrice: priceMemo,
         shippingPrice: diliveryPriceMemo,
         totalPrice: TotalpriceMemo,
         user: user?.id,
       });
+
+      if(valueRadio === "Thanh toán khi nhận hàng") {
+        
+      }else if(valueRadio === "Thanh toán QR") {
+        mutationPayQR.mutate()
+      }else if(valueRadio === "Thanh toán Zalopay") {
+        mutationPayZaloPay.mutate()
+      }
     }
   };
+
 
   const handleUpdateModal = () => {
     mutationUpdate.mutate(stateUserDetail);
@@ -149,12 +154,37 @@ export default function PayProduct() {
     const res = UserService.updateUser(id, data, access_Token);
     return res;
   });
-
   const mutationOrderProduct = useMutationHooks((data) => {
     const { ...rests } = data;
     const access_Token = user.access_Token.split("=")[1];
     const res = OrderProduct.createOrderProduct(access_Token, data);
     return res;
+  });
+
+  const mutationPayQR = useMutationHooks(async() => {
+    try {
+      const res = await PaymentService.createPaymentLink();
+      // Kiểm tra xem API đã trả về thành công hay không
+      if (res && res.url) {
+          // Chuyển hướng người dùng đến URL mới
+          window.location.href = res.url;
+      } else {
+          // Xử lý trường hợp API trả về không thành công
+          console.error("Lỗi: Không có URL trả về từ API thanh toán.");
+      }
+  } catch (error) {
+      console.error("Lỗi khi gọi API thanh toán:", error);
+  }
+  });
+
+  const mutationPayZaloPay = useMutationHooks(async() => {
+    try {
+      const res = await PaymentService.createPaymentZaloPay();
+      // Kiểm tra xem API đã trả về thành công hay không
+      return res
+  } catch (error) {
+      console.error("Lỗi khi gọi API thanh toán:", error);
+  }
   });
 
   useEffect(() => {
@@ -179,6 +209,15 @@ export default function PayProduct() {
     mutationUpdate;
   const { data: orderProductPay, isLoading: isLoadingAddOrder } =
     mutationOrderProduct;
+  const {data: payQR} =mutationPayQR
+  const {data: PayZalo}=mutationPayZaloPay
+  console.log(PayZalo)
+  useEffect(()=> {
+    if (PayZalo) {
+      // Chuyển hướng người dùng đến URL được trả về từ API
+      window.location.href = PayZalo.order_url;
+  }
+  },[PayZalo])
 
   useEffect(() => {
     if (orderProductPay?.status === 200) {
@@ -248,6 +287,21 @@ export default function PayProduct() {
   const TotalpriceMemo = useMemo(() => {
     return priceMemo + diliveryPriceMemo;
   }, [priceMemo, diliveryPriceMemo]);
+
+  const onChange = (e) => {
+    setValue(e.target.value);
+  }
+
+  useEffect(() => {
+    if(value === 1){
+      setValueRadio('Thanh toán khi nhận hàng')
+    }else if(value ===2) {
+      setValueRadio('Thanh toán QR')
+    }else if(value === 3) {
+      setValueRadio('Thanh toán Zalopay')
+    }
+  }, [value])
+
 
   const steps = [
     {
@@ -340,7 +394,20 @@ export default function PayProduct() {
     },
     {
       title: "Chọn phương thức thanh toán",
-      content: "Second-content",
+      content: (
+        <>
+          <div className="bg-[#e9d5d5] p-5 md:p-10">
+            <h2 className="mb-2 text-[20px]">Phương thức thanh toán</h2>
+            <Radio.Group onChange={onChange} value={value}>
+              <Space direction="vertical">
+                <Radio value={1}>Thanh toán khi nhận hàng</Radio>
+                <Radio value={2}>Quét mã QR thanh toán</Radio>
+                <Radio value={3}>Thanh toán ZALOPAY</Radio>
+              </Space>
+            </Radio.Group>
+          </div>
+        </>
+      ),
     },
   ];
   const { token } = theme.useToken();
@@ -411,13 +478,13 @@ export default function PayProduct() {
               <ButtonComponent
                 textButton="Mua hàng"
                 disabled={
-                  !user?.phone || !user?.address || !user?.name || !user?.city
+                  !user?.phone || !user?.address || !user?.name || !user?.city || !valueRadio
                     ? true
                     : false
                 }
                 styleButton={{
                   background:
-                    !user?.phone || !user?.address || !user?.name || !user?.city
+                    !user?.phone || !user?.address || !user?.name || !user?.city || !valueRadio
                       ? "#ccc"
                       : "rgb(255, 57,69)",
                   height: "40px",

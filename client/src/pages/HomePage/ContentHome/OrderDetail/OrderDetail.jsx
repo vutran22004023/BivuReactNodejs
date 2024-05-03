@@ -3,19 +3,21 @@ import TabContext from "@mui/lab/TabContext";
 import { Box, Tab } from "@mui/material";
 import TabPanel from "@mui/lab/TabPanel";
 import TabList from "@mui/lab/TabList";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 import { OrderProduct } from "../../../../services/index";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import Product1 from "../../../../assets/font-end/imgs/Product/product1.png";
 import ButtonFrom from "../../../../components/ButtonSearch/Button";
-
+import { AddOrderProduct } from "../../../../redux/Slides/orderProductSlide";
+import {useMutationHooks} from "../../../../hooks/UseMutationHook"
 export default function OrderDetail() {
   const [value, setValue] = useState("1");
   const location = useLocation();
   const { state } = location;
   const user = useSelector((state) => state.user);
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -27,6 +29,12 @@ export default function OrderDetail() {
     return res;
   };
 
+  const fetchOrderDetailProduct = useMutationHooks(async(id) => {
+    const access_Token = state?.token.split("=")[1];
+    const res =  await OrderProduct.getDetailOrderProduct(id, access_Token);
+    return res;
+  });
+
   const { data: productsLimit, isLoading: isLoadingProductsLimit } = useQuery({
     queryKey: ["orderDetailUser"],
     queryFn: fetchOrderDetailUser,
@@ -34,13 +42,31 @@ export default function OrderDetail() {
   });
 
   const handleButtonDetailOrder = (id) => {
-    console.log(id)
     navigate(`/chi-tiet-don-hang/${id}`,{
       state: {
         id: id,
        token:user?.access_Token,
       }
     })
+  }
+
+  const handleButtonRepurchase = (id) => {
+    fetchOrderDetailProduct.mutate(id);
+    const {data: orderDetail} = fetchOrderDetailProduct
+        orderDetail?.data?.oderItems.forEach((item) => {
+          dispatch(
+            AddOrderProduct({
+              orderItem: {
+                name: item?.name,
+                amount: item?.amount,
+                image: item?.image,
+                price: item?.price,
+                product: item?.product
+              }
+            })
+          );
+          navigate('/gio-hang', { state: { listChecked: item?.product } });
+        });
   }
   
 
@@ -121,6 +147,7 @@ export default function OrderDetail() {
                           margin: "10px 0",
                         }}
                         textButton={"Mua lại"}
+                        onClick={() =>handleButtonRepurchase(order?._id)}
                       ></ButtonFrom>
                     </div>
                     <div>

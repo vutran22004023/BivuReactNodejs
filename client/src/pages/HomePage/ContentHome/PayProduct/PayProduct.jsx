@@ -120,9 +120,32 @@ export default function PayProduct() {
       if(valueRadio === "Thanh toán khi nhận hàng") {
         
       }else if(valueRadio === "Thanh toán QR") {
-        mutationPayQR.mutate()
+        mutationPayQR.mutate({
+          oderItem: order?.orderItemsSlected,
+          fullName: user?.name,
+          address: user?.specific_address,
+          phone: user?.phone,
+          city: user?.city,
+          email: user?.email,
+          paymentMethod: valueRadio,
+          itemsPrice: priceMemo,
+          shippingPrice: diliveryPriceMemo,
+          totalPrice: TotalpriceMemo,
+          user: user?.id,
+        })
       }else if(valueRadio === "Thanh toán Zalopay") {
-        mutationPayZaloPay.mutate()
+        mutationPayZaloPay.mutate({
+          oderItem: order?.orderItemsSlected,
+          fullName: user?.name,
+          address: user?.specific_address,
+          phone: user?.phone,
+          city: user?.city,
+          paymentMethod: valueRadio,
+          itemsPrice: priceMemo,
+          shippingPrice: diliveryPriceMemo,
+          totalPrice: TotalpriceMemo,
+          user: user?.id,
+        })
       }
     }
   };
@@ -161,25 +184,21 @@ export default function PayProduct() {
     return res;
   });
 
-  const mutationPayQR = useMutationHooks(async() => {
+  const mutationPayQR = useMutationHooks(async(data) => {
     try {
-      const res = await PaymentService.createPaymentLink();
+      const { ...rests } = data;
+      const res = await PaymentService.createPaymentLink(data);
       // Kiểm tra xem API đã trả về thành công hay không
-      if (res && res.url) {
-          // Chuyển hướng người dùng đến URL mới
-          window.location.href = res.url;
-      } else {
-          // Xử lý trường hợp API trả về không thành công
-          console.error("Lỗi: Không có URL trả về từ API thanh toán.");
-      }
+      return res;
   } catch (error) {
       console.error("Lỗi khi gọi API thanh toán:", error);
   }
   });
 
-  const mutationPayZaloPay = useMutationHooks(async() => {
+  const mutationPayZaloPay = useMutationHooks(async(data) => {
     try {
-      const res = await PaymentService.createPaymentZaloPay();
+      const { ...rests } = data;
+      const res = await PaymentService.createPaymentZaloPay(data);
       // Kiểm tra xem API đã trả về thành công hay không
       return res
   } catch (error) {
@@ -211,7 +230,12 @@ export default function PayProduct() {
     mutationOrderProduct;
   const {data: payQR} =mutationPayQR
   const {data: PayZalo}=mutationPayZaloPay
-  console.log(PayZalo)
+  useEffect(()=> {
+    if (payQR) {
+      // Chuyển hướng người dùng đến URL được trả về từ API
+      window.location.href = payQR.checkoutUrl;
+  }
+  },[payQR])
   useEffect(()=> {
     if (PayZalo) {
       // Chuyển hướng người dùng đến URL được trả về từ API

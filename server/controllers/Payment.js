@@ -23,13 +23,13 @@ const createLinkPayOs = async(req, res) => {
   const order = {
     orderCode: transID,
     amount: totalPrice,
-    description: "VQRIO123",
+    description: `VQRIO${transID}`,
     buyerName: fullName,
     buyerEmail: email,
     buyerPhone: phone,
     buyerAddress: address,
     items: items,
-    cancelUrl: "https://your-cancel-url.com",
+    cancelUrl: "http://localhost:5173/mua-hang",
     returnUrl: "https://your-success-url.com",
   };
   try {
@@ -44,6 +44,36 @@ const createLinkPayOs = async(req, res) => {
 const receiveHookPayOs = async(req, res) => {
   console.log(req.body);
   res.json();
+}
+
+const getPaymentInfomationsPayOs = async(req, res) => {
+  const orderCode = req.params.idorder
+  try {
+    const paymentLinkInfo = await payos.getPaymentLinkInformation(orderCode);
+    console.log(paymentLinkInfo)
+    return res.status(200).json(paymentLinkInfo)
+  }catch(err) {
+    console.log(err.message)
+  }
+}
+
+const canceledPaymentLinkPayOs = async(req, res) => {
+  const orderCode = req.params.idorder
+  try {
+    const paymentLinkInfo = await payos.cancelPaymentLink(orderCode);
+    return res.status(200).json(paymentLinkInfo)
+  }catch(err) {
+    console.log(err.message)
+  }
+} 
+
+const confirmWebhookPayOs = async(req, res) => {
+  try {
+    const confirmWebhookPayOs =  await payos.confirmWebhook("https://4120-2001-ee0-4b49-bae0-f965-b39e-b88d-4021.ngrok-free.app/receive-hook");
+    return res.status(200).json(confirmWebhookPayOs)
+  }catch(err) {
+    console.log(err.message)
+  }
 }
 
 
@@ -236,6 +266,9 @@ const transactionRefundStatus = async(req, res) => {
 export default {
     createLinkPayOs,
     receiveHookPayOs,
+    getPaymentInfomationsPayOs,
+    canceledPaymentLinkPayOs,
+    confirmWebhookPayOs,
     createPaymentZaloPay,
     callbackZaloPay,
     orderStatusZaloPay,

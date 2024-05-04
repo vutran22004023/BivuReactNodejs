@@ -25,6 +25,12 @@ app.use("/api/order-product", orderRouters);
 app.post("/api/create-payment-link",payMentController.createLinkPayOs);
 
 app.post("/receive-hook",payMentController.receiveHookPayOs);
+
+app.get("/get-payment-infomations/:idorder",payMentController.getPaymentInfomationsPayOs)
+
+app.post("/cancel-payment-link/:idorder", payMentController.canceledPaymentLinkPayOs)
+
+app.post("/confirm-webhook-payos", payMentController.confirmWebhookPayOs)
 //end api thanh toán PayOS
 
 app.post("/payment-zalopay",payMentController.createPaymentZaloPay);

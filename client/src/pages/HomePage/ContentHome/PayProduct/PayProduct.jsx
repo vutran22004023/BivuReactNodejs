@@ -110,6 +110,7 @@ export default function PayProduct() {
         address: user?.specific_address,
         phone: user?.phone,
         city: user?.city,
+        email: user?.email,
         paymentMethod: valueRadio,
         itemsPrice: priceMemo,
         shippingPrice: diliveryPriceMemo,

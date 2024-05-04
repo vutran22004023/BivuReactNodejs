@@ -5,7 +5,7 @@ import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import { Outlet } from "react-router-dom";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import { Modal, Form, Input, Upload, Avatar, Space, Select,Image } from "antd";
+import { Modal, Form, Input, Upload, Avatar, Space, Select, Image } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { getBase64 } from "../../../../utils.js";
 import { UploadOutlined, WarningOutlined } from "@ant-design/icons";
@@ -15,6 +15,8 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import IconButton, { iconButtonClasses } from "@mui/joy/IconButton";
 import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
+
+// import { convertFromHTML } from 'draft-convert'; 
 import {
   Menu,
   MenuButton,
@@ -36,6 +38,7 @@ import DrawerComponent from "../../../../components/DrawerComponent/Drawer.jsx";
 import LoadingComponent from "../../../../components/LoadComponent/Loading.jsx";
 import ModalComponent from "../../../../components/ModalComponent/Modal.jsx";
 import { renderOptions } from "../../../../utils.js";
+import { convertLegacyProps } from "antd/es/button/buttonHelpers.js";
 
 export default function ProductAdmin() {
   //button thêm sửa xóa
@@ -68,39 +71,56 @@ export default function ProductAdmin() {
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false);
   const [typeSelect, setTypeSelect] = useState("");
-  const [typePage,setTypePage] = useState(0)
+  const [typePage, setTypePage] = useState(0);
   useEffect(() => {
-    if (pages) { // Đảm bảo pages không phải là undefined hoặc null
-        setTypePage(pages.page)
+    if (pages) {
+      // Đảm bảo pages không phải là undefined hoặc null
+      setTypePage(pages.page);
     }
-}, [pages?.page]);
-  const [stateProduct, setStateProduct] = useState({
+  }, [pages?.page]);
+
+  const inittial = () => ({
     name: "",
     image: "",
     type: "",
-    price: "",
-    counInStock: "",
-    rating: "",
-    description: "",
-    discount:""
-  });
-  const [stateProductDetail, setStateProductDetail] = useState({
-    name: "",
-    image: "",
-    type: "",
-    price: "",
+    // price: "",
     counInStock: "",
     rating: "",
     description: "",
     discount: "",
+    categorySize: [
+      {
+        size: "",
+        price: "",
+      },
+    ],
   });
 
+  const handleAddInput = () => {
+    setStateProduct({
+      ...stateProduct,
+      categorySize: [...stateProduct.categorySize, { size: "", price: "" }],
+    });
+  };
+
+  const handleRemoveInput = (index) => {
+    const newSize = [...stateProduct.categorySize];
+    newSize.splice(index, 1);
+    setStateProduct({
+      ...stateProduct,
+      categorySize: newSize,
+    });
+  };
+
+  const [stateProduct, setStateProduct] = useState(inittial);
+  console.log(stateProduct);
+  const [stateProductDetail, setStateProductDetail] = useState(inittial);
   const [RowSelected, setRowSelected] = useState("");
+ 
 
   //trạng thái mở modal
   const showModal = () => {
     setIsModalOpen(true);
-    // form.resetFields();
   };
 
   const handleOk = () => {
@@ -109,17 +129,19 @@ export default function ProductAdmin() {
   //trang thái đóng modal
   const handleCancel = () => {
     setIsModalOpen(false);
-    form.resetFields();
   };
 
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
   // ochange dữ liệu khi nhập vào imput
-  const handleOnchanges = (e) => {
+  const handleOnchanges = (index, e) => {
+    const newSize = [...stateProduct.categorySize];
+    newSize[index][e.target.name] = e.target.value;
     setStateProduct({
       ...stateProduct,
       [e.target.name]: e.target.value,
+      categorySize: newSize,
     });
   };
 
@@ -169,7 +191,7 @@ export default function ProductAdmin() {
         headers: {
           token: `Beare ${access_Token}`,
         },
-      }
+      },
     );
     return res.data;
   });
@@ -177,8 +199,8 @@ export default function ProductAdmin() {
   const fetchProductAll = async (context) => {
     const search = "";
     const limit = "";
-    const page = context.queryKey[1]
-    const res = await ProductService.getAllProduct(limit, search,page);
+    const page = context.queryKey[1];
+    const res = await ProductService.getAllProduct(limit, search, page);
     return res;
   };
 
@@ -189,7 +211,7 @@ export default function ProductAdmin() {
     const res = ProductService.updatedDetailProduct(
       RowSelected,
       data,
-      access_Token
+      access_Token,
     );
     return res;
   });
@@ -217,7 +239,7 @@ export default function ProductAdmin() {
         onSettled: () => {
           queryProduct.refetch();
         },
-      }
+      },
     );
   };
 
@@ -227,9 +249,14 @@ export default function ProductAdmin() {
   };
 
   // các biến dữ liệu
-  const { data, isLoading: isLoadingCreateProduct, isSuccess, isError } = mutation;
+  const {
+    data,
+    isLoading: isLoadingCreateProduct,
+    isSuccess,
+    isError,
+  } = mutation;
   const queryProduct = useQuery({
-    queryKey: ["products",typePage],
+    queryKey: ["products", typePage],
     queryFn: fetchProductAll,
     retryDelay: 1000,
     staleTime: 1000,
@@ -441,7 +468,7 @@ export default function ProductAdmin() {
         counInStock: res?.data?.counInStock,
         rating: res?.data?.rating,
         description: res?.data?.description,
-        discount: res?.data?.discount
+        discount: res?.data?.discount,
       });
     }
     setIsLoadingUpdate(false);
@@ -451,8 +478,12 @@ export default function ProductAdmin() {
 
   //sao khi bấm vào cập nhập thì input có thể hiện thị thông tin
   useEffect(() => {
-    form.setFieldsValue(stateProductDetail);
-  }, [form, stateProductDetail]);
+    if (!isModalOpen) {
+      form.setFieldsValue(stateProductDetail);
+    } else {
+      form.setFieldsValue(inittial());
+    }
+  }, [form, stateProductDetail, isModalOpen]);
 
   const handleDetailProduct = () => {
     if (RowSelected) {
@@ -502,7 +533,6 @@ export default function ProductAdmin() {
       setTypeSelect(value);
     }
   };
-
 
   return (
     <>
@@ -571,13 +601,13 @@ export default function ProductAdmin() {
             <Form
               name="basic"
               labelCol={{
-                span: 6,
+                span: 10,
               }}
               wrapperCol={{
-                span: 18,
+                span: 14,
               }}
               style={{
-                maxWidth: 600,
+                maxWidth: 800,
               }}
               initialValues={{
                 remember: true,
@@ -621,19 +651,64 @@ export default function ProductAdmin() {
                 />
                 {typeSelect === "add_type" ? (
                   <Input
-                    style={{marginTop: '5px'}}
+                    style={{ marginTop: "5px" }}
                     value={stateProduct.type}
                     onChange={handleOnchanges}
                     name="type"
                   />
-                ): (
+                ) : (
                   <Input
-                    style={{display: 'none'}}
+                    style={{ display: "none" }}
                     value={stateProduct.type}
                     onChange={handleOnchanges}
                     name="type"
                   />
                 )}
+              </Form.Item>
+
+              {stateProduct.categorySize.map((item, index) => (
+                <div key={index} className="flex">
+                  <Form.Item
+                    label= {`Kích thước ${index}`}
+                    name={`size${index}`}
+                    rules={[
+                      {
+                        required: true,
+                        message: "vui lòng nhập giá size",
+                      },
+                    ]}
+                  >
+                    <Input
+                      name="size"
+                      value={item.size}
+                      onChange={(e) => handleOnchanges(index, e)}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    label={`Giá ${index}`}
+                    name={`price${index}`}
+                    rules={[
+                      {
+                        required: true,
+                        message: "vui lòng nhập giá sản phẩm",
+                      },
+                    ]}
+                    style={{display: 'block'}}
+                  >
+                    <Input
+                      name="price"
+                      value={item.price}
+                      onChange={(e) => handleOnchanges(index, e)}
+                    />
+                  </Form.Item>
+                  <Form.Item>
+                    {index === 0 ? (""): (<Button variant="outlined" color="error" onClick={() => handleRemoveInput(index)}>Xóa</Button>)}
+                    
+                  </Form.Item>
+                </div>
+              ))}
+              <Form.Item className="ml-[100px]">
+              <Button  onClick={handleAddInput} type="primary">Thêm size</Button>
               </Form.Item>
 
               <Form.Item
@@ -651,23 +726,7 @@ export default function ProductAdmin() {
                   onChange={handleOnchanges}
                   name="description"
                 />
-              </Form.Item>
-
-              <Form.Item
-                label="Giá sản phẩm"
-                name="price"
-                rules={[
-                  {
-                    required: true,
-                    message: "vui lòng nhập giá sản phẩm",
-                  },
-                ]}
-              >
-                <Input
-                  value={stateProduct.price}
-                  onChange={handleOnchanges}
-                  name="price"
-                />
+                
               </Form.Item>
               <Form.Item
                 label="Giảm giá sản phẩm"

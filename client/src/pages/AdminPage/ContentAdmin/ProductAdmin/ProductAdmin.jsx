@@ -42,7 +42,9 @@ import DrawerComponent from "../../../../components/DrawerComponent/Drawer.jsx";
 import LoadingComponent from "../../../../components/LoadComponent/Loading.jsx";
 import ModalComponent from "../../../../components/ModalComponent/Modal.jsx";
 import {renderOptions, vietnameseToSlug } from "../../../../utils.js";
-
+import {imgDB,txtDB} from '../../../../Firebase/config.jsx'
+import {v4} from 'uuid'
+import {getDownloadURL, ref, uploadBytes} from 'firebase/storage'
 export default function ProductAdmin() {
   //button thêm sửa xóa
   const RowMenu = () => (
@@ -118,6 +120,7 @@ export default function ProductAdmin() {
   };
 
   const [stateProduct, setStateProduct] = useState(inittial);
+  console.log(stateProduct)
   const [stateProductDetail, setStateProductDetail] = useState(inittial);
   const [RowSelected, setRowSelected] = useState("");
 
@@ -538,20 +541,49 @@ export default function ProductAdmin() {
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState();
-  const handleChange = async ({ fileList }) => {
-    const thumbUrls = await fileList?.map((file) => file.thumbUrl); // Lấy thumbUrl từ mỗi file trong fileList
+  console.log(previewImage)
+  // const handleChange = async ({fileList}) => {
+  //     const imgs = ref(imgDB, `Imgs/${v4()}`);
+  //     const uploadTaskSnapshot = await uploadBytes(imgs, fileList.originFileObj);
+  //     const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
+  //     setStateProduct({ ...stateProduct, image: downloadURL });
 
-    setStateProduct({ ...stateProduct, image: thumbUrls });
-  };
+  // };
   const handlePreview = async ({ fileList }) => {
-    const file = fileList;
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
-      console.log(file);
+    if (Array.isArray(fileList)) {
+      fileList.forEach(async (file) => {
+        setPreviewImage(file);
+        setPreviewOpen(true);
+      });
+    } else {
+      console.error("fileList is not an array");
     }
-    setPreviewImage(file.preview);
-    setPreviewOpen(true);
   };
+  
+  const handleChange = async ({ fileList }) => {
+    if (fileList) {
+      try {
+        const downloadURLs = await Promise.all(fileList.map(async (item) => {
+          const imgs = ref(imgDB, `Imgs/${v4()}`);
+          try {
+            const uploadTaskSnapshot = await uploadBytes(imgs, item.originFileObj);
+            return getDownloadURL(uploadTaskSnapshot.ref);
+          } catch (error) {
+            console.error("Error uploading file: ", error);
+            return null;
+          }
+        }));
+        // Lọc bỏ các giá trị null (nếu có) khỏi mảng downloadURLs
+        const filteredURLs = downloadURLs.filter(url => url !== null);
+        setStateProduct({ ...stateProduct, image: filteredURLs });
+      } catch (error) {
+        console.error("Error handling files: ", error);
+      }
+    } else {
+      console.error("fileList is not an array");
+    }
+  };
+
   const uploadButton = (
     <button
       style={{
@@ -870,7 +902,8 @@ export default function ProductAdmin() {
                   fileList={stateProduct?.image?.uid}
                   onPreview={handlePreview}
                 >
-                  {stateProduct?.image?.length >= 11 ? null : uploadButton}
+                  {/* {stateProduct?.image.length ? null : uploadButton} */}
+                  {uploadButton}
                 </Upload>
 
                 {previewImage && (

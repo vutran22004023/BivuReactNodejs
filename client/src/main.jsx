@@ -4,9 +4,6 @@ import "./index.css";
 import { RouterProvider } from "react-router-dom";
 import route from "./router";
 import {
-  useQuery,
-  useMutation,
-  useQueryClient,
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";

@@ -92,3 +92,28 @@ export const convertPrice = (price) => {
     return null;
   }
 } 
+
+export const vietnameseToSlug = (str) => {
+  try{
+    str = str.toLowerCase();
+  
+    // Xóa dấu và ký tự đặc biệt
+    const fromChars = "àáảãạâầấẩẫậăằắẳẵặèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđ";
+    const toChars = "aaaaaaaaaaaaaaaaaeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyyd";
+  for (let i = 0; i < fromChars.length; i++) {
+    str = str.replace(new RegExp(fromChars.charAt(i), 'g'), toChars.charAt(i));
+  }
+
+  // Xóa các ký tự không phải chữ cái hoặc số
+  str = str.replace(/[^a-z0-9\s-]/g, '');
+
+  // Chuyển khoảng trắng thành dấu gạch ngang
+  str = str.replace(/\s+/g, '-');
+
+  // Xóa dấu gạch ngang ở đầu và cuối chuỗi
+  str = str.replace(/^-+/g, '').replace(/-+$/g, '');
+  return str;
+  }catch(err) {
+    return null
+  }
+}

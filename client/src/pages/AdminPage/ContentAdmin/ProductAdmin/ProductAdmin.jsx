@@ -44,7 +44,7 @@ import ModalComponent from "../../../../components/ModalComponent/Modal.jsx";
 import { renderOptions, vietnameseToSlug } from "../../../../utils.js";
 import { imgDB, txtDB } from "../../../../Firebase/config.jsx";
 import { v4 } from "uuid";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { getDownloadURL, ref, uploadBytes,deleteObject, getStorage  } from "firebase/storage";
 export default function ProductAdmin() {
   //button thêm sửa xóa
   const RowMenu = () => (
@@ -107,16 +107,22 @@ export default function ProductAdmin() {
   const handleAddInput = () => {
     setStateProduct({
       ...stateProduct,
-      categorySize: [...stateProduct.categorySize, { size: "", price: "",counInStock: "" }],
+      categorySize: [
+        ...stateProduct.categorySize,
+        { size: "", price: "", counInStock: "" },
+      ],
     });
   };
 
   const handleAddInputDetail = () => {
     setStateProductDetail({
       ...stateProductDetail,
-      categorySize: [...stateProductDetail.categorySize, { size: "", price: "",counInStock: "" }],
+      categorySize: [
+        ...stateProductDetail.categorySize,
+        { size: "", price: "", counInStock: "" },
+      ],
     });
-  }
+  };
 
   const handleRemoveInput = (index) => {
     const newSize = [...stateProduct.categorySize];
@@ -138,7 +144,7 @@ export default function ProductAdmin() {
 
   const [stateProduct, setStateProduct] = useState(inittial);
   const [stateProductDetail, setStateProductDetail] = useState(inittial);
-  console.log(stateProductDetail);
+  console.log(stateProduct,stateProductDetail);
   const [RowSelected, setRowSelected] = useState("");
 
   //trạng thái mở modal
@@ -183,10 +189,6 @@ export default function ProductAdmin() {
   };
 
   const handleOnchangeDetails = (index, e, fieldName) => {
-    // setStateProductDetail({
-    //   ...stateProductDetail,
-    //   [e.target.name]: e.target.value,
-    // });
     let value = e.target.value;
     const slug = vietnameseToSlug(value);
     if (fieldName === "categorySize") {
@@ -208,17 +210,6 @@ export default function ProductAdmin() {
         [fieldName]: e.target.value,
       });
     }
-  };
-
-  const handleOnchangeAvatarDetailProduct = async ({ fileList }) => {
-    const file = fileList[0];
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
-    }
-    setStateProductDetail({
-      ...stateProductDetail,
-      image: file.preview,
-    });
   };
 
   const onFinish = () => {
@@ -599,42 +590,119 @@ export default function ProductAdmin() {
   //     setStateProduct({ ...stateProduct, image: downloadURL });
 
   // };
-  const handlePreview = async ({ fileList }) => {
-    if (Array.isArray(fileList)) {
-      fileList.forEach(async (file) => {
-        setPreviewImage(file);
-        setPreviewOpen(true);
-      });
-    } else {
-      console.error("fileList is not an array");
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+  }
+  setPreviewImage(file.url||file ||file.preview);
+  setPreviewVisible(true);
+  };
+
+  const handlePreviewDetail = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+  }
+      setPreviewImage( file.url||file);
+      setPreviewOpen(true);
+  };
+
+  const [dataImage, setDataImage] = useState([])
+  const [dataImageDetail, setDataImageDetail] = useState([])
+  const handleChange = async (fileList) => {
+    try {
+      const uploadedURLs = [];
+  
+        const imgs = ref(imgDB, `Imgs/${v4()}`);
+        const uploadTaskSnapshot = await uploadBytes(imgs, fileList);
+        const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
+        // Thêm URL của ảnh vừa upload vào mảng
+        uploadedURLs.push(downloadURL);
+      
+
+      // Cập nhật state của dataImage với mảng các URL của ảnh đã upload
+      setDataImage([...stateProduct?.image, ...uploadedURLs]);
+  
+      return false; // return false để ngăn việc tải tệp lên tự động
+    } catch (error) {
+      console.error("Error uploading files: ", error);
+      return false; // Xử lý lỗi và trả về false để ngăn tệp được tải lên tự động
+    }
+  };
+  
+  useEffect(() => {
+    // Khi dataImage thay đổi, cập nhật stateProduct với giá trị mới
+    setStateProduct({ ...stateProduct, image: dataImage });
+    console.log(stateProduct)
+  }, [dataImage]);
+
+
+
+  const handleChangeDetail = async (fileList) => {
+    try {
+      const uploadedURLs = [];
+  
+        const imgs = ref(imgDB, `Imgs/${v4()}`);
+        const uploadTaskSnapshot = await uploadBytes(imgs, fileList);
+        const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
+        // Thêm URL của ảnh vừa upload vào mảng
+        uploadedURLs.push(downloadURL);
+      
+
+      // Cập nhật state của dataImage với mảng các URL của ảnh đã upload
+      setDataImageDetail([...stateProductDetail?.image, ...uploadedURLs]);
+  
+      return false; // return false để ngăn việc tải tệp lên tự động
+    } catch (error) {
+      console.error("Error uploading files: ", error);
+      return false; // Xử lý lỗi và trả về false để ngăn tệp được tải lên tự động
     }
   };
 
-  const handleChange = async ({ fileList }) => {
-    if (fileList) {
-      try {
-        const filteredURLs = [];
-        for (const item of fileList) {
-          const imgs = ref(imgDB, `Imgs/${v4()}`);
-          try {
-            const uploadTaskSnapshot = await uploadBytes(
-              imgs,
-              item.originFileObj,
-            );
-            const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
-            filteredURLs.push(downloadURL);
-          } catch (error) {
-            console.error("Error uploading file: ", error);
-          }
-        }
-        setStateProduct({ ...stateProduct, image: filteredURLs });
-      } catch (error) {
-        console.error("Error handling files: ", error);
-      }
-    } else {
-      console.error("fileList is not an array");
+  useEffect(() => {
+    // Khi dataImage thay đổi, cập nhật stateProduct với giá trị mới
+    setStateProductDetail({ ...stateProductDetail, image: dataImageDetail });
+
+  }, [dataImageDetail]);
+  
+  const storage = getStorage();
+  const handleRemoveImage = async (file) => {
+    try {
+        // Lấy đường dẫn hoặc ID của tệp ảnh trong Firebase Storage từ thuộc tính url của file
+        const imageURL = file.url; // Đây có thể là đường dẫn hoặc ID của tệp ảnh trong Storage
+        
+        // Thực hiện xóa tệp ảnh từ Firebase Storage
+        await deleteObject(ref(storage, imageURL));
+
+        // Sau khi xóa thành công từ Firebase Storage, cập nhật trạng thái của ứng dụng bằng cách loại bỏ ảnh khỏi mảng stateProduct.image
+        const newImages = stateProduct.image.filter((image) => image !== file.url);
+        setStateProduct({ ...stateProduct, image: newImages });
+        
+        console.log("Image deleted successfully");
+    } catch (error) {
+        console.error("Error deleting image: ", error);
     }
-  };
+};
+
+const handleRemoveImageDetail = async (file) => {
+  try {
+
+      // Sau khi xóa thành công từ Firebase Storage, cập nhật trạng thái của ứng dụng bằng cách loại bỏ ảnh khỏi mảng stateProduct.image
+      const newImages = stateProductDetail.image.filter((image) => image !== file.url);
+      setStateProductDetail({ ...stateProductDetail, image: newImages });
+      
+      console.log("Image deleted successfully");
+  } catch (error) {
+      console.error("Error deleting image: ", error);
+  }
+};
+
+  // const handleRemoveImageDetail = (file) => {
+  //   const filteredImages = stateProductDetail.image.filter((image) => image !== file.url);
+  //   setStateProductDetail({
+  //     ...stateProductDetail,
+  //     image: filteredImages,
+  //   });
+  // };
 
   const uploadButton = (
     <button
@@ -945,10 +1013,18 @@ export default function ProductAdmin() {
               >
                 <Upload
                   // onChange={handleOnchangeAvatar}
-                  onChange={handleChange}
+                  beforeUpload={handleChange}
                   listType="picture-card"
-                  fileList={stateProduct?.image?.uid}
+                  fileList={
+                    stateProduct?.image.map((url, index) => ({
+                      uid: index,
+                      name: `image-${index}`,
+                      status: "done",
+                      url: url,
+                    })) || []
+                  }
                   onPreview={handlePreview}
+                  onRemove={handleRemoveImage}
                 >
                   {/* {stateProduct?.image.length ? null : uploadButton} */}
                   {uploadButton}
@@ -1095,16 +1171,19 @@ export default function ProductAdmin() {
                   />
                 )}
               </Form.Item>
-              <Form.List name="categorySize"
-              rules={[
-          {
-            validator: async (_, categorySize) => {
-              if (!categorySize || categorySize.length < 2) {
-                return Promise.reject(new Error('At least 2 passengers'));
-              }
-            },
-          },
-        ]}
+              <Form.List
+                name="categorySize"
+                rules={[
+                  {
+                    validator: async (_, categorySize) => {
+                      if (!categorySize || categorySize.length < 2) {
+                        return Promise.reject(
+                          new Error("At least 2 passengers"),
+                        );
+                      }
+                    },
+                  },
+                ]}
               >
                 {(fields, { add, remove }) => (
                   <>
@@ -1127,7 +1206,6 @@ export default function ProductAdmin() {
                               message: "Vui lòng nhập size",
                             },
                           ]}
-                          
                         >
                           <Input
                             value={name}
@@ -1138,7 +1216,7 @@ export default function ProductAdmin() {
                           />
                         </Form.Item>
                         <Form.Item
-                        label={`Giá ${key}`}
+                          label={`Giá ${key}`}
                           {...restField}
                           name={[name, "price"]}
                           rules={[
@@ -1158,7 +1236,7 @@ export default function ProductAdmin() {
                         </Form.Item>
 
                         <Form.Item
-                        label={`Số lượng kho ${key}`}
+                          label={`Số lượng kho ${key}`}
                           {...restField}
                           name={[name, "counInStock"]}
                           rules={[
@@ -1177,15 +1255,14 @@ export default function ProductAdmin() {
                           />
                         </Form.Item>
                         {fields.length > 1 ? (
-                  <MinusCircleOutlined
-                    className="dynamic-delete-button"
-                    onClick={() => {
-                          remove(name)
-                          handleRemoveInputDetail(name)
-                        }} 
-                  />
-                ) : null}
-                        
+                          <MinusCircleOutlined
+                            className="dynamic-delete-button"
+                            onClick={() => {
+                              remove(name);
+                              handleRemoveInputDetail(name);
+                            }}
+                          />
+                        ) : null}
                       </Space>
                     ))}
                     <Form.Item>
@@ -1213,11 +1290,6 @@ export default function ProductAdmin() {
                   },
                 ]}
               >
-                {/* <Input
-                  value={stateProduct.description}
-                  onChange={(e) => handleOnchanges(null, e, "description")} 
-                  name="description"
-                /> */}
                 <FroalaEditor
                   model={stateProductDetail.description}
                   onModelChange={(value) =>
@@ -1263,13 +1335,19 @@ export default function ProductAdmin() {
                 ]}
               >
                 <Upload
-                  // onChange={handleOnchangeAvatar}
-                  onChange={handleChange}
+                  beforeUpload={handleChangeDetail}
                   listType="picture-card"
-                  fileList={stateProductDetail?.image?.uid}
-                  onPreview={handlePreview}
+                  fileList={
+                    stateProductDetail?.image.map((url, index) => ({
+                      uid: index,
+                      name: `image-${index}`,
+                      status: "done",
+                      url: url,
+                    })) || []
+                  }
+                  onPreview={handlePreviewDetail}
+                  onRemove={handleRemoveImageDetail}
                 >
-                  {/* {stateProduct?.image.length ? null : uploadButton} */}
                   {uploadButton}
                 </Upload>
 

@@ -6,7 +6,7 @@ import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import { Outlet } from "react-router-dom";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { Modal, Form, Input, Upload, Avatar, Space, Select, Image } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { SearchOutlined } from "@ant-design/icons";
 import { getBase64 } from "../../../../utils.js";
 import { UploadOutlined, WarningOutlined } from "@ant-design/icons";
@@ -41,10 +41,10 @@ import {
 import DrawerComponent from "../../../../components/DrawerComponent/Drawer.jsx";
 import LoadingComponent from "../../../../components/LoadComponent/Loading.jsx";
 import ModalComponent from "../../../../components/ModalComponent/Modal.jsx";
-import {renderOptions, vietnameseToSlug } from "../../../../utils.js";
-import {imgDB,txtDB} from '../../../../Firebase/config.jsx'
-import {v4} from 'uuid'
-import {getDownloadURL, ref, uploadBytes} from 'firebase/storage'
+import { renderOptions, vietnameseToSlug } from "../../../../utils.js";
+import { imgDB, txtDB } from "../../../../Firebase/config.jsx";
+import { v4 } from "uuid";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 export default function ProductAdmin() {
   //button thêm sửa xóa
   const RowMenu = () => (
@@ -76,6 +76,7 @@ export default function ProductAdmin() {
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false);
   const [typeSelect, setTypeSelect] = useState("");
+  const [typeSelectDetail, setTypeSelectDetail] = useState("");
   const [typePage, setTypePage] = useState(0);
   const [model, setModel] = useState("");
 
@@ -106,9 +107,16 @@ export default function ProductAdmin() {
   const handleAddInput = () => {
     setStateProduct({
       ...stateProduct,
-      categorySize: [...stateProduct.categorySize, { size: "", price: "" }],
+      categorySize: [...stateProduct.categorySize, { size: "", price: "",counInStock: "" }],
     });
   };
+
+  const handleAddInputDetail = () => {
+    setStateProductDetail({
+      ...stateProductDetail,
+      categorySize: [...stateProductDetail.categorySize, { size: "", price: "",counInStock: "" }],
+    });
+  }
 
   const handleRemoveInput = (index) => {
     const newSize = [...stateProduct.categorySize];
@@ -119,9 +127,18 @@ export default function ProductAdmin() {
     });
   };
 
+  const handleRemoveInputDetail = (index) => {
+    const newSize = [...stateProductDetail.categorySize];
+    newSize.splice(index, 1);
+    setStateProductDetail({
+      ...stateProductDetail,
+      categorySize: newSize,
+    });
+  };
+
   const [stateProduct, setStateProduct] = useState(inittial);
-  console.log(stateProduct)
   const [stateProductDetail, setStateProductDetail] = useState(inittial);
+  console.log(stateProductDetail);
   const [RowSelected, setRowSelected] = useState("");
 
   //trạng thái mở modal
@@ -151,20 +168,46 @@ export default function ProductAdmin() {
         ...stateProduct,
         categorySize: newSize,
       });
-    } else {
+    } else if (fieldName === "name") {
       setStateProduct({
         ...stateProduct,
         [fieldName]: e.target.value,
         slug: slug,
       });
+    } else {
+      setStateProduct({
+        ...stateProduct,
+        [fieldName]: e.target.value,
+      });
     }
   };
 
-  const handleOnchangeDetails = (e) => {
-    setStateProductDetail({
-      ...stateProductDetail,
-      [e.target.name]: e.target.value,
-    });
+  const handleOnchangeDetails = (index, e, fieldName) => {
+    // setStateProductDetail({
+    //   ...stateProductDetail,
+    //   [e.target.name]: e.target.value,
+    // });
+    let value = e.target.value;
+    const slug = vietnameseToSlug(value);
+    if (fieldName === "categorySize") {
+      const newSize = [...stateProductDetail.categorySize];
+      newSize[index][e.target.name] = e.target.value;
+      setStateProductDetail({
+        ...stateProductDetail,
+        categorySize: newSize,
+      });
+    } else if (fieldName === "name") {
+      setStateProductDetail({
+        ...stateProductDetail,
+        [fieldName]: e.target.value,
+        slug: slug,
+      });
+    } else {
+      setStateProductDetail({
+        ...stateProductDetail,
+        [fieldName]: e.target.value,
+      });
+    }
   };
 
   const handleOnchangeAvatarDetailProduct = async ({ fileList }) => {
@@ -389,16 +432,20 @@ export default function ProductAdmin() {
       ...getColumnSearchProps("name"),
     },
     {
-      title: "Price",
-      dataIndex: "price",
-      sorter: (a, b) => a.price - b.price,
-      ...getColumnSearchProps("price"),
+      title: "Đường dẫn",
+      dataIndex: "slug",
+      sorter: (a, b) => a.slug.length - b.slug.length,
+      ...getColumnSearchProps("slug"),
     },
     {
-      title: "Rating",
-      dataIndex: "rating",
-      sorter: (a, b) => a.rating - b.rating,
-      ...getColumnSearchProps("rating"),
+      title: "Type",
+      dataIndex: "type",
+      sorter: (a, b) => a.type.length - b.type.length,
+      ...getColumnSearchProps("type"),
+    },
+    {
+      title: "Mô tả",
+      dataIndex: "description",
     },
     {
       title: "Action",
@@ -412,16 +459,9 @@ export default function ProductAdmin() {
   useEffect(() => {
     if (data?.status === 200) {
       success();
-      setStateProduct({
-        name: "",
-        image: "",
-        type: "",
-        price: "",
-        counInStock: "",
-        rating: "",
-        description: "",
-      });
+      setStateProduct(inittial());
       setIsModalOpen(false);
+      form.resetFields();
     }
     if (data?.status === "ERR") {
       error();
@@ -469,11 +509,11 @@ export default function ProductAdmin() {
         name: res?.data?.name,
         image: res?.data?.image,
         type: res?.data?.type,
-        price: res?.data?.price,
-        counInStock: res?.data?.counInStock,
+        slug: res?.data?.slug,
         rating: res?.data?.rating,
         description: res?.data?.description,
         discount: res?.data?.discount,
+        categorySize: res.data?.categorySize,
       });
     }
     setIsLoadingUpdate(false);
@@ -539,9 +579,19 @@ export default function ProductAdmin() {
     }
   };
 
+  const handleChangeSelectDetail = (value) => {
+    if (value !== "add_type") {
+      setStateProductDetail({
+        ...stateProductDetail,
+        type: value,
+      });
+    } else {
+      setTypeSelectDetail(value);
+    }
+  };
+
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState();
-  console.log(previewImage)
   // const handleChange = async ({fileList}) => {
   //     const imgs = ref(imgDB, `Imgs/${v4()}`);
   //     const uploadTaskSnapshot = await uploadBytes(imgs, fileList.originFileObj);
@@ -559,22 +609,24 @@ export default function ProductAdmin() {
       console.error("fileList is not an array");
     }
   };
-  
+
   const handleChange = async ({ fileList }) => {
     if (fileList) {
       try {
-        const downloadURLs = await Promise.all(fileList.map(async (item) => {
+        const filteredURLs = [];
+        for (const item of fileList) {
           const imgs = ref(imgDB, `Imgs/${v4()}`);
           try {
-            const uploadTaskSnapshot = await uploadBytes(imgs, item.originFileObj);
-            return getDownloadURL(uploadTaskSnapshot.ref);
+            const uploadTaskSnapshot = await uploadBytes(
+              imgs,
+              item.originFileObj,
+            );
+            const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
+            filteredURLs.push(downloadURL);
           } catch (error) {
             console.error("Error uploading file: ", error);
-            return null;
           }
-        }));
-        // Lọc bỏ các giá trị null (nếu có) khỏi mảng downloadURLs
-        const filteredURLs = downloadURLs.filter(url => url !== null);
+        }
         setStateProduct({ ...stateProduct, image: filteredURLs });
       } catch (error) {
         console.error("Error handling files: ", error);
@@ -713,9 +765,9 @@ export default function ProductAdmin() {
               >
                 <Input
                   value={stateProduct.slug}
-                  onChange={(e) => handleOnchanges(null,e, "slug")}
+                  onChange={(e) => handleOnchanges(null, e, "slug")}
                   name="slug"
-                  disabled 
+                  disabled
                 />
               </Form.Item>
 
@@ -739,14 +791,14 @@ export default function ProductAdmin() {
                   <Input
                     style={{ marginTop: "5px" }}
                     value={stateProduct.type}
-                    onChange={handleOnchanges}
+                    onChange={(e) => handleOnchanges(null, e, "type")}
                     name="type"
                   />
                 ) : (
                   <Input
                     style={{ display: "none" }}
                     value={stateProduct.type}
-                    onChange={handleOnchanges}
+                    onChange={(e) => handleOnchanges(null, e, "type")}
                     name="type"
                   />
                 )}
@@ -881,10 +933,6 @@ export default function ProductAdmin() {
                 />
               </Form.Item>
 
-              <div className="text-[red]">
-                (Ảnh đầu tiên upload vào sẽ không đc lưu vui lòng thêm ảnh kế
-                tiếp hoặc xóa ảnh đầu tiên đi)(Tối đa 10 ảnh)
-              </div>
               <Form.Item
                 name="image"
                 label="Ảnh sản phẩm"
@@ -968,12 +1016,12 @@ export default function ProductAdmin() {
           <LoadingComponent isLoading={isLoadingUpdate || dataUpdateisLoading}>
             <Form
               name="basic"
-              labelCol={{
-                span: 6,
-              }}
-              wrapperCol={{
-                span: 18,
-              }}
+              // labelCol={{
+              //   span: 10,
+              // }}
+              // wrapperCol={{
+              //   span: ,
+              // }}
               style={{
                 maxWidth: 600,
               }}
@@ -994,8 +1042,24 @@ export default function ProductAdmin() {
               >
                 <Input
                   value={stateProductDetail.name}
-                  onChange={handleOnchangeDetails}
+                  onChange={(e) => handleOnchangeDetails(null, e, "name")}
                   name="name"
+                />
+              </Form.Item>
+              <Form.Item
+                label="Đường dẫn"
+                name="slug"
+                rules={[
+                  {
+                    required: true,
+                  },
+                ]}
+              >
+                <Input
+                  value={stateProductDetail.slug}
+                  onChange={(e) => handleOnchangeDetails(null, e, "slug")}
+                  name="slug"
+                  disabled
                 />
               </Form.Item>
 
@@ -1009,13 +1073,136 @@ export default function ProductAdmin() {
                   },
                 ]}
               >
-                <Input
+                <Select
+                  onChange={handleChangeSelectDetail}
+                  name={productType !== "add_type" ? "type" : ""}
                   value={stateProductDetail.type}
-                  onChange={handleOnchangeDetails}
-                  name="type"
+                  options={renderOptions(productType?.data)}
                 />
+                {typeSelect === "add_type" ? (
+                  <Input
+                    style={{ marginTop: "5px" }}
+                    value={stateProductDetail.type}
+                    onChange={(e) => handleOnchangeDetails(null, e, "type")}
+                    name="type"
+                  />
+                ) : (
+                  <Input
+                    style={{ display: "none" }}
+                    value={stateProductDetail.type}
+                    onChange={(e) => handleOnchangeDetails(null, e, "type")}
+                    name="type"
+                  />
+                )}
               </Form.Item>
+              <Form.List name="categorySize"
+              rules={[
+          {
+            validator: async (_, categorySize) => {
+              if (!categorySize || categorySize.length < 2) {
+                return Promise.reject(new Error('At least 2 passengers'));
+              }
+            },
+          },
+        ]}
+              >
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map(({ key, name, ...restField }) => (
+                      <Space
+                        key={key}
+                        style={{
+                          display: "flex",
+                          marginBottom: 8,
+                        }}
+                        align="baseline"
+                      >
+                        <Form.Item
+                          label={`Kích thước ${key}`}
+                          {...restField}
+                          name={[name, "size"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Vui lòng nhập size",
+                            },
+                          ]}
+                          
+                        >
+                          <Input
+                            value={name}
+                            onChange={(e) =>
+                              handleOnchangeDetails(key, e, "categorySize")
+                            }
+                            name="size"
+                          />
+                        </Form.Item>
+                        <Form.Item
+                        label={`Giá ${key}`}
+                          {...restField}
+                          name={[name, "price"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Vui lòng nhập giá",
+                            },
+                          ]}
+                        >
+                          <Input
+                            value={name}
+                            onChange={(e) =>
+                              handleOnchangeDetails(key, e, "categorySize")
+                            }
+                            name="price"
+                          />
+                        </Form.Item>
 
+                        <Form.Item
+                        label={`Số lượng kho ${key}`}
+                          {...restField}
+                          name={[name, "counInStock"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Vui lòng nhập số lượng kho",
+                            },
+                          ]}
+                        >
+                          <Input
+                            value={name}
+                            onChange={(e) =>
+                              handleOnchangeDetails(key, e, "categorySize")
+                            }
+                            name="counInStock"
+                          />
+                        </Form.Item>
+                        {fields.length > 1 ? (
+                  <MinusCircleOutlined
+                    className="dynamic-delete-button"
+                    onClick={() => {
+                          remove(name)
+                          handleRemoveInputDetail(name)
+                        }} 
+                  />
+                ) : null}
+                        
+                      </Space>
+                    ))}
+                    <Form.Item>
+                      <Button
+                        type="dashed"
+                        onClick={() => {
+                          handleAddInputDetail();
+                          add();
+                        }}
+                        icon={<PlusOutlined />}
+                      >
+                        Thêm kích thước
+                      </Button>
+                    </Form.Item>
+                  </>
+                )}
+              </Form.List>
               <Form.Item
                 label="Mô tả"
                 name="description"
@@ -1026,27 +1213,26 @@ export default function ProductAdmin() {
                   },
                 ]}
               >
-                <Input
-                  value={stateProductDetail.description}
-                  onChange={handleOnchangeDetails}
+                {/* <Input
+                  value={stateProduct.description}
+                  onChange={(e) => handleOnchanges(null, e, "description")} 
                   name="description"
-                />
-              </Form.Item>
-
-              <Form.Item
-                label="Giá sản phẩm"
-                name="price"
-                rules={[
-                  {
-                    required: true,
-                    message: "vui lòng nhập giá sản phẩm",
-                  },
-                ]}
-              >
-                <Input
-                  value={stateProductDetail.price}
-                  onChange={handleOnchangeDetails}
-                  name="price"
+                /> */}
+                <FroalaEditor
+                  model={stateProductDetail.description}
+                  onModelChange={(value) =>
+                    handleOnchangeDetails(
+                      null,
+                      { target: { value } },
+                      "description",
+                    )
+                  }
+                  config={{
+                    placeholderText: "Nhập mô tả vào đây",
+                    charCounterCount: true,
+                  }}
+                  tag="textarea"
+                  name="description"
                 />
               </Form.Item>
 
@@ -1066,6 +1252,43 @@ export default function ProductAdmin() {
                   name="discount"
                 />
               </Form.Item>
+              <Form.Item
+                name="image"
+                label="Ảnh sản phẩm"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng thêm ảnh sản phẩm",
+                  },
+                ]}
+              >
+                <Upload
+                  // onChange={handleOnchangeAvatar}
+                  onChange={handleChange}
+                  listType="picture-card"
+                  fileList={stateProductDetail?.image?.uid}
+                  onPreview={handlePreview}
+                >
+                  {/* {stateProduct?.image.length ? null : uploadButton} */}
+                  {uploadButton}
+                </Upload>
+
+                {previewImage && (
+                  <Image
+                    wrapperStyle={{
+                      display: "none",
+                    }}
+                    preview={{
+                      visible: previewOpen,
+                      onVisibleChange: (visible) => setPreviewOpen(visible),
+                      afterOpenChange: (visible) =>
+                        !visible && setPreviewImage(""),
+                    }}
+                    src={previewImage}
+                  />
+                )}
+              </Form.Item>
+
               <Form.Item>
                 {dataUpdate?.status === "ERR" && (
                   <div
@@ -1091,30 +1314,6 @@ export default function ProductAdmin() {
                 </div>
               )} */}
               </Form.Item>
-
-              <Form.Item
-                name="image"
-                rules={[
-                  {
-                    required: true,
-                    message: "Vui lòng thêm ảnh sản phẩm",
-                  },
-                ]}
-              >
-                <Upload
-                  onChange={handleOnchangeAvatarDetailProduct}
-                  listType="picture-card"
-                  defaultFileList={stateProductDetail?.image}
-                  maxCount={1}
-                >
-                  <Button
-                    style={{ marginTop: "10px" }}
-                    icon={<UploadOutlined />}
-                  >
-                    Click thêm ảnh sản phẩm
-                  </Button>
-                </Upload>
-              </Form.Item>
             </Form>
           </LoadingComponent>
         </DrawerComponent>
@@ -1132,7 +1331,7 @@ export default function ProductAdmin() {
           </LoadingComponent>
         </ModalComponent>
 
-        <LoadingComponent isLoading={isLoadingProducts }>
+        <LoadingComponent isLoading={isLoadingProducts}>
           <OrderTable
             handleDeleteMany={handleDeleteMany}
             dataDeleteisLoadingMany={dataDeleteisLoadingMany}

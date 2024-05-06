@@ -26,7 +26,6 @@ export default function  OrderTable  (props) {
       ...product,
       key: product._id,
     }
-
   })
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -116,7 +115,7 @@ export default function  OrderTable  (props) {
     pagination={{
       pageSize: 10,
       total: total,
-      current:pageCurrent ,
+      current:pageCurrent || 0,
       onChange: onPageChange
     }}
     scroll={{

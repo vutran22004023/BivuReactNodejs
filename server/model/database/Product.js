@@ -7,20 +7,19 @@ const ProductSchema =  new mongoose.Schema(
         require: true,
         unique: true,
     },
-    image: {
+    slug: {
         type: String,
         require: true,
     },
+    image: [
+        {
+            type: String,
+            require: true,
+        }
+    ],
     type: {
         type: String,
-        require: true,
-    },
-    price:  {
-        type: Number,
-        required: true,
-    },
-    counInStock: {
-        type: Number,
+        require: true, 
     },
     rating: {
         type: Number,
@@ -32,12 +31,29 @@ const ProductSchema =  new mongoose.Schema(
     discount: {
         type: Number,
     },
+
     selled: {
         type: Number,
     },
     quality: {
         type: Number,
-    }
+    },
+    categorySize: [
+        {
+            size: {
+                type: String,
+                required: true,
+            },
+            price: {
+                type:String,
+                required: true,
+            },
+            counInStock: {
+                type:String,
+                required: true,
+            }
+        }
+    ]
 },{
     timestamps: true,
 }

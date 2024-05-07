@@ -39,6 +39,10 @@ const PayProduct = React.lazy(() =>
 const OrderDetail = React.lazy(() =>
   import("../pages/HomePage/ContentHome/OrderDetail/OrderDetail.jsx")
 );
+const OrderProductDetails = React.lazy(() =>
+  import("../pages/HomePage/ContentHome/OrderDetail/OrderProductDetail.jsx")
+);
+
 
 export default createBrowserRouter([
   {
@@ -83,7 +87,11 @@ export default createBrowserRouter([
             children: [
               {
                 element: <OrderDetail/>,
-                path: '/don-hang/:id'
+                path: '/don-hang/:id',
+              },
+              {
+                element: <OrderProductDetails/>,
+                path: '/chi-tiet-don-hang/:id' 
               }
             ]
           }

@@ -5,7 +5,8 @@ import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import { Outlet } from "react-router-dom";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import { Modal, Form, Input, Upload, Avatar, Space, Select,Image } from "antd";
+import { Modal, Form, Input, Upload, Avatar, Space, Select, Image } from "antd";
+import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { SearchOutlined } from "@ant-design/icons";
 import { getBase64 } from "../../../../utils.js";
 import { UploadOutlined, WarningOutlined } from "@ant-design/icons";
@@ -15,6 +16,11 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import IconButton, { iconButtonClasses } from "@mui/joy/IconButton";
 import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
+import "froala-editor/css/froala_style.min.css";
+import "froala-editor/css/froala_editor.pkgd.min.css";
+import FroalaEditor from "react-froala-wysiwyg";
+import "froala-editor/js/plugins/image.min.js";
+import "froala-editor/js/plugins/char_counter.min.js";
 import {
   Menu,
   MenuButton,
@@ -35,8 +41,10 @@ import {
 import DrawerComponent from "../../../../components/DrawerComponent/Drawer.jsx";
 import LoadingComponent from "../../../../components/LoadComponent/Loading.jsx";
 import ModalComponent from "../../../../components/ModalComponent/Modal.jsx";
-import { renderOptions } from "../../../../utils.js";
-
+import { renderOptions, vietnameseToSlug } from "../../../../utils.js";
+import { imgDB, txtDB } from "../../../../Firebase/config.jsx";
+import { v4 } from "uuid";
+import { getDownloadURL, ref, uploadBytes,deleteObject, getStorage  } from "firebase/storage";
 export default function ProductAdmin() {
   //button thêm sửa xóa
   const RowMenu = () => (
@@ -68,39 +76,80 @@ export default function ProductAdmin() {
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false);
   const [typeSelect, setTypeSelect] = useState("");
-  const [typePage,setTypePage] = useState(0)
+  const [typeSelectDetail, setTypeSelectDetail] = useState("");
+  const [typePage, setTypePage] = useState(0);
+  const [model, setModel] = useState("");
+
   useEffect(() => {
-    if (pages) { // Đảm bảo pages không phải là undefined hoặc null
-        setTypePage(pages.page)
+    if (pages) {
+      // Đảm bảo pages không phải là undefined hoặc null
+      setTypePage(pages.page);
     }
-}, [pages?.page]);
-  const [stateProduct, setStateProduct] = useState({
+  }, [pages?.page]);
+
+  const inittial = () => ({
     name: "",
-    image: "",
+    image: [],
     type: "",
-    price: "",
-    counInStock: "",
-    rating: "",
-    description: "",
-    discount:""
-  });
-  const [stateProductDetail, setStateProductDetail] = useState({
-    name: "",
-    image: "",
-    type: "",
-    price: "",
-    counInStock: "",
+    slug: "",
     rating: "",
     description: "",
     discount: "",
+    categorySize: [
+      {
+        size: "",
+        price: "",
+        counInStock: "",
+      },
+    ],
   });
 
+  const handleAddInput = () => {
+    setStateProduct({
+      ...stateProduct,
+      categorySize: [
+        ...stateProduct.categorySize,
+        { size: "", price: "", counInStock: "" },
+      ],
+    });
+  };
+
+  const handleAddInputDetail = () => {
+    setStateProductDetail({
+      ...stateProductDetail,
+      categorySize: [
+        ...stateProductDetail.categorySize,
+        { size: "", price: "", counInStock: "" },
+      ],
+    });
+  };
+
+  const handleRemoveInput = (index) => {
+    const newSize = [...stateProduct.categorySize];
+    newSize.splice(index, 1);
+    setStateProduct({
+      ...stateProduct,
+      categorySize: newSize,
+    });
+  };
+
+  const handleRemoveInputDetail = (index) => {
+    const newSize = [...stateProductDetail.categorySize];
+    newSize.splice(index, 1);
+    setStateProductDetail({
+      ...stateProductDetail,
+      categorySize: newSize,
+    });
+  };
+
+  const [stateProduct, setStateProduct] = useState(inittial);
+  const [stateProductDetail, setStateProductDetail] = useState(inittial);
+  console.log(stateProduct,stateProductDetail);
   const [RowSelected, setRowSelected] = useState("");
 
   //trạng thái mở modal
   const showModal = () => {
     setIsModalOpen(true);
-    // form.resetFields();
   };
 
   const handleOk = () => {
@@ -109,46 +158,58 @@ export default function ProductAdmin() {
   //trang thái đóng modal
   const handleCancel = () => {
     setIsModalOpen(false);
-    form.resetFields();
   };
 
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
   // ochange dữ liệu khi nhập vào imput
-  const handleOnchanges = (e) => {
-    setStateProduct({
-      ...stateProduct,
-      [e.target.name]: e.target.value,
-    });
+  const handleOnchanges = (index, e, fieldName) => {
+    let value = e.target.value;
+    const slug = vietnameseToSlug(value);
+    if (fieldName === "categorySize") {
+      const newSize = [...stateProduct.categorySize];
+      newSize[index][e.target.name] = e.target.value;
+      setStateProduct({
+        ...stateProduct,
+        categorySize: newSize,
+      });
+    } else if (fieldName === "name") {
+      setStateProduct({
+        ...stateProduct,
+        [fieldName]: e.target.value,
+        slug: slug,
+      });
+    } else {
+      setStateProduct({
+        ...stateProduct,
+        [fieldName]: e.target.value,
+      });
+    }
   };
 
-  const handleOnchangeDetails = (e) => {
-    setStateProductDetail({
-      ...stateProductDetail,
-      [e.target.name]: e.target.value,
-    });
-  };
-  // xử lý phần file ảnh
-  const handleOnchangeAvatar = async ({ fileList }) => {
-    const file = fileList[0];
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
+  const handleOnchangeDetails = (index, e, fieldName) => {
+    let value = e.target.value;
+    const slug = vietnameseToSlug(value);
+    if (fieldName === "categorySize") {
+      const newSize = [...stateProductDetail.categorySize];
+      newSize[index][e.target.name] = e.target.value;
+      setStateProductDetail({
+        ...stateProductDetail,
+        categorySize: newSize,
+      });
+    } else if (fieldName === "name") {
+      setStateProductDetail({
+        ...stateProductDetail,
+        [fieldName]: e.target.value,
+        slug: slug,
+      });
+    } else {
+      setStateProductDetail({
+        ...stateProductDetail,
+        [fieldName]: e.target.value,
+      });
     }
-    setStateProduct({
-      ...stateProduct,
-      image: file.preview,
-    });
-  };
-  const handleOnchangeAvatarDetailProduct = async ({ fileList }) => {
-    const file = fileList[0];
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
-    }
-    setStateProductDetail({
-      ...stateProductDetail,
-      image: file.preview,
-    });
   };
 
   const onFinish = () => {
@@ -169,7 +230,7 @@ export default function ProductAdmin() {
         headers: {
           token: `Beare ${access_Token}`,
         },
-      }
+      },
     );
     return res.data;
   });
@@ -177,8 +238,8 @@ export default function ProductAdmin() {
   const fetchProductAll = async (context) => {
     const search = "";
     const limit = "";
-    const page = context.queryKey[1]
-    const res = await ProductService.getAllProduct(limit, search,page);
+    const page = context.queryKey[1];
+    const res = await ProductService.getAllProduct(limit, search, page);
     return res;
   };
 
@@ -189,7 +250,7 @@ export default function ProductAdmin() {
     const res = ProductService.updatedDetailProduct(
       RowSelected,
       data,
-      access_Token
+      access_Token,
     );
     return res;
   });
@@ -217,7 +278,7 @@ export default function ProductAdmin() {
         onSettled: () => {
           queryProduct.refetch();
         },
-      }
+      },
     );
   };
 
@@ -227,9 +288,14 @@ export default function ProductAdmin() {
   };
 
   // các biến dữ liệu
-  const { data, isLoading: isLoadingCreateProduct, isSuccess, isError } = mutation;
+  const {
+    data,
+    isLoading: isLoadingCreateProduct,
+    isSuccess,
+    isError,
+  } = mutation;
   const queryProduct = useQuery({
-    queryKey: ["products",typePage],
+    queryKey: ["products", typePage],
     queryFn: fetchProductAll,
     retryDelay: 1000,
     staleTime: 1000,
@@ -357,16 +423,20 @@ export default function ProductAdmin() {
       ...getColumnSearchProps("name"),
     },
     {
-      title: "Price",
-      dataIndex: "price",
-      sorter: (a, b) => a.price - b.price,
-      ...getColumnSearchProps("price"),
+      title: "Đường dẫn",
+      dataIndex: "slug",
+      sorter: (a, b) => a.slug.length - b.slug.length,
+      ...getColumnSearchProps("slug"),
     },
     {
-      title: "Rating",
-      dataIndex: "rating",
-      sorter: (a, b) => a.rating - b.rating,
-      ...getColumnSearchProps("rating"),
+      title: "Type",
+      dataIndex: "type",
+      sorter: (a, b) => a.type.length - b.type.length,
+      ...getColumnSearchProps("type"),
+    },
+    {
+      title: "Mô tả",
+      dataIndex: "description",
     },
     {
       title: "Action",
@@ -380,16 +450,9 @@ export default function ProductAdmin() {
   useEffect(() => {
     if (data?.status === 200) {
       success();
-      setStateProduct({
-        name: "",
-        image: "",
-        type: "",
-        price: "",
-        counInStock: "",
-        rating: "",
-        description: "",
-      });
+      setStateProduct(inittial());
       setIsModalOpen(false);
+      form.resetFields();
     }
     if (data?.status === "ERR") {
       error();
@@ -437,11 +500,11 @@ export default function ProductAdmin() {
         name: res?.data?.name,
         image: res?.data?.image,
         type: res?.data?.type,
-        price: res?.data?.price,
-        counInStock: res?.data?.counInStock,
+        slug: res?.data?.slug,
         rating: res?.data?.rating,
         description: res?.data?.description,
-        discount: res?.data?.discount
+        discount: res?.data?.discount,
+        categorySize: res.data?.categorySize,
       });
     }
     setIsLoadingUpdate(false);
@@ -451,8 +514,12 @@ export default function ProductAdmin() {
 
   //sao khi bấm vào cập nhập thì input có thể hiện thị thông tin
   useEffect(() => {
-    form.setFieldsValue(stateProductDetail);
-  }, [form, stateProductDetail]);
+    if (!isModalOpen) {
+      form.setFieldsValue(stateProductDetail);
+    } else {
+      form.setFieldsValue(inittial());
+    }
+  }, [form, stateProductDetail, isModalOpen]);
 
   const handleDetailProduct = () => {
     if (RowSelected) {
@@ -503,6 +570,158 @@ export default function ProductAdmin() {
     }
   };
 
+  const handleChangeSelectDetail = (value) => {
+    if (value !== "add_type") {
+      setStateProductDetail({
+        ...stateProductDetail,
+        type: value,
+      });
+    } else {
+      setTypeSelectDetail(value);
+    }
+  };
+
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState();
+  // const handleChange = async ({fileList}) => {
+  //     const imgs = ref(imgDB, `Imgs/${v4()}`);
+  //     const uploadTaskSnapshot = await uploadBytes(imgs, fileList.originFileObj);
+  //     const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
+  //     setStateProduct({ ...stateProduct, image: downloadURL });
+
+  // };
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+  }
+  setPreviewImage(file.url||file ||file.preview);
+  setPreviewVisible(true);
+  };
+
+  const handlePreviewDetail = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+  }
+      setPreviewImage( file.url||file);
+      setPreviewOpen(true);
+  };
+
+  const [dataImage, setDataImage] = useState([])
+  const [dataImageDetail, setDataImageDetail] = useState([])
+  const handleChange = async (fileList) => {
+    try {
+      const uploadedURLs = [];
+  
+        const imgs = ref(imgDB, `Imgs/${v4()}`);
+        const uploadTaskSnapshot = await uploadBytes(imgs, fileList);
+        const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
+        // Thêm URL của ảnh vừa upload vào mảng
+        uploadedURLs.push(downloadURL);
+      
+
+      // Cập nhật state của dataImage với mảng các URL của ảnh đã upload
+      setDataImage([...stateProduct?.image, ...uploadedURLs]);
+  
+      return false; // return false để ngăn việc tải tệp lên tự động
+    } catch (error) {
+      console.error("Error uploading files: ", error);
+      return false; // Xử lý lỗi và trả về false để ngăn tệp được tải lên tự động
+    }
+  };
+  
+  useEffect(() => {
+    // Khi dataImage thay đổi, cập nhật stateProduct với giá trị mới
+    setStateProduct({ ...stateProduct, image: dataImage });
+    console.log(stateProduct)
+  }, [dataImage]);
+
+
+
+  const handleChangeDetail = async (fileList) => {
+    try {
+      const uploadedURLs = [];
+  
+        const imgs = ref(imgDB, `Imgs/${v4()}`);
+        const uploadTaskSnapshot = await uploadBytes(imgs, fileList);
+        const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
+        // Thêm URL của ảnh vừa upload vào mảng
+        uploadedURLs.push(downloadURL);
+      
+
+      // Cập nhật state của dataImage với mảng các URL của ảnh đã upload
+      setDataImageDetail([...stateProductDetail?.image, ...uploadedURLs]);
+  
+      return false; // return false để ngăn việc tải tệp lên tự động
+    } catch (error) {
+      console.error("Error uploading files: ", error);
+      return false; // Xử lý lỗi và trả về false để ngăn tệp được tải lên tự động
+    }
+  };
+
+  useEffect(() => {
+    // Khi dataImage thay đổi, cập nhật stateProduct với giá trị mới
+    setStateProductDetail({ ...stateProductDetail, image: dataImageDetail });
+
+  }, [dataImageDetail]);
+  
+  const storage = getStorage();
+  const handleRemoveImage = async (file) => {
+    try {
+        // Lấy đường dẫn hoặc ID của tệp ảnh trong Firebase Storage từ thuộc tính url của file
+        const imageURL = file.url; // Đây có thể là đường dẫn hoặc ID của tệp ảnh trong Storage
+        
+        // Thực hiện xóa tệp ảnh từ Firebase Storage
+        await deleteObject(ref(storage, imageURL));
+
+        // Sau khi xóa thành công từ Firebase Storage, cập nhật trạng thái của ứng dụng bằng cách loại bỏ ảnh khỏi mảng stateProduct.image
+        const newImages = stateProduct.image.filter((image) => image !== file.url);
+        setStateProduct({ ...stateProduct, image: newImages });
+        
+        console.log("Image deleted successfully");
+    } catch (error) {
+        console.error("Error deleting image: ", error);
+    }
+};
+
+const handleRemoveImageDetail = async (file) => {
+  try {
+
+      // Sau khi xóa thành công từ Firebase Storage, cập nhật trạng thái của ứng dụng bằng cách loại bỏ ảnh khỏi mảng stateProduct.image
+      const newImages = stateProductDetail.image.filter((image) => image !== file.url);
+      setStateProductDetail({ ...stateProductDetail, image: newImages });
+      
+      console.log("Image deleted successfully");
+  } catch (error) {
+      console.error("Error deleting image: ", error);
+  }
+};
+
+  // const handleRemoveImageDetail = (file) => {
+  //   const filteredImages = stateProductDetail.image.filter((image) => image !== file.url);
+  //   setStateProductDetail({
+  //     ...stateProductDetail,
+  //     image: filteredImages,
+  //   });
+  // };
+
+  const uploadButton = (
+    <button
+      style={{
+        border: 0,
+        background: "none",
+      }}
+      type="button"
+    >
+      <PlusOutlined />
+      <div
+        style={{
+          marginTop: 8,
+        }}
+      >
+        Upload
+      </div>
+    </button>
+  );
 
   return (
     <>
@@ -566,18 +785,19 @@ export default function ProductAdmin() {
           onOk={handleOk}
           onCancel={handleCancel}
           okText="Submit"
+          width={600}
         >
           <LoadingComponent isLoading={isLoadingCreateProduct}>
             <Form
               name="basic"
-              labelCol={{
-                span: 6,
-              }}
-              wrapperCol={{
-                span: 18,
-              }}
+              // labelCol={{
+              //   span: 6,
+              // }}
+              // wrapperCol={{
+              //   span: 17,
+              // }}
               style={{
-                maxWidth: 600,
+                maxWidth: 800,
               }}
               initialValues={{
                 remember: true,
@@ -592,14 +812,30 @@ export default function ProductAdmin() {
                 rules={[
                   {
                     required: true,
-                    message: "Vui lòng điền tên sản phẩm",
+                    message: "vui lòng nhập Tên sản phẩm",
                   },
                 ]}
               >
                 <Input
                   value={stateProduct.name}
-                  onChange={handleOnchanges}
+                  onChange={(e) => handleOnchanges(null, e, "name")}
                   name="name"
+                />
+              </Form.Item>
+              <Form.Item
+                label="Đường dẫn"
+                name="slug"
+                rules={[
+                  {
+                    required: true,
+                  },
+                ]}
+              >
+                <Input
+                  value={stateProduct.slug}
+                  onChange={(e) => handleOnchanges(null, e, "slug")}
+                  name="slug"
+                  disabled
                 />
               </Form.Item>
 
@@ -621,19 +857,103 @@ export default function ProductAdmin() {
                 />
                 {typeSelect === "add_type" ? (
                   <Input
-                    style={{marginTop: '5px'}}
+                    style={{ marginTop: "5px" }}
                     value={stateProduct.type}
-                    onChange={handleOnchanges}
+                    onChange={(e) => handleOnchanges(null, e, "type")}
                     name="type"
                   />
-                ): (
+                ) : (
                   <Input
-                    style={{display: 'none'}}
+                    style={{ display: "none" }}
                     value={stateProduct.type}
-                    onChange={handleOnchanges}
+                    onChange={(e) => handleOnchanges(null, e, "type")}
                     name="type"
                   />
                 )}
+              </Form.Item>
+
+              {stateProduct?.categorySize?.map((item, index) => (
+                <div key={index}>
+                  <div className="flex">
+                    <Form.Item
+                      label={`Kích thước ${index}`}
+                      name={`size${index}`}
+                      rules={[
+                        {
+                          required: true,
+                          message: "vui lòng nhập giá size",
+                        },
+                      ]}
+                      className="w-full"
+                    >
+                      <Input
+                        name="size"
+                        value={item.size}
+                        onChange={(e) =>
+                          handleOnchanges(index, e, "categorySize")
+                        }
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      label={`Giá ${index}`}
+                      name={`price${index}`}
+                      rules={[
+                        {
+                          required: true,
+                          message: "vui lòng nhập giá sản phẩm",
+                        },
+                      ]}
+                      className="ml-2 w-full"
+                    >
+                      <Input
+                        name="price"
+                        value={item.price}
+                        onChange={(e) =>
+                          handleOnchanges(index, e, "categorySize")
+                        }
+                      />
+                    </Form.Item>
+                    <Form.Item>
+                      {index === 0 ? (
+                        ""
+                      ) : (
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => handleRemoveInput(index)}
+                        >
+                          Xóa
+                        </Button>
+                      )}
+                    </Form.Item>
+                  </div>
+                  <div>
+                    <Form.Item
+                      label={`Số lượng kho${index}`}
+                      name={`counInStock${index}`}
+                      rules={[
+                        {
+                          required: true,
+                          message: "vui lòng nhập giá sản phẩm",
+                        },
+                      ]}
+                      className="ml-2 w-full"
+                    >
+                      <Input
+                        name="counInStock"
+                        value={item.counInStock}
+                        onChange={(e) =>
+                          handleOnchanges(index, e, "categorySize")
+                        }
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+              ))}
+              <Form.Item className="ml-[100px]">
+                <Button onClick={handleAddInput} type="primary">
+                  Thêm size
+                </Button>
               </Form.Item>
 
               <Form.Item
@@ -646,27 +966,22 @@ export default function ProductAdmin() {
                   },
                 ]}
               >
-                <Input
+                {/* <Input
                   value={stateProduct.description}
-                  onChange={handleOnchanges}
+                  onChange={(e) => handleOnchanges(null, e, "description")} 
                   name="description"
-                />
-              </Form.Item>
-
-              <Form.Item
-                label="Giá sản phẩm"
-                name="price"
-                rules={[
-                  {
-                    required: true,
-                    message: "vui lòng nhập giá sản phẩm",
-                  },
-                ]}
-              >
-                <Input
-                  value={stateProduct.price}
-                  onChange={handleOnchanges}
-                  name="price"
+                /> */}
+                <FroalaEditor
+                  model={stateProduct.description}
+                  onModelChange={(value) =>
+                    handleOnchanges(null, { target: { value } }, "description")
+                  }
+                  config={{
+                    placeholderText: "Nhập mô tả vào đây",
+                    charCounterCount: true,
+                  }}
+                  tag="textarea"
+                  name="description"
                 />
               </Form.Item>
               <Form.Item
@@ -681,10 +996,56 @@ export default function ProductAdmin() {
               >
                 <Input
                   value={stateProduct.discount}
-                  onChange={handleOnchanges}
+                  onChange={(e) => handleOnchanges(null, e, "discount")}
                   name="discount"
                 />
               </Form.Item>
+
+              <Form.Item
+                name="image"
+                label="Ảnh sản phẩm"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng thêm ảnh sản phẩm",
+                  },
+                ]}
+              >
+                <Upload
+                  // onChange={handleOnchangeAvatar}
+                  beforeUpload={handleChange}
+                  listType="picture-card"
+                  fileList={
+                    stateProduct?.image.map((url, index) => ({
+                      uid: index,
+                      name: `image-${index}`,
+                      status: "done",
+                      url: url,
+                    })) || []
+                  }
+                  onPreview={handlePreview}
+                  onRemove={handleRemoveImage}
+                >
+                  {/* {stateProduct?.image.length ? null : uploadButton} */}
+                  {uploadButton}
+                </Upload>
+
+                {previewImage && (
+                  <Image
+                    wrapperStyle={{
+                      display: "none",
+                    }}
+                    preview={{
+                      visible: previewOpen,
+                      onVisibleChange: (visible) => setPreviewOpen(visible),
+                      afterOpenChange: (visible) =>
+                        !visible && setPreviewImage(""),
+                    }}
+                    src={previewImage}
+                  />
+                )}
+              </Form.Item>
+
               <Form.Item>
                 {data?.status === "ERR" && (
                   <div
@@ -710,33 +1071,6 @@ export default function ProductAdmin() {
                   </div>
                 )}
               </Form.Item>
-
-              <Form.Item
-                name="image"
-                rules={[
-                  {
-                    required: true,
-                    message: "Vui lòng thêm ảnh sản phẩm",
-                  },
-                ]}
-              >
-                <Upload
-                  onChange={handleOnchangeAvatar}
-                  listType="picture"
-                  defaultFileList={stateProduct?.image}
-                  maxCount={1}
-                >
-                  <Button
-                    style={{ marginTop: "10px" }}
-                    icon={<UploadOutlined />}
-                  >
-                    Click thêm ảnh sản phẩm
-                  </Button>
-                  {/* {stateProduct?.image && (
-                <Avatar src={stateProduct?.image} shape="square" size={200} />
-              )} */}
-                </Upload>
-              </Form.Item>
             </Form>
           </LoadingComponent>
         </Modal>
@@ -758,12 +1092,12 @@ export default function ProductAdmin() {
           <LoadingComponent isLoading={isLoadingUpdate || dataUpdateisLoading}>
             <Form
               name="basic"
-              labelCol={{
-                span: 6,
-              }}
-              wrapperCol={{
-                span: 18,
-              }}
+              // labelCol={{
+              //   span: 10,
+              // }}
+              // wrapperCol={{
+              //   span: ,
+              // }}
               style={{
                 maxWidth: 600,
               }}
@@ -784,8 +1118,24 @@ export default function ProductAdmin() {
               >
                 <Input
                   value={stateProductDetail.name}
-                  onChange={handleOnchangeDetails}
+                  onChange={(e) => handleOnchangeDetails(null, e, "name")}
                   name="name"
+                />
+              </Form.Item>
+              <Form.Item
+                label="Đường dẫn"
+                name="slug"
+                rules={[
+                  {
+                    required: true,
+                  },
+                ]}
+              >
+                <Input
+                  value={stateProductDetail.slug}
+                  onChange={(e) => handleOnchangeDetails(null, e, "slug")}
+                  name="slug"
+                  disabled
                 />
               </Form.Item>
 
@@ -799,13 +1149,137 @@ export default function ProductAdmin() {
                   },
                 ]}
               >
-                <Input
+                <Select
+                  onChange={handleChangeSelectDetail}
+                  name={productType !== "add_type" ? "type" : ""}
                   value={stateProductDetail.type}
-                  onChange={handleOnchangeDetails}
-                  name="type"
+                  options={renderOptions(productType?.data)}
                 />
+                {typeSelect === "add_type" ? (
+                  <Input
+                    style={{ marginTop: "5px" }}
+                    value={stateProductDetail.type}
+                    onChange={(e) => handleOnchangeDetails(null, e, "type")}
+                    name="type"
+                  />
+                ) : (
+                  <Input
+                    style={{ display: "none" }}
+                    value={stateProductDetail.type}
+                    onChange={(e) => handleOnchangeDetails(null, e, "type")}
+                    name="type"
+                  />
+                )}
               </Form.Item>
+              <Form.List
+                name="categorySize"
+                rules={[
+                  {
+                    validator: async (_, categorySize) => {
+                      if (!categorySize || categorySize.length < 2) {
+                        return Promise.reject(
+                          new Error("At least 2 passengers"),
+                        );
+                      }
+                    },
+                  },
+                ]}
+              >
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map(({ key, name, ...restField }) => (
+                      <Space
+                        key={key}
+                        style={{
+                          display: "flex",
+                          marginBottom: 8,
+                        }}
+                        align="baseline"
+                      >
+                        <Form.Item
+                          label={`Kích thước ${key}`}
+                          {...restField}
+                          name={[name, "size"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Vui lòng nhập size",
+                            },
+                          ]}
+                        >
+                          <Input
+                            value={name}
+                            onChange={(e) =>
+                              handleOnchangeDetails(key, e, "categorySize")
+                            }
+                            name="size"
+                          />
+                        </Form.Item>
+                        <Form.Item
+                          label={`Giá ${key}`}
+                          {...restField}
+                          name={[name, "price"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Vui lòng nhập giá",
+                            },
+                          ]}
+                        >
+                          <Input
+                            value={name}
+                            onChange={(e) =>
+                              handleOnchangeDetails(key, e, "categorySize")
+                            }
+                            name="price"
+                          />
+                        </Form.Item>
 
+                        <Form.Item
+                          label={`Số lượng kho ${key}`}
+                          {...restField}
+                          name={[name, "counInStock"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Vui lòng nhập số lượng kho",
+                            },
+                          ]}
+                        >
+                          <Input
+                            value={name}
+                            onChange={(e) =>
+                              handleOnchangeDetails(key, e, "categorySize")
+                            }
+                            name="counInStock"
+                          />
+                        </Form.Item>
+                        {fields.length > 1 ? (
+                          <MinusCircleOutlined
+                            className="dynamic-delete-button"
+                            onClick={() => {
+                              remove(name);
+                              handleRemoveInputDetail(name);
+                            }}
+                          />
+                        ) : null}
+                      </Space>
+                    ))}
+                    <Form.Item>
+                      <Button
+                        type="dashed"
+                        onClick={() => {
+                          handleAddInputDetail();
+                          add();
+                        }}
+                        icon={<PlusOutlined />}
+                      >
+                        Thêm kích thước
+                      </Button>
+                    </Form.Item>
+                  </>
+                )}
+              </Form.List>
               <Form.Item
                 label="Mô tả"
                 name="description"
@@ -816,27 +1290,21 @@ export default function ProductAdmin() {
                   },
                 ]}
               >
-                <Input
-                  value={stateProductDetail.description}
-                  onChange={handleOnchangeDetails}
+                <FroalaEditor
+                  model={stateProductDetail.description}
+                  onModelChange={(value) =>
+                    handleOnchangeDetails(
+                      null,
+                      { target: { value } },
+                      "description",
+                    )
+                  }
+                  config={{
+                    placeholderText: "Nhập mô tả vào đây",
+                    charCounterCount: true,
+                  }}
+                  tag="textarea"
                   name="description"
-                />
-              </Form.Item>
-
-              <Form.Item
-                label="Giá sản phẩm"
-                name="price"
-                rules={[
-                  {
-                    required: true,
-                    message: "vui lòng nhập giá sản phẩm",
-                  },
-                ]}
-              >
-                <Input
-                  value={stateProductDetail.price}
-                  onChange={handleOnchangeDetails}
-                  name="price"
                 />
               </Form.Item>
 
@@ -856,6 +1324,49 @@ export default function ProductAdmin() {
                   name="discount"
                 />
               </Form.Item>
+              <Form.Item
+                name="image"
+                label="Ảnh sản phẩm"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng thêm ảnh sản phẩm",
+                  },
+                ]}
+              >
+                <Upload
+                  beforeUpload={handleChangeDetail}
+                  listType="picture-card"
+                  fileList={
+                    stateProductDetail?.image.map((url, index) => ({
+                      uid: index,
+                      name: `image-${index}`,
+                      status: "done",
+                      url: url,
+                    })) || []
+                  }
+                  onPreview={handlePreviewDetail}
+                  onRemove={handleRemoveImageDetail}
+                >
+                  {uploadButton}
+                </Upload>
+
+                {previewImage && (
+                  <Image
+                    wrapperStyle={{
+                      display: "none",
+                    }}
+                    preview={{
+                      visible: previewOpen,
+                      onVisibleChange: (visible) => setPreviewOpen(visible),
+                      afterOpenChange: (visible) =>
+                        !visible && setPreviewImage(""),
+                    }}
+                    src={previewImage}
+                  />
+                )}
+              </Form.Item>
+
               <Form.Item>
                 {dataUpdate?.status === "ERR" && (
                   <div
@@ -880,30 +1391,6 @@ export default function ProductAdmin() {
                   {dataUpdate?.message}
                 </div>
               )} */}
-              </Form.Item>
-
-              <Form.Item
-                name="image"
-                rules={[
-                  {
-                    required: true,
-                    message: "Vui lòng thêm ảnh sản phẩm",
-                  },
-                ]}
-              >
-                <Upload
-                  onChange={handleOnchangeAvatarDetailProduct}
-                  listType="picture"
-                  defaultFileList={stateProductDetail?.image}
-                  maxCount={1}
-                >
-                  <Button
-                    style={{ marginTop: "10px" }}
-                    icon={<UploadOutlined />}
-                  >
-                    Click thêm ảnh sản phẩm
-                  </Button>
-                </Upload>
               </Form.Item>
             </Form>
           </LoadingComponent>

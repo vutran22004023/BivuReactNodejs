@@ -1,7 +1,9 @@
 import { OrderProductModel,ProductModel } from "../model/index.js";
+import {Emailservicres} from './index.js'
+
 const createOrderProductservices = async (newOrder) => {
     try {
-        const {oderItem,paymentMethod,itemsPrice,shippingPrice, totalPrice,fullName, address, city, phone,user} =  newOrder
+        const {oderItem,paymentMethod,itemsPrice,shippingPrice, totalPrice,fullName, address, city, phone,user,email} =  newOrder
         const promises = oderItem.map(async(order) => {
             const productData = await ProductModel.findOneAndUpdate(
                 {
@@ -33,6 +35,7 @@ const createOrderProductservices = async (newOrder) => {
     
             })
             if(createProduct) {
+                await Emailservicres.sendEmailCreateOrder(newOrder)
                 return {
                     status: 200,
                     message: "Thêm sản phẩm thành công",
@@ -61,7 +64,6 @@ const createOrderProductservices = async (newOrder) => {
             status: 200,
             message: 'Success'
         }
-
 }
     catch(e) {
         console.log(e)
@@ -90,7 +92,28 @@ const getOrderDetail = async(uidorder) => {
     }
 }
 
+const getOrderDetailProduct = async(uidorder) => {
+    try {
+        const order = await OrderProductModel.findById({
+            _id: uidorder
+        })
+        if(order === null) {
+            return {
+                status: 'ERR',
+                message: 'Không có cái id này'
+            }    
+        }
+        return {
+            status: 200,
+            message: 'Đã show dữ liệu thành công',
+            data: order
+        }
+    }catch(e) {
+
+    }
+}
 export default {
     createOrderProductservices,
-    getOrderDetail
+    getOrderDetail,
+    getOrderDetailProduct
 }

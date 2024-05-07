@@ -1,5 +1,6 @@
 import {Productservices} from '../services/index.js'
 
+
 const getAllProduct = async(req, res) => {
     try{
         const {limit, page,sort, filter} = req.query
@@ -32,9 +33,10 @@ const getDetailProduct = async(req,res) => {
 
 const createProduct = async (req, res) => {
     try {
-    const {name,image,type,price,counInStock,rating,description,discount} = req.body;
+        console.log(req.body)
+    const {name,image,type,rating,description,discount,categorySize,slug} = req.body;
 
-    if(!name || !image || !type || !price || !description) {
+    if(!name || !image || !type || !description || !categorySize || !slug) {
         return res.status(200).json({
             status: 'ERR',
             message: "Chưa điền đầy đủ thông tin sản phẩm"

@@ -38,6 +38,9 @@ const ProductSchema =  new mongoose.Schema(
     quality: {
         type: Number,
     },
+    linksshopee: {
+        type: String,
+    },
     categorySize: [
         {
             size: {

@@ -28,6 +28,7 @@ import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { AddOrderProduct } from "../../redux/Slides/orderProductSlide";
 import ModalComponentLogin from '../ModalComponent/ModalLogin'
+import { convertPrice } from "../../utils";
 export const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;
   return (
@@ -103,7 +104,7 @@ export default function ProductDetail({idProduct}) {
           name: productDetail?.name,
           amount: numberProduct,
           image: productDetail?.image,
-          price: productDetail?.price,
+          categorySize: productDetail?.categorySize,
           product: productDetail?._id
         },
       }))
@@ -117,7 +118,7 @@ export default function ProductDetail({idProduct}) {
           name: productDetail?.name,
           amount: numberProduct,
           image: productDetail?.image,
-          price: productDetail?.price,
+          categorySize: productDetail?.categorySize,
           product: productDetail?._id
         }
       }))
@@ -147,30 +148,22 @@ export default function ProductDetail({idProduct}) {
           asNavFor={nav2}
           ref={(slider) => (sliderRef1 = slider)}
         >
-          <WapperProductDetailImageSmall src={Product1} alt="image-product" />
-          <WapperProductDetailImageSmall src={Product2} alt="image-product" />
-          <WapperProductDetailImageSmall src={Product3} alt="image-product" />
-          <WapperProductDetailImageSmall src={Product4} alt="image-product" />
-          <WapperProductDetailImageSmall src={Product4} alt="image-product" />
-          <WapperProductDetailImageSmall src={Product4} alt="image-product" />
-          <WapperProductDetailImageSmall src={Product4} alt="image-product" />
+        {productDetail?.image.map((img) => (
+          <><WapperProductDetailImageSmall src={img} alt="image-product" /></>
+        ))}
         </Slider>
         <Slider
           {...settings2}
           asNavFor={nav1}
           ref={(slider) => (sliderRef2 = slider)}
-          slidesToShow={6}
+          slidesToShow={5}
           swipeToSlide={true}
           focusOnSelect={true}
           style={{ margin: "10px" }}
         >
-          <WapperProductDetailImageSmall src={Product1} alt="image-product" />
-          <WapperProductDetailImageSmall src={Product2} alt="image-product" />
-          <WapperProductDetailImageSmall src={Product3} alt="image-product" />
-          <WapperProductDetailImageSmall src={Product4} alt="image-product" />
-          <WapperProductDetailImageSmall src={Product4} alt="image-product" />
-          <WapperProductDetailImageSmall src={Product4} alt="image-product" />
-          <WapperProductDetailImageSmall src={Product4} alt="image-product" />
+        {productDetail?.image.map((img) => (
+          <><WapperProductDetailImageSmall src={img} alt="image-product" /></>
+        ))}
         </Slider>
       </Col>
       <Col span={15} style={{ marginTop: "10px", paddingRight: "20px" }}>
@@ -186,7 +179,7 @@ export default function ProductDetail({idProduct}) {
           </div>
 
           <WapperStylePriceProduct>
-            <WapperStyleTextPriceProduct>{productDetail?.price.toLocaleString()} đ</WapperStyleTextPriceProduct>
+            <WapperStyleTextPriceProduct>{convertPrice(productDetail?.categorySize[0].price)}</WapperStyleTextPriceProduct>
           </WapperStylePriceProduct>
         </WapperStyleBlockProduct>
 

@@ -58,7 +58,7 @@ export default function ProductHome() {
           <IsLoadingCardComponent></IsLoadingCardComponent>
         ): (
           <>
-          <div className='grid grid-cols-3 gap-2 mb-3 md:grid-cols-6 md:gap-4'>
+          <div className='grid grid-cols-4 gap-2 mb-3 mt-3 md:grid-cols-6 md:gap-4'>
         
           { productsLimit?.data?.map((product,index)=> {
             return (

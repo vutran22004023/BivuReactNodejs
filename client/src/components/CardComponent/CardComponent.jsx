@@ -1,10 +1,8 @@
 import React from "react";
 import { Card } from "antd";
 import "../../assets/font-end/css/Home.css";
-import { StyleNameProduct,
-   WrapperReporText,
-   WrapperPriceText,
-   WrapperDisscountText,
+import {
+   
    WapperCardStyled,
    
    } from "./style";
@@ -33,30 +31,33 @@ const CardComponent =(props) => {
       // className={counInStock === 0 ? "cursor-not-allowed" : ''}
       // style={{backgroundColor: counInStock === 0 ? '#ccc' :'#fff',}}
       style={{backgroundColor: '#fff'}}
+      className="w-full "
       cover={
         <img
           alt="example"
           loading="lazy"
           src={image}
-          className="w-full h-[150px] md:h-[250px]"
+          className="w-full h-[130px] md:h-[250px]"
           disabled={true}
         />
       }
     >
-      <StyleNameProduct>{name}</StyleNameProduct>
-      <WrapperReporText>
+      <div className=" block h-[33px] overflow-hidden md:h-auto">
+        <div className="text-[11px] font-normal leading-4 md:text-[14px]">{name}</div>
+      </div>
+      <div className="text-[10px] md:text-[12px]"> 
         <span>{rating}</span>
         <span>
-          <StarFilled
-            style={{ fontSize: "12px", color: "yellow", marginTop: "4px" }}
+          <StarFilled className="text-[10px] md:text-[12px] text-yellow-500 mt-[4px]"
+            
           />
         </span>
         <span>| Đã Bán {selled || null}+</span>
-      </WrapperReporText>
-      <WrapperPriceText>
+      </div>
+      <div className="text-[10px] md:text-[16px] text-red-500 font-semibold flex">
       <span>{convertPrice(categorySize[0].price)}</span>
-        <span><WrapperDisscountText>-5%</WrapperDisscountText></span>
-      </WrapperPriceText>
+        <span><div className="ml-[3px] text-[10px] md:text-[12px] font-medium">-5%</div></span>
+      </div>
     </Card>
   );
 
@@ -73,12 +74,12 @@ const CardLoading =() =>{
       }
     >
       <StyleNameProduct><div className="loading-main-text"></div></StyleNameProduct>
-      <WrapperReporText>
+      <div>
       <div className="loading-text-container">
         <div className="loading-main-text"></div>
         <div className="loading-sub-text"></div>
       </div>
-      </WrapperReporText>
+      </div>
       <WrapperPriceText>
         <div className="loading-main-text"></div>
         <div className="loading-sub-text"></div>

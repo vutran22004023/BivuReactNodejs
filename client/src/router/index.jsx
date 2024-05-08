@@ -62,7 +62,7 @@ export default createBrowserRouter([
           },
           {
             element: <DetailProduct />,
-            path: "/chi-tiet/:id",
+            path: "/chi-tiet/:id/:slug",
           },
           {
             element: <ProFileUser />,

@@ -14,6 +14,7 @@ export default function CartProduct() {
     const [listChecked, setListChecked] = useState([])
     const dispatch = useDispatch()
     const location = useLocation();
+    console.log(location)
     const order = useSelector((state) => state.order);
     const user = useSelector((state) => state.user);
     const showModal = () => {
@@ -127,6 +128,7 @@ export default function CartProduct() {
             <div className="w-64 flex-auto text-left flex">
             <div>Tất cả ({order.orderItems?.length} sản phẩm)</div>
             </div>
+            <div className="w-32 flex-auto"></div>
             <div className="w-32 flex-auto">Đơn giá</div>
             <div className="w-32 flex-auto">Số Lượng</div>
             <div className="w-32 flex-auto">Thành tiền</div>
@@ -146,6 +148,7 @@ export default function CartProduct() {
               </div>
               <div className="ml-1">{item?.name}</div>
             </div>
+            <div className="w-32 flex-auto"></div>
             <div className="w-32 flex-auto">{convertPrice(item?.price)}</div> 
             <div className="w-32 flex-auto flex" style={{justifyContent:'center'}}>
             <button style={{ border:'1px solid #000',background: '#fff', cursor: 'pointer',borderRadius: '5px 0 0 5px', padding: '0 5px' }}

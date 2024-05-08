@@ -95,6 +95,7 @@ export default function ProductAdmin() {
     rating: "",
     description: "",
     discount: "",
+    linksshopee: "",
     categorySize: [
       {
         size: "",
@@ -144,7 +145,6 @@ export default function ProductAdmin() {
 
   const [stateProduct, setStateProduct] = useState(inittial);
   const [stateProductDetail, setStateProductDetail] = useState(inittial);
-  console.log(stateProduct,stateProductDetail);
   const [RowSelected, setRowSelected] = useState("");
 
   //trạng thái mở modal
@@ -505,6 +505,7 @@ export default function ProductAdmin() {
         description: res?.data?.description,
         discount: res?.data?.discount,
         categorySize: res.data?.categorySize,
+        linksshopee: res.data?.linksshopee
       });
     }
     setIsLoadingUpdate(false);
@@ -1000,6 +1001,21 @@ const handleRemoveImageDetail = async (file) => {
                   name="discount"
                 />
               </Form.Item>
+              <Form.Item
+                label="Link shopee"
+                name="linksshopee"
+                rules={[
+                  {
+                    required: false,
+                  },
+                ]}
+              >
+                <Input
+                  value={stateProduct.linksshopee}
+                  onChange={(e) => handleOnchanges(null, e, "linksshopee")}
+                  name="linksshopee"
+                />
+              </Form.Item>
 
               <Form.Item
                 name="image"
@@ -1324,6 +1340,23 @@ const handleRemoveImageDetail = async (file) => {
                   name="discount"
                 />
               </Form.Item>
+
+              <Form.Item
+                label="Link shopee"
+                name="linksshopee"
+                rules={[
+                  {
+                    required: false,
+                  },
+                ]}
+              >
+                <Input
+                  value={stateProductDetail.linksshopee}
+                  onChange={(e) => handleOnchanges(null, e, "linksshopee")}
+                  name="linksshopee"
+                />
+              </Form.Item>
+
               <Form.Item
                 name="image"
                 label="Ảnh sản phẩm"

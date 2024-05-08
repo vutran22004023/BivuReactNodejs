@@ -66,14 +66,14 @@ export default function ProductHome() {
               
               <CardComponent
               key={product._id}
-              counInStock ={product.counInStock}
               description={product.description}
               image ={product.image}
               name = {product.name}
-              price = {product.price}
+              categorySize = {product.categorySize}
               rating = {product.rating}   
               type = {product.type}
               discount = {product.discount}
+              slug = {product.slug}
               selled = {product.selled}
               id = {product._id}
               

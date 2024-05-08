@@ -17,19 +17,22 @@ import { convertPrice } from "../../utils";
 
 
 const CardComponent =(props) => {
-  const {counInStock, description, image, name, price,rating,type,discount,selled,id} = props
+  const {counInStock, description, image, name, price,rating,type,discount,selled,id,categorySize, slug} = props
   const navigate = useNavigate()
-  const handleDetailsProduct =(id) => {
-    navigate(`/chi-tiet/${id}`)
+  const handleDetailsProduct =(id,slug) => {
+    navigate(`/chi-tiet/${id}/${slug}`)
   }
   return (
     <Card
-      hoverable= {counInStock !== 0 ? true: false}
-      onClick={()=> counInStock !== 0 && handleDetailsProduct(id)}
+      // hoverable= {counInStock !== 0 ? true: false}
+      hoverable= {true}
+      // onClick={()=> counInStock !== 0 && handleDetailsProduct(id)}
+      onClick={() => handleDetailsProduct(id,slug)}
       bodyStyle={{padding:'5px'}}
       // style={{display: counInStock === 0 ? 'none': ''}}
-      className={counInStock === 0 ? "cursor-not-allowed" : ''}
-      style={{backgroundColor: counInStock === 0 ? '#ccc' :'#fff',}}
+      // className={counInStock === 0 ? "cursor-not-allowed" : ''}
+      // style={{backgroundColor: counInStock === 0 ? '#ccc' :'#fff',}}
+      style={{backgroundColor: '#fff'}}
       cover={
         <img
           alt="example"
@@ -51,7 +54,7 @@ const CardComponent =(props) => {
         <span>| Đã Bán {selled || null}+</span>
       </WrapperReporText>
       <WrapperPriceText>
-      <span>{convertPrice(price)}</span>
+      <span>{convertPrice(categorySize[0].price)}</span>
         <span><WrapperDisscountText>-5%</WrapperDisscountText></span>
       </WrapperPriceText>
     </Card>

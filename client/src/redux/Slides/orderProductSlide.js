@@ -63,10 +63,8 @@ export const orderSlice = createSlice({
   reducers: {
     AddOrderProduct: (state, action) => {
       const { orderItem } = action.payload;
-      const index = state?.orderItems.findIndex(
-        (item) => item.product === orderItem.product,
-      );
-      console.log(state?.orderItems);
+      const index = state?.orderItems.findIndex(item => item.category === orderItem.category);
+      console.log(index);
       if (index !== -1) {
         state.orderItems[index].amount += orderItem.amount;
       } else {

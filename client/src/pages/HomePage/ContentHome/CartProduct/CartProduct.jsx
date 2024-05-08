@@ -14,6 +14,7 @@ export default function CartProduct() {
     const [listChecked, setListChecked] = useState([])
     const dispatch = useDispatch()
     const location = useLocation();
+    console.log(location)
     const order = useSelector((state) => state.order);
     const user = useSelector((state) => state.user);
     const showModal = () => {

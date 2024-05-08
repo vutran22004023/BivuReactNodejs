@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import {Col, Image} from 'antd'
+import {Col, Image,Radio} from 'antd'
 import {Link} from 'react-router-dom'
 export const WapperProductDetailImageSmall = styled(Image)`
     height: 64px;
@@ -111,6 +111,12 @@ align-items: center;
 export const WrapperTextLight = styled(Link)`
     color: rgb(13,92,182);
     font-size: 13px;
+`
+
+export const WrapperRadioGroup = styled(Radio.Group)`
+    display: none;
+`
+export const WrapperRadio = styled(Radio)`
 `
 
 

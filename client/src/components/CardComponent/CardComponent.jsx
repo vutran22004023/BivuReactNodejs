@@ -18,7 +18,6 @@ import { convertPrice } from "../../utils";
 
 const CardComponent =(props) => {
   const {counInStock, description, image, name, price,rating,type,discount,selled,id,categorySize, slug} = props
-  console.log(id,slug)
   const navigate = useNavigate()
   const handleDetailsProduct =(id,slug) => {
     navigate(`/chi-tiet/${id}/${slug}`)

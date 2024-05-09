@@ -1520,18 +1520,6 @@ const saveData = () => {
                     {dataUpdate?.message}
                   </div>
                 )}
-
-                {/* {dataUpdate?.status === 200 && (
-                <div
-                  style={{
-                    color: "#4fba69",
-                    fontSize: "14px",
-                    paddingTop: "10px",
-                  }}
-                >
-                  {dataUpdate?.message}
-                </div>
-              )} */}
               </Form.Item>
             </Form>
           </LoadingComponent>

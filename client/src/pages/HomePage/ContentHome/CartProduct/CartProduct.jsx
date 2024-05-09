@@ -148,7 +148,12 @@ export default function CartProduct() {
               </div>
               <div className="ml-1">{item?.name}</div>
             </div>
-            <div className="w-32 flex-auto"></div>
+            <div className="w-32 flex-auto">
+              <div className="text-left " style={{ display: item.category ? 'block' : 'none' }}>
+                <div>Phân Loại hàng</div>
+                <div>{item.category}</div>
+              </div>
+            </div>
             <div className="w-32 flex-auto">{convertPrice(item?.price)}</div> 
             <div className="w-32 flex-auto flex" style={{justifyContent:'center'}}>
             <button style={{ border:'1px solid #000',background: '#fff', cursor: 'pointer',borderRadius: '5px 0 0 5px', padding: '0 5px' }}

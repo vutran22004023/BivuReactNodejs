@@ -34,7 +34,7 @@ const getDetailProduct = async(req,res) => {
 const createProduct = async (req, res) => {
     try {
         console.log(req.body)
-    const {name,image,type,rating,description,discount,categorySize,slug,linksshopee} = req.body;
+    const {name,image,type,rating,description,discount,categorySize,slug,linksshopee,idColor} = req.body;
 
     if(!name || !image || !type || !description || !categorySize || !slug) {
         return res.status(200).json({
@@ -119,6 +119,36 @@ const getAlltypeProduct = async(req, res) => {
     }
 }
 
+const getColor = async(req, res) => {
+    try {
+        const response = await Productservices.getAllColor()
+        return res.status(200).json(response)
+    }catch(e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
+
+const getColorDetail = async (req, res) => {
+
+    try{
+        const id = req.params.id
+        if(!id) {
+            return res.status(200).json({
+                status: 'Err',
+                message: 'id không tồn tại'
+            })
+        }
+        const response = await Productservices.getDetailColor(id)
+        return res.status(200).json(response)
+    }catch(e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
+
 
 export default {
     getAllProduct,
@@ -127,5 +157,7 @@ export default {
     deleteProduct,
     createProduct,
     deleteManyProduct,
-    getAlltypeProduct
+    getAlltypeProduct,
+    getColor,
+    getColorDetail
 }

@@ -1,6 +1,7 @@
-import { ProductModel } from "../model/index.js";
+import { ProductModel,ColorModel } from "../model/index.js";
+
 const createProduct = async (newProduct) => {
-        const {name,image,type,rating,description,discount,categorySize,slug,linksshopee} =  newProduct
+        const {name,image,type,rating,description,discount,categorySize,slug,linksshopee,idColor} =  newProduct
         try {
             const checkProduct = await ProductModel.findOne({
                 name: name,
@@ -21,7 +22,8 @@ const createProduct = async (newProduct) => {
               discount,
               categorySize,
               slug,
-              linksshopee
+              linksshopee,
+              idColor
             })
             if(createProduct) {
                 return {
@@ -174,8 +176,44 @@ const getAllTypeProduct = async() => {
     const allType = await ProductModel.distinct('type');
     return {
       status: 200,
-      message: `Xóa thành công`,
+      message: `Show thành công`,
       data: allType
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
+const getAllColor = async() => {
+  try {
+
+    const allColor = await ColorModel.find();
+    return {
+      status: 200,
+      message: `Show thành công`,
+      data: allColor
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
+const getDetailColor = async(id) => {
+  try {
+
+    const checkColor = await ColorModel.find({
+      _id: id,
+    });
+    if(!checkColor) {
+      return {
+        status: "ERR",
+        message: "Id không tồn tại",
+      };
+    }
+    return {
+      status: 200,
+      message: `Show thông tin của id: ${checkColor.id}`,
+      data: checkColor
     };
   } catch (error) {
     throw error;
@@ -191,5 +229,7 @@ export default {
     getAllProduct,
     getDetailProduct,
     deleteProductMany,
-    getAllTypeProduct
+    getAllTypeProduct,
+    getAllColor,
+    getDetailColor
 }

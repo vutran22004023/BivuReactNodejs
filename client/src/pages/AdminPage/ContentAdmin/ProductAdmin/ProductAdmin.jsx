@@ -5,7 +5,20 @@ import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import { Outlet } from "react-router-dom";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import { Modal, Form, Input, Upload, Avatar, Space, Select, Image } from "antd";
+import {
+  Modal,
+  Form,
+  Input,
+  Upload,
+  Avatar,
+  Space,
+  Select,
+  Image,
+  Switch,
+  Col,
+  Row,
+  Checkbox,
+} from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { SearchOutlined } from "@ant-design/icons";
 import { getBase64 } from "../../../../utils.js";
@@ -44,7 +57,13 @@ import ModalComponent from "../../../../components/ModalComponent/Modal.jsx";
 import { renderOptions, vietnameseToSlug } from "../../../../utils.js";
 import { imgDB, txtDB } from "../../../../Firebase/config.jsx";
 import { v4 } from "uuid";
-import { getDownloadURL, ref, uploadBytes,deleteObject, getStorage  } from "firebase/storage";
+import {
+  getDownloadURL,
+  ref,
+  uploadBytes,
+  deleteObject,
+  getStorage,
+} from "firebase/storage";
 export default function ProductAdmin() {
   //button thêm sửa xóa
   const RowMenu = () => (
@@ -79,7 +98,31 @@ export default function ProductAdmin() {
   const [typeSelectDetail, setTypeSelectDetail] = useState("");
   const [typePage, setTypePage] = useState(0);
   const [model, setModel] = useState("");
+  const [valueSwitch, setValueSwitch] = useState(false);
+  const [valueCheckBox, setValueCheckBox] = useState([]);
 
+
+  const onChange = (checked) => {
+    setValueSwitch(checked);
+  };
+  useEffect(() => {
+    if(valueSwitch === true) {
+      fetchAllColor.mutate()
+    }
+  },[valueSwitch])
+
+  useEffect(() => {
+    if(valueCheckBox) {
+      setStateProduct({ ...stateProduct, idColor: valueCheckBox });
+    }
+  },[valueCheckBox])
+
+
+  const onChangeCheckBox = (checkedValues) => {
+    if(valueSwitch === true) {
+      setValueCheckBox(checkedValues)
+    }
+  }
   useEffect(() => {
     if (pages) {
       // Đảm bảo pages không phải là undefined hoặc null
@@ -96,6 +139,7 @@ export default function ProductAdmin() {
     description: "",
     discount: "",
     linksshopee: "",
+    idColor: [],
     categorySize: [
       {
         size: "",
@@ -146,6 +190,30 @@ export default function ProductAdmin() {
   const [stateProduct, setStateProduct] = useState(inittial);
   const [stateProductDetail, setStateProductDetail] = useState(inittial);
   const [RowSelected, setRowSelected] = useState("");
+  const [valIdColor, setValIdColor] = useState([])
+  useEffect(() => {
+    if (stateProductDetail?.idColor) {
+        fetchAllColor.mutate()
+        const idColors = stateProductDetail.idColor.map(item => item);
+        setValIdColor(idColors);
+    }
+}, [stateProductDetail]);
+
+const onChangeCheckBoxDetail = (val) => {
+  setValIdColor(val)
+}
+
+
+
+const saveData = () => {
+  setStateProductDetail({ ...stateProductDetail, idColor: valIdColor });
+};
+
+
+//  useEffect(() => {
+//   setStateProductDetail({...stateProductDetail, idColors: valIdColor});
+//  },[stateProductDetail])
+
 
   //trạng thái mở modal
   const showModal = () => {
@@ -287,6 +355,13 @@ export default function ProductAdmin() {
     return res;
   };
 
+  const fetchAllColor = useMutationHooks(() => {
+    const res = ProductService.getAllColor();
+    return res;
+  });
+
+  
+
   // các biến dữ liệu
   const {
     data,
@@ -310,7 +385,7 @@ export default function ProductAdmin() {
     queryKey: ["productsType"],
     queryFn: fetchTypeProduct,
   });
-
+  const {data: dataAllColor,isLoading:isLoadingColor} = fetchAllColor
   // xử lý search trong table
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
@@ -399,20 +474,20 @@ export default function ProductAdmin() {
         setTimeout(() => searchInput.current?.select(), 100);
       }
     },
-    // render: (text) =>
-    //   searchedColumn === dataIndex ? (
-    //     <Highlighter
-    //       highlightStyle={{
-    //         backgroundColor: '#ffc069',
-    //         padding: 0,
-    //       }}
-    //       searchWords={[searchText]}
-    //       autoEscape
-    //       textToHighlight={text ? text.toString() : ''}
-    //     />
-    //   ) : (
-    //     text
-    //   ),
+    render: (text) =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{
+            backgroundColor: '#ffc069',
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ''}
+        />
+      ) : (
+        text
+      ),
   });
 
   const columns = [
@@ -505,7 +580,8 @@ export default function ProductAdmin() {
         description: res?.data?.description,
         discount: res?.data?.discount,
         categorySize: res.data?.categorySize,
-        linksshopee: res.data?.linksshopee
+        linksshopee: res.data?.linksshopee,
+        idColor: res?.data?.idColor
       });
     }
     setIsLoadingUpdate(false);
@@ -584,74 +660,63 @@ export default function ProductAdmin() {
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState();
-  // const handleChange = async ({fileList}) => {
-  //     const imgs = ref(imgDB, `Imgs/${v4()}`);
-  //     const uploadTaskSnapshot = await uploadBytes(imgs, fileList.originFileObj);
-  //     const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
-  //     setStateProduct({ ...stateProduct, image: downloadURL });
 
-  // };
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
-  }
-  setPreviewImage(file.url||file ||file.preview);
-  setPreviewVisible(true);
+    }
+    setPreviewImage(file.url || file || file.preview);
+    setPreviewVisible(true);
   };
 
   const handlePreviewDetail = async (file) => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
-  }
-      setPreviewImage( file.url||file);
-      setPreviewOpen(true);
+    }
+    setPreviewImage(file.url || file);
+    setPreviewOpen(true);
   };
 
-  const [dataImage, setDataImage] = useState([])
-  const [dataImageDetail, setDataImageDetail] = useState([])
+  const [dataImage, setDataImage] = useState([]);
+  const [dataImageDetail, setDataImageDetail] = useState([]);
   const handleChange = async (fileList) => {
     try {
       const uploadedURLs = [];
-  
-        const imgs = ref(imgDB, `Imgs/${v4()}`);
-        const uploadTaskSnapshot = await uploadBytes(imgs, fileList);
-        const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
-        // Thêm URL của ảnh vừa upload vào mảng
-        uploadedURLs.push(downloadURL);
-      
+
+      const imgs = ref(imgDB, `Imgs/${v4()}`);
+      const uploadTaskSnapshot = await uploadBytes(imgs, fileList);
+      const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
+      // Thêm URL của ảnh vừa upload vào mảng
+      uploadedURLs.push(downloadURL);
 
       // Cập nhật state của dataImage với mảng các URL của ảnh đã upload
       setDataImage([...stateProduct?.image, ...uploadedURLs]);
-  
+
       return false; // return false để ngăn việc tải tệp lên tự động
     } catch (error) {
       console.error("Error uploading files: ", error);
       return false; // Xử lý lỗi và trả về false để ngăn tệp được tải lên tự động
     }
   };
-  
+
   useEffect(() => {
     // Khi dataImage thay đổi, cập nhật stateProduct với giá trị mới
     setStateProduct({ ...stateProduct, image: dataImage });
-    console.log(stateProduct)
   }, [dataImage]);
-
-
 
   const handleChangeDetail = async (fileList) => {
     try {
       const uploadedURLs = [];
-  
-        const imgs = ref(imgDB, `Imgs/${v4()}`);
-        const uploadTaskSnapshot = await uploadBytes(imgs, fileList);
-        const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
-        // Thêm URL của ảnh vừa upload vào mảng
-        uploadedURLs.push(downloadURL);
-      
+
+      const imgs = ref(imgDB, `Imgs/${v4()}`);
+      const uploadTaskSnapshot = await uploadBytes(imgs, fileList);
+      const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
+      // Thêm URL của ảnh vừa upload vào mảng
+      uploadedURLs.push(downloadURL);
 
       // Cập nhật state của dataImage với mảng các URL của ảnh đã upload
       setDataImageDetail([...stateProductDetail?.image, ...uploadedURLs]);
-  
+
       return false; // return false để ngăn việc tải tệp lên tự động
     } catch (error) {
       console.error("Error uploading files: ", error);
@@ -662,48 +727,43 @@ export default function ProductAdmin() {
   useEffect(() => {
     // Khi dataImage thay đổi, cập nhật stateProduct với giá trị mới
     setStateProductDetail({ ...stateProductDetail, image: dataImageDetail });
-
   }, [dataImageDetail]);
-  
+
   const storage = getStorage();
   const handleRemoveImage = async (file) => {
     try {
-        // Lấy đường dẫn hoặc ID của tệp ảnh trong Firebase Storage từ thuộc tính url của file
-        const imageURL = file.url; // Đây có thể là đường dẫn hoặc ID của tệp ảnh trong Storage
-        
-        // Thực hiện xóa tệp ảnh từ Firebase Storage
-        await deleteObject(ref(storage, imageURL));
+      // Lấy đường dẫn hoặc ID của tệp ảnh trong Firebase Storage từ thuộc tính url của file
+      const imageURL = file.url; // Đây có thể là đường dẫn hoặc ID của tệp ảnh trong Storage
 
-        // Sau khi xóa thành công từ Firebase Storage, cập nhật trạng thái của ứng dụng bằng cách loại bỏ ảnh khỏi mảng stateProduct.image
-        const newImages = stateProduct.image.filter((image) => image !== file.url);
-        setStateProduct({ ...stateProduct, image: newImages });
-        
-        console.log("Image deleted successfully");
-    } catch (error) {
-        console.error("Error deleting image: ", error);
-    }
-};
-
-const handleRemoveImageDetail = async (file) => {
-  try {
+      // Thực hiện xóa tệp ảnh từ Firebase Storage
+      await deleteObject(ref(storage, imageURL));
 
       // Sau khi xóa thành công từ Firebase Storage, cập nhật trạng thái của ứng dụng bằng cách loại bỏ ảnh khỏi mảng stateProduct.image
-      const newImages = stateProductDetail.image.filter((image) => image !== file.url);
-      setStateProductDetail({ ...stateProductDetail, image: newImages });
-      
-      console.log("Image deleted successfully");
-  } catch (error) {
-      console.error("Error deleting image: ", error);
-  }
-};
+      const newImages = stateProduct.image.filter(
+        (image) => image !== file.url,
+      );
+      setStateProduct({ ...stateProduct, image: newImages });
 
-  // const handleRemoveImageDetail = (file) => {
-  //   const filteredImages = stateProductDetail.image.filter((image) => image !== file.url);
-  //   setStateProductDetail({
-  //     ...stateProductDetail,
-  //     image: filteredImages,
-  //   });
-  // };
+      console.log("Image deleted successfully");
+    } catch (error) {
+      console.error("Error deleting image: ", error);
+    }
+  };
+
+  const handleRemoveImageDetail = async (file) => {
+    try {
+      // Sau khi xóa thành công từ Firebase Storage, cập nhật trạng thái của ứng dụng bằng cách loại bỏ ảnh khỏi mảng stateProduct.image
+      const newImages = stateProductDetail.image.filter(
+        (image) => image !== file.url,
+      );
+      setStateProductDetail({ ...stateProductDetail, image: newImages });
+
+      console.log("Image deleted successfully");
+    } catch (error) {
+      console.error("Error deleting image: ", error);
+    }
+  };
+
 
   const uploadButton = (
     <button
@@ -957,6 +1017,33 @@ const handleRemoveImageDetail = async (file) => {
                 </Button>
               </Form.Item>
 
+              <Form.Item label="Màu sắc">
+                <Switch defaultChecked={false} onChange={onChange} />
+              </Form.Item>
+
+              <Form.Item style={{display: valueSwitch === true ? "block" : 'none'}}>
+              <div className="text-[red]">(Nếu có tắt vui lòng để check box trống tránh tình trạng lưu vào db)</div>
+              <Checkbox.Group
+                  style={{
+                    width: "100%",
+                    height: "200px", // Chiều cao cố định của Checkbox.Group
+                    overflowY: 'auto' 
+                  }}
+                  onChange={onChangeCheckBox}
+                >
+                  <Row>
+                    {dataAllColor?.data.map((item) => {
+
+                      return (
+                        <Col span={3}>
+                        <Checkbox value={item._id}><div className="w-[20px] h-[20px]" style={{backgroundColor: item.hex}}></div></Checkbox>
+                      </Col>
+                      )
+                    })}
+                  </Row>
+                </Checkbox.Group>
+              </Form.Item>
+
               <Form.Item
                 label="Mô tả"
                 name="description"
@@ -967,11 +1054,6 @@ const handleRemoveImageDetail = async (file) => {
                   },
                 ]}
               >
-                {/* <Input
-                  value={stateProduct.description}
-                  onChange={(e) => handleOnchanges(null, e, "description")} 
-                  name="description"
-                /> */}
                 <FroalaEditor
                   model={stateProduct.description}
                   onModelChange={(value) =>
@@ -1171,7 +1253,7 @@ const handleRemoveImageDetail = async (file) => {
                   value={stateProductDetail.type}
                   options={renderOptions(productType?.data)}
                 />
-                {typeSelect === "add_type" ? (
+                {typeSelectDetail === "add_type" ? (
                   <Input
                     style={{ marginTop: "5px" }}
                     value={stateProductDetail.type}
@@ -1296,6 +1378,32 @@ const handleRemoveImageDetail = async (file) => {
                   </>
                 )}
               </Form.List>
+              <Form.Item label="Màu sắc">
+  <div className="text-[red]">(Nếu có tắt vui lòng để check box trống tránh tình trạng lưu vào db)</div>
+  <Checkbox.Group
+    style={{
+      width: "100%",
+      height: "200px", // Chiều cao cố định của Checkbox.Group
+      overflowY: 'auto' 
+    }}
+    onChange={onChangeCheckBoxDetail }
+    value={valIdColor}
+
+  >
+    {dataAllColor?.data.map((item) => (
+      <Col span={3}>
+        {/* Đảm bảo có key duy nhất cho mỗi phần tử trong danh sách */}
+        <Checkbox value={item._id}>
+          <div className="w-[20px] h-[20px]" style={{ backgroundColor: item.hex }}></div>
+        </Checkbox>
+      </Col>
+    ))}
+  </Checkbox.Group>
+</Form.Item>
+  <Form.Item>
+    {/* Button để lưu dữ liệu */}
+  <Button onClick={saveData} disabled={JSON.stringify(valIdColor) === JSON.stringify(stateProductDetail.idColor)}>Lưu màu</Button>
+  </Form.Item>
               <Form.Item
                 label="Mô tả"
                 name="description"

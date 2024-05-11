@@ -25,6 +25,7 @@ import {
   deleteObject,
   getStorage,
 } from "firebase/storage";
+import UploadComponent from '../../../../components/UploadComponent/UploadComponent.jsx'
 export default function InforPageAdmin() {
   const normFile = (e) => {
     if (Array.isArray(e)) {
@@ -61,7 +62,6 @@ export default function InforPageAdmin() {
     link_qc_5: "",
   });
   const [InforPageDetail, setInforPageDetail] = useState(inittial);
-  console.log(InforPageDetail);
   // const [InforPage, setInforPage] = useState(inittial)
 
   // const handleOchangeInforTitle = (e) => {
@@ -153,54 +153,7 @@ export default function InforPageAdmin() {
     mutationUpdateInforTitle.mutate(InforPageDetail);
   };
 
-  //upload anh Filebase
-  const [dataImage, setDataImage] = useState([]);
-  const handleChange = async (file) => {
-    try {
-      const uploadedURLs = [];
 
-      const imgs = ref(imgDB, `Logo/${v4()}`);
-      const uploadTaskSnapshot = await uploadBytes(imgs,file);
-      const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
-      // Thêm URL của ảnh vừa upload vào mảng
-      uploadedURLs.push(downloadURL);
-
-      // Cập nhật state của dataImage với mảng các URL của ảnh đã upload
-      setDataImage(uploadedURLs);
-
-      return false; // return false để ngăn việc tải tệp lên tự động
-    } catch (error) {
-      console.error("Error uploading files: ", error);
-      return false; // Xử lý lỗi và trả về false để ngăn tệp được tải lên tự động
-    }
-  };
-
-  useEffect(() => {
-    // Khi dataImage thay đổi, cập nhật stateProduct với giá trị mới
-    setInforPageDetail({ ...InforPageDetail, logo_1: dataImage });
-  }, [dataImage]);
-
-  const handlePreview = async (file) => {
-    // if (!file.url && !file.preview) {
-    //   file.preview = await getBase64(file.originFileObj);
-    // }
-    setPreviewImage(file.thumbUrl);
-    setPreviewVisible(true);
-  };
-  const storage = getStorage();
-  const handleRemoveImage = async (file) => {
-    try {
-      // Sau khi xóa thành công từ Firebase Storage, cập nhật trạng thái của ứng dụng bằng cách loại bỏ ảnh khỏi mảng stateProduct.image
-      const newImages = InforPageDetail.logo_1.filter(
-        (image) => image !== file.url,
-      );
-      setInforPageDetail({ ...InforPageDetail, logo_1: newImages });
-
-      console.log("Image deleted successfully");
-    } catch (error) {
-      console.error("Error deleting image: ", error);
-    }
-  };
   return (
     <IsLoadingComponent isLoading={isLoadingUpdateInforPage}>
       <Box
@@ -450,39 +403,7 @@ export default function InforPageAdmin() {
                 />
               </Form.Item>
               <Form.Item label="Logo">
-                <Upload
-                  listType="picture-card"
-                  fileList={
-                    InforPageDetail?.logo_1.map((url, index) => ({
-                      uid: index,
-                      name: `image-${index}`,
-                      status: "done",
-                      url: url,
-                    })) || []
-                  }
-                  beforeUpload={handleChange}
-                  onPreview={handlePreview}
-                  onRemove={handleRemoveImage}
-                >
-                {InforPageDetail?.logo_1.length === 1 ? null : (
-                  <button
-                    style={{
-                      border: 0,
-                      background: "none",
-                    }}
-                    type="button"
-                  >
-                    <PlusOutlined />
-                    <div
-                      style={{
-                        marginTop: 8,
-                      }}
-                    >
-                      Upload
-                    </div>
-                  </button>
-                )}
-                </Upload>
+                <UploadComponent setInforPageDetail={setInforPageDetail} InforPageDetail={InforPageDetail} valueImge={InforPageDetail?.logo_1} amount={1} valueName="logo_1" />
               </Form.Item>
             </Form>
             <div className="flex justify-between">
@@ -517,37 +438,19 @@ export default function InforPageAdmin() {
               }}
               // onFinish={onFinish}
               // onFinishFailed={onFinishFailed}
+              form={form}
             >
               <div className="block w-full md:flex ">
                 <Form.Item
                   label="Ảnh quảng cáo 1"
-                  valuePropName="fileList"
-                  getValueFromEvent={normFile}
                   className="w-full"
                 >
-                  <Upload action="/upload.do" listType="picture-card">
-                    <button
-                      style={{
-                        border: 0,
-                        background: "none",
-                      }}
-                      type="button"
-                    >
-                      <PlusOutlined />
-                      <div
-                        style={{
-                          marginTop: 8,
-                        }}
-                      >
-                        Upload
-                      </div>
-                    </button>
-                  </Upload>
+                  <UploadComponent setInforPageDetail={setInforPageDetail} InforPageDetail={InforPageDetail} valueImge={InforPageDetail?.image_qc_1} amount={1} valueName="image_qc_1" />
                 </Form.Item>
 
                 <Form.Item
                   label="Link quảng cáo 1"
-                  name="name"
+                  name="link_qc_1"
                   rules={[
                     {
                       required: true,
@@ -558,43 +461,24 @@ export default function InforPageAdmin() {
                   maxCount={1}
                 >
                   <Input
-                    // value={}
-                    // onChange={handleOnchangeDetails}
-                    name="name"
+                    value={InforPageDetail?.link_qc_1}
+                    onChange={handleOchangeInforTitleDetail}
+                    name="link_qc_1"
                   />
                 </Form.Item>
               </div>
 
               <div className="block w-full md:flex ">
-                <Form.Item
+              <Form.Item
                   label="Ảnh quảng cáo 2"
-                  valuePropName="fileList"
-                  getValueFromEvent={normFile}
                   className="w-full"
                 >
-                  <Upload action="/upload.do" listType="picture-card">
-                    <button
-                      style={{
-                        border: 0,
-                        background: "none",
-                      }}
-                      type="button"
-                    >
-                      <PlusOutlined />
-                      <div
-                        style={{
-                          marginTop: 8,
-                        }}
-                      >
-                        Upload
-                      </div>
-                    </button>
-                  </Upload>
+                  <UploadComponent setInforPageDetail={setInforPageDetail} InforPageDetail={InforPageDetail} valueImge={InforPageDetail?.image_qc_2} amount={1} valueName="image_qc_2" />
                 </Form.Item>
 
                 <Form.Item
                   label="Link quảng cáo 2"
-                  name="name"
+                  name="link_qc_2"
                   rules={[
                     {
                       required: true,
@@ -604,43 +488,24 @@ export default function InforPageAdmin() {
                   className="w-full text-center"
                 >
                   <Input
-                    // value={}
-                    // onChange={handleOnchangeDetails}
-                    name="name"
+                    value={InforPageDetail?.link_qc_2}
+                    onChange={handleOchangeInforTitleDetail}
+                    name="link_qc_2"
                   />
                 </Form.Item>
               </div>
 
               <div className="block w-full md:flex ">
-                <Form.Item
+              <Form.Item
                   label="Ảnh quảng cáo 3"
-                  valuePropName="fileList"
-                  getValueFromEvent={normFile}
                   className="w-full"
                 >
-                  <Upload action="/upload.do" listType="picture-card">
-                    <button
-                      style={{
-                        border: 0,
-                        background: "none",
-                      }}
-                      type="button"
-                    >
-                      <PlusOutlined />
-                      <div
-                        style={{
-                          marginTop: 8,
-                        }}
-                      >
-                        Upload
-                      </div>
-                    </button>
-                  </Upload>
+                  <UploadComponent setInforPageDetail={setInforPageDetail} InforPageDetail={InforPageDetail} valueImge={InforPageDetail?.image_qc_3} amount={1} valueName="image_qc_3" />
                 </Form.Item>
 
                 <Form.Item
                   label="Link quảng cáo 3"
-                  name="name"
+                  name="link_qc_3"
                   rules={[
                     {
                       required: true,
@@ -650,54 +515,24 @@ export default function InforPageAdmin() {
                   className="w-full text-center"
                 >
                   <Input
-                    // value={}
-                    // onChange={handleOnchangeDetails}
-                    name="name"
+                    value={InforPageDetail?.link_qc_3}
+                    onChange={handleOchangeInforTitleDetail}
+                    name="link_qc_3"
                   />
                 </Form.Item>
               </div>
 
               <div className="block w-full md:flex ">
-                <Form.Item
+              <Form.Item
                   label="Ảnh quảng cáo 4"
-                  valuePropName="fileList"
-                  getValueFromEvent={normFile}
                   className="w-full"
                 >
-                  <Upload
-                    action="/upload.do"
-                    listType="picture-card"
-                    beforeUpload={(file) => {
-                      // Kiểm tra nếu đã có một file trong fileList thì không cho phép tải lên nữa
-                      if (fileList && fileList.length >= 1) {
-                        message.error("Chỉ được tải lên một ảnh");
-                        return false;
-                      }
-                      return true;
-                    }}
-                  >
-                    <button
-                      style={{
-                        border: 0,
-                        background: "none",
-                      }}
-                      type="button"
-                    >
-                      <PlusOutlined />
-                      <div
-                        style={{
-                          marginTop: 8,
-                        }}
-                      >
-                        Upload
-                      </div>
-                    </button>
-                  </Upload>
+                  <UploadComponent setInforPageDetail={setInforPageDetail} InforPageDetail={InforPageDetail} valueImge={InforPageDetail?.image_qc_4} amount={1} valueName="image_qc_4" />
                 </Form.Item>
 
                 <Form.Item
                   label="Link quảng cáo 4"
-                  name="name"
+                  name="link_qc_4"
                   rules={[
                     {
                       required: true,
@@ -707,43 +542,24 @@ export default function InforPageAdmin() {
                   className="w-full text-center"
                 >
                   <Input
-                    // value={}
-                    // onChange={handleOnchangeDetails}
-                    name="name"
+                    value={InforPageDetail?.link_qc_4}
+                    onChange={handleOchangeInforTitleDetail}
+                    name="link_qc_4"
                   />
                 </Form.Item>
               </div>
 
               <div className="block w-full md:flex ">
-                <Form.Item
+              <Form.Item
                   label="Ảnh quảng cáo 5"
-                  valuePropName="fileList"
-                  getValueFromEvent={normFile}
                   className="w-full"
                 >
-                  <Upload action="/upload.do" listType="picture-card">
-                    <button
-                      style={{
-                        border: 0,
-                        background: "none",
-                      }}
-                      type="button"
-                    >
-                      <PlusOutlined />
-                      <div
-                        style={{
-                          marginTop: 8,
-                        }}
-                      >
-                        Upload
-                      </div>
-                    </button>
-                  </Upload>
+                  <UploadComponent setInforPageDetail={setInforPageDetail} InforPageDetail={InforPageDetail} valueImge={InforPageDetail?.image_qc_5} amount={1} valueName="image_qc_5" />
                 </Form.Item>
 
                 <Form.Item
                   label="Link quảng cáo 5"
-                  name="name"
+                  name="link_qc_5"
                   rules={[
                     {
                       required: true,
@@ -753,9 +569,9 @@ export default function InforPageAdmin() {
                   className="w-full text-center"
                 >
                   <Input
-                    // value={}
-                    // onChange={handleOnchangeDetails}
-                    name="name"
+                    value={InforPageDetail?.link_qc_5}
+                    onChange={handleOchangeInforTitleDetail}
+                    name="link_qc_5"
                   />
                 </Form.Item>
               </div>
@@ -764,8 +580,12 @@ export default function InforPageAdmin() {
             <div className="flex justify-between">
               <div></div>
               <div>
-                <Button type="primary" size="large">
-                  Thêm
+                <Button
+                  type="primary"
+                  size="large"
+                  onClick={handleButtonUpdateInforTitle}
+                >
+                  Cập Nhập
                 </Button>
               </div>
             </div>

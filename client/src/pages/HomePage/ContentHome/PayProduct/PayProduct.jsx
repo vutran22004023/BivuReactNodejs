@@ -24,6 +24,7 @@ import {
 } from "../../../../components/MessageComponents/Message.jsx";
 import IsLoadingComponent from "../../../../components/LoadComponent/Loading.jsx";
 import { Steps, theme, Radio, Space } from "antd";
+import GoogleMapComponent from '../../../../components/GoogleMapComponent/GoogleMap.jsx'
 export default function PayProduct() {
   const [value, setValue] = useState();
   const [valueRadio, setValueRadio] = useState();
@@ -751,6 +752,7 @@ export default function PayProduct() {
                 </div>
               </FormLabel>
             </div>
+            <GoogleMapComponent  stateUserDetail= {stateUserDetail}/>
           </IsLoadingComponent>
         </ModalComponent>
       </div>

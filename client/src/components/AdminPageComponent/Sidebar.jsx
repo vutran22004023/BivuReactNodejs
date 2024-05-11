@@ -52,7 +52,7 @@ function Toggler({ defaultExpanded = false, renderToggle, children }) {
 export default function Sidebar() {
   const user = useSelector((state) => state.user);
   const navigate = useNavigate()
-  const [selectedIndex, setSelectedIndex] = React.useState('san-pham');
+  const [selectedIndex, setSelectedIndex] = useState('san-pham');
 
   const handleListItemClick = (event, index) => {
     switch (index) {
@@ -64,6 +64,10 @@ export default function Sidebar() {
         setSelectedIndex(index);
         navigate('/admin/nguoi-dung');
         break;
+        case 'thong-tin':
+          setSelectedIndex(index);
+          navigate('/admin/thong-tin');
+          break;  
     }
     }
 
@@ -81,6 +85,7 @@ export default function Sidebar() {
         height: '100dvh',
         width: 'var(--Sidebar-width)',
         top: 0,
+        bottom: 0,
         p: 2,
         flexShrink: 0,
         display: 'flex',
@@ -164,6 +169,15 @@ export default function Sidebar() {
               </ListItemContent>
             </ListItemButton>
           </ListItem>
+          <ListItem>
+            <ListItemButton selected={selectedIndex === 'thong-tin'}
+            onClick={(event) => handleListItemClick(event, 'thong-tin')}>
+              <ShoppingCartRoundedIcon />
+              <ListItemContent>
+                <Typography level="title-sm">Thông tin Page</Typography>
+              </ListItemContent>
+            </ListItemButton>
+          </ListItem>
 
           <ListItem>
             <ListItemButton selected={selectedIndex === 'san-pham'}
@@ -179,7 +193,7 @@ export default function Sidebar() {
             onClick={(event) => handleListItemClick(event, 'nguoi-dung')}>
                 <GroupRoundedIcon />
               <ListItemContent>
-              <Typography level="title-sm">Users</Typography>
+              <Typography level="title-sm">Người dùng</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>

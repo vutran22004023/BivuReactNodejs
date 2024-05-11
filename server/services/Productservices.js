@@ -148,7 +148,6 @@ const getDetailProduct = async(id) => {
           message: `Show thông tin của id: ${checkProduct.id}`,
           data: {
             ...checkProduct._doc,
-            password: 'Not password'
           }
         };
       } catch (error) {

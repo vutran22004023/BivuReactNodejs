@@ -12,6 +12,8 @@ const UploadImage = ({
   valueName,
 }) => {
   const [dataImage, setDataImage] = useState([]);
+  const [previewImage, setPreviewImage] = useState('');
+  const [previewOpen, setPreviewOpen] = useState(false);
   const handleChange = async (file) => {
     try {
       const uploadedURLs = [];
@@ -39,11 +41,11 @@ const UploadImage = ({
 
   
   const handlePreview = async (file) => {
-    // if (!file.url && !file.preview) {
-    //   file.preview = await getBase64(file.originFileObj);
-    // }
-    setPreviewImage(file.thumbUrl);
-    setPreviewVisible(true);
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+    setPreviewImage(file.url || file.preview);
+    setPreviewOpen(true);
   };
   const handleRemoveImage = async (file) => {
     try {
@@ -52,15 +54,46 @@ const UploadImage = ({
         (image) => image !== file.url,
       );
       setInforPageDetail({ ...InforPageDetail, [valueName]: newImages });
-
-      console.log("Image deleted successfully");
     } catch (error) {
       console.error("Error deleting image: ", error);
     }
   };
 
+  const handleReplaceImage = async (index) => {
+    try {
+      const file = await selectImageFromUser(); // Tạo hàm này để người dùng chọn ảnh mới từ máy tính của họ
+      const uploadedURLs = [...valueImge];
+      const replacedImgRef = ref(imgDB, `Logo/${v4()}`);
+      const uploadTaskSnapshot = await uploadBytes(replacedImgRef, file);
+      const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
+      uploadedURLs[index] = downloadURL;
+      setInforPageDetail({ ...InforPageDetail, [valueName]: uploadedURLs });
+    } catch (error) {
+      console.error("Error replacing image: ", error);
+      message.error("Failed to replace image");
+    }
+  };
+
+  const selectImageFromUser = () => {
+    return new Promise((resolve, reject) => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.onchange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          resolve(file);
+        } else {
+          reject(new Error("No file selected"));
+        }
+      };
+      input.click();
+    });
+  };
+
 
   return (
+    <>
     <Upload
       listType="picture-card"
       fileList={
@@ -94,7 +127,30 @@ const UploadImage = ({
         </button>
       )}
     </Upload>
+    {previewImage && (
+        <Image
+          wrapperStyle={{ display: 'none' }}
+          preview={{
+            visible: previewOpen,
+            onVisibleChange: (visible) => setPreviewOpen(visible),
+            afterOpenChange: (visible) => !visible && setPreviewImage(''),
+          }}
+          src={previewImage}
+        />
+      )}
+      {valueImge.map((url, index) => (
+        <Button
+          key={index}
+          onClick={() => handleReplaceImage(index)} // chỉ truyền index
+          style={{ marginTop: 8 }}
+        >
+          Chỉnh sửa lại ảnh số {index+1}
+        </Button>
+      ))}  
+      </>
   );
+  
 };
+
 
 export default React.memo(UploadImage);

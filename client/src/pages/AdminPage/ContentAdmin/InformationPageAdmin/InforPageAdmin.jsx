@@ -16,25 +16,9 @@ import {
   error,
   warning,
 } from "../../../../components/MessageComponents/Message.jsx";
-import { imgDB, txtDB } from "../../../../Firebase/config.jsx";
-import { v4 } from "uuid";
-import {
-  getDownloadURL,
-  ref,
-  uploadBytes,
-  deleteObject,
-  getStorage,
-} from "firebase/storage";
 import UploadComponent from '../../../../components/UploadComponent/UploadComponent.jsx'
+import UploadImgManyComponent from '../../../../components/UploadComponent/UploadImgManyComponent.jsx'
 export default function InforPageAdmin() {
-  const normFile = (e) => {
-    if (Array.isArray(e)) {
-      console.log(e);
-      return e;
-    }
-    return e?.fileList;
-  };
-
   const inittial = () => ({
     namePage: "",
     description: "",
@@ -62,6 +46,7 @@ export default function InforPageAdmin() {
     link_qc_5: "",
   });
   const [InforPageDetail, setInforPageDetail] = useState(inittial);
+  console.log(InforPageDetail)
   // const [InforPage, setInforPage] = useState(inittial)
 
   // const handleOchangeInforTitle = (e) => {
@@ -406,6 +391,74 @@ export default function InforPageAdmin() {
                 <UploadComponent setInforPageDetail={setInforPageDetail} InforPageDetail={InforPageDetail} valueImge={InforPageDetail?.logo_1} amount={1} valueName="logo_1" />
               </Form.Item>
             </Form>
+            <div className="flex justify-between">
+              <div></div>
+              <div>
+                <Button
+                  type="primary"
+                  size="large"
+                  onClick={handleButtonUpdateInforTitle}
+                >
+                  Cập Nhập
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Box>
+
+        <Box className="mt-5 block md:flex">
+          <div className="w-full rounded-lg border-[1px] border-slate-400 p-5">
+            <Typography level="h4" component="h1" sx={{ marginBottom: "10px" }}>
+              Thông tin Slider
+            </Typography>
+            <Form
+              initialValues={{
+                remember: true,
+              }}
+              // labelCol={{
+              //   span: 6,
+              // }}
+              // wrapperCol={{
+              //   span: 18,
+              // }}
+              // onFinish={onFinish}
+              // onFinishFailed={onFinishFailed}
+              form={form}
+            >
+              <div className="block w-full md:flex ">
+                <Form.Item
+                  label={<div className="block">
+                    <div>Ảnh slider</div>
+                    <div className="text-[red]">(Tối đa 8 ảnh)</div>
+                  </div> 
+                  }
+                  className="w-full"
+                >
+                  <UploadImgManyComponent setInforPageDetail={setInforPageDetail} InforPageDetail={InforPageDetail} valueImge={InforPageDetail?.image_slider} amount={8} valueName="image_slider" />
+                </Form.Item>
+                <Form.Item
+                  label={<div className="block">
+                    <div>Ảnh kế bên phải Slider</div>
+                    <div className="text-[red]">(Tối đa 2 ảnh)</div>
+                  </div> 
+                  }
+                  className="w-full"
+                >
+                  <UploadImgManyComponent setInforPageDetail={setInforPageDetail} InforPageDetail={InforPageDetail} valueImge={InforPageDetail?.image_right} amount={2} valueName="image_right" />
+                </Form.Item>
+                <Form.Item
+                  label={<div className="block">
+                    <div>Ảnh bên dưới Slider</div>
+                    <div className="text-[red]">(Tối đa 3 ảnh)</div>
+                  </div> 
+                  }
+                  className="w-full"
+                >
+                  <UploadImgManyComponent setInforPageDetail={setInforPageDetail} InforPageDetail={InforPageDetail} valueImge={InforPageDetail?.image_bottom} amount={3} valueName="image_bottom" />
+                </Form.Item>
+            </div>
+            </Form>
+
             <div className="flex justify-between">
               <div></div>
               <div>

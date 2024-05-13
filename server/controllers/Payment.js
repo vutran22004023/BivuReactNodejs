@@ -15,10 +15,11 @@ const payos = new PayOS(
 const createLinkPayOs = async(req, res) => {
   const {oderItem,fullName,address,phone,paymentMethod,itemsPrice,shippingPrice,totalPrice,user,email} = req.body
   const transID = Math.floor(Math.random() * 1000000000);
+  console.log(oderItem)
   const items = oderItem.map(item => ({
     name: item.name,
     quantity: item.amount,
-    price: item.price
+    price: parseFloat(item.price)
   }));
   const order = {
     orderCode: transID,

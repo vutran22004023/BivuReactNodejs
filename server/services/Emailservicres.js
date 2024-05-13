@@ -1,9 +1,16 @@
 import nodemailer from 'nodemailer';
 import * as dotenv from "dotenv";
 dotenv.config();
-
+ const convertPrice = (price) => {
+    try {
+      const result = price?.toLocaleString().replaceAll(',','.')
+      return `${result} VND`
+    }catch(e) {
+      return null;
+    }
+}
 const sendEmailCreateOrder = async (newOrder) => {
-    const { oderItem, totalPrice, fullName, address, city, phone, email } = newOrder;
+    const { oderItem, totalPrice, fullName, address, city, phone, email,shippingPrice } = newOrder;
     // Tạo HTML cho email
     let htmlContent = `
         <div>
@@ -30,9 +37,9 @@ const sendEmailCreateOrder = async (newOrder) => {
             <tr>
                 <td>${index + 1}</td>
                 <td>${item.name}</td>
-                <td>${item.price}</td>
+                <td>${convertPrice(item.price)}</td>
                 <td>${item.amount}</td>
-                <td>${item.price * item.amount}</td>
+                <td>${convertPrice(item.price * item.amount)}</td>
             </tr>`;
     });
 
@@ -40,9 +47,13 @@ const sendEmailCreateOrder = async (newOrder) => {
     htmlContent += `
                 </tbody>
                 <tfoot>
+                <tr>
+                        <td colspan="4" align="right"><strong>Phí ship:</strong></td>
+                        <td>${convertPrice(shippingPrice)}</td>
+                </tr>
                     <tr>
                         <td colspan="4" align="right"><strong>Tổng Số Tiền:</strong></td>
-                        <td>${totalPrice}</td>
+                        <td>${convertPrice(totalPrice)}</td>
                     </tr>
                 </tfoot>
             </table>

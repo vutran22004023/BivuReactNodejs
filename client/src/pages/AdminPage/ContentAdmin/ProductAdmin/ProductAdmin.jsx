@@ -661,19 +661,20 @@ const saveData = () => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState();
 
+
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
     }
-    setPreviewImage(file.url || file || file.preview);
-    setPreviewVisible(true);
+    setPreviewImage(file.url || file.preview);
+    setPreviewOpen(true);
   };
 
   const handlePreviewDetail = async (file) => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
     }
-    setPreviewImage(file.url || file);
+    setPreviewImage(file.url || file.preview);
     setPreviewOpen(true);
   };
 
@@ -762,6 +763,54 @@ const saveData = () => {
     } catch (error) {
       console.error("Error deleting image: ", error);
     }
+  };
+
+  const handleReplaceImage = async (index) => {
+    try {
+      const file = await selectImageFromUser(); // Tạo hàm này để người dùng chọn ảnh mới từ máy tính của họ
+      const uploadedURLs = [...stateProduct?.image];
+      const replacedImgRef = ref(imgDB, `Logo/${v4()}`);
+      const uploadTaskSnapshot = await uploadBytes(replacedImgRef, file);
+      const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
+      uploadedURLs[index] = downloadURL;
+      setStateProduct({ ...stateProduct, image: uploadedURLs });
+    } catch (error) {
+      console.error("Error replacing image: ", error);
+      message.error("Failed to replace image");
+    }
+  };
+
+  const handleReplaceImageDetail = async (index) => {
+    try {
+      const file = await selectImageFromUser(); // Tạo hàm này để người dùng chọn ảnh mới từ máy tính của họ
+      const uploadedURLs = [...stateProductDetail?.image];
+      console.log(uploadedURLs)
+      const replacedImgRef = ref(imgDB, `Logo/${v4()}`);
+      const uploadTaskSnapshot = await uploadBytes(replacedImgRef, file);
+      const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);
+      uploadedURLs[index] = downloadURL;
+      setStateProductDetail({ ...stateProductDetail, image: uploadedURLs });
+    } catch (error) {
+      console.error("Error replacing image: ", error);
+      message.error("Failed to replace image");
+    }
+  };
+
+  const selectImageFromUser = () => {
+    return new Promise((resolve, reject) => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.onchange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          resolve(file);
+        } else {
+          reject(new Error("No file selected"));
+        }
+      };
+      input.click();
+    });
   };
 
 
@@ -1157,6 +1206,16 @@ const saveData = () => {
                     src={previewImage}
                   />
                 )}
+
+                {stateProduct?.image.map((url, index) => (
+        <Button
+          key={index}
+          onClick={() => handleReplaceImage(index)} // chỉ truyền index
+          style={{ marginTop: 8 }}
+        >
+          Chỉnh sửa lại ảnh số {index+1}
+        </Button>
+      ))} 
               </Form.Item>
 
               <Form.Item>
@@ -1521,6 +1580,15 @@ const saveData = () => {
                     src={previewImage}
                   />
                 )}
+                {stateProductDetail?.image.map((url, index) => (
+        <Button
+          key={index}
+          onClick={() => handleReplaceImageDetail(index)} // chỉ truyền index
+          style={{ marginTop: 8 }}
+        >
+          Chỉnh sửa lại ảnh số {index+1}
+        </Button>
+      ))}  
               </Form.Item>
 
               <Form.Item>

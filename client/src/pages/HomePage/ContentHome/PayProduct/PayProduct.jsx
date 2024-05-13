@@ -374,7 +374,12 @@ export default function PayProduct() {
                     </div>
                   </div>
 
-                  <div className="w-5 flex-auto">Sản phẩm</div>
+                  <div className="w-5 flex-auto">
+                  <div className="" style={{ display: item.category ? 'block' : 'none' }}>
+                    <div>Phân Loại hàng</div>
+                    <div>{item.category}</div>
+              </div>
+                  </div>
                   <div className="flex">
                     <div className="w-20 flex-auto md:w-40">
                       {convertPrice(item?.price)}

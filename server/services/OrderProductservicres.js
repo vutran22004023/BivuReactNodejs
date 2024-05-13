@@ -7,16 +7,19 @@ const createOrderProductservices = async (newOrder) => {
         const promises = oderItem.map(async(order) => {
             const productData = await ProductModel.findOneAndUpdate(
                 {
-                    _id: order.product,
-                    counInStock: { $gte: order.amount }
+                    name: order.name,
+                    'categorySize.counInStock': { $gte: order.amount } 
                 },
                 {
                     $inc: {
-                        counInStock: -order.amount,
+                        "categorySize.$[elem].counInStock": -order.amount,
                         selled: +order.amount 
                     }
                 },
-                { new: true }
+                { 
+                    arrayFilters: [{ "elem.size": order.category }],
+                    new: true // Trả về document sau khi cập nhật
+                }
             );
             if(productData) {
                 const createProduct = await OrderProductModel.create({

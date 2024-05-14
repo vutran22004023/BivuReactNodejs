@@ -32,6 +32,8 @@ import {
   error,
   warning,
 } from "../../components/MessageComponents/Message";
+import LikeButtonFbComponent from '../LikeButtonFbComponent/LikeButtonFb'
+import CommentFbComponent from '../CommentFbComponent/CommentFb'
 export const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;
   return (
@@ -280,6 +282,7 @@ export default function ProductDetail({ idProduct }) {
                 </div>
               </div>
             </WapperStyleAddressProduct>
+            <LikeButtonFbComponent dataHref="https://developers.facebook.com/docs/plugins/"/>
           </WapperStyleBlockProductBottom>
 
           <WapperStyleBlockProductBottom>
@@ -382,6 +385,7 @@ export default function ProductDetail({ idProduct }) {
             </div>
           </WapperStyleButtonAddProduct>
         </Col>
+        <CommentFbComponent dataHref="https://developers.facebook.com/docs/plugins/comments#configurator"/>
       </Row>
     </IsLoadingComponent>
   );

@@ -1,5 +1,15 @@
 import {OrderProductservices} from '../services/index.js'
 
+const getAllOrderProduct = async(req, res) => {
+    try {
+        const response = await OrderProductservices.getAllOrderProduct()
+        return res.status(200).json(response)
+    }catch (e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
 
 const createOrderProduct = async(req, res) => {
     try {
@@ -56,9 +66,31 @@ const getOrderDetailProduct =  async(req, res)=> {
         })
     }
 }
+const updateOrderProduct = async(req, res)=> {
+    try {
+        const uidorder = req.params.id
+        const data = req.body
+        if(!uidorder) {
+            return  {
+                status: 'ERR',
+                message: 'Không có id của đơn hàng này'
+            }
+        }
+
+        const response =  await OrderProductservices.updateOrderProduct(uidorder,data)
+        return res.status(200).json(response)
+    }catch(e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+
+}
 
 export default {
     createOrderProduct,
     getOrderDetail,
-    getOrderDetailProduct
+    getOrderDetailProduct,
+    getAllOrderProduct,
+    updateOrderProduct
 }

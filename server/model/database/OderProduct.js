@@ -18,6 +18,10 @@ const oderSchema =  new mongoose.Schema(
                     required: true,
                 }
             ],
+            category: 
+                {
+                    type: String,
+                },
             price: {
                 type: Number,
                 required: true,
@@ -62,6 +66,10 @@ const oderSchema =  new mongoose.Schema(
     totalPrice: {
         type: Number,
         required: true,
+    },
+    confirmation_Order: {
+        type: Boolean,
+        default:false,
     },
     user: {
         type:  mongoose.Schema.Types.ObjectId,

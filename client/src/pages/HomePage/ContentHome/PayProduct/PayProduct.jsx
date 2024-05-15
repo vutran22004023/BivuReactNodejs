@@ -13,7 +13,8 @@ import {
   ProvinceVn,
   UserService,
   OrderProduct,
-  PaymentService
+  PaymentService,
+  GhtkService
 } from "../../../../services/index";
 import { useQuery } from "@tanstack/react-query";
 import { useMutationHooks } from "../../../../hooks/UseMutationHook";
@@ -23,10 +24,12 @@ import {
   warning,
 } from "../../../../components/MessageComponents/Message.jsx";
 import IsLoadingComponent from "../../../../components/LoadComponent/Loading.jsx";
-import { Steps, theme, Radio, Space } from "antd";
+import { Steps, theme, Radio, Space, Input,Form } from "antd";
+const { TextArea } = Input;
 import GoogleMapComponent from '../../../../components/GoogleMapComponent/GoogleMap.jsx'
 export default function PayProduct() {
-  const [value, setValue] = useState();
+  const [value, setValue] = useState(null);
+  const [valueRadioShip, setValueRadioShip] = useState();
   const [valueRadio, setValueRadio] = useState();
   const order = useSelector((state) => state.order);
   const user = useSelector((state) => state.user);
@@ -34,6 +37,10 @@ export default function PayProduct() {
   const [SleectDistrict, setSleectDistrict] = useState("");
   const [SleectRard, setSleectRard] = useState("");
   const [isModalUpdateInfo, setIsOpenModalUpdateInfo] = useState(false);
+  const [isModalTransition, setIsOpenModalTransition] = useState(false)
+  const handleButtonTransport = () => {
+    setIsOpenModalTransition(true)
+  }
   const [stateUserDetail, setStateUserDetail] = useState({
     name: "",
     phone: "",
@@ -45,8 +52,8 @@ export default function PayProduct() {
     nameDistrict: "",
     nameRard: "",
     specific_address: "",
+    note_customers: "",
   });
-
   const handleOpenModal = () => {
     setIsOpenModalUpdateInfo(true);
     if (user) {
@@ -117,6 +124,7 @@ export default function PayProduct() {
         shippingPrice: diliveryPriceMemo,
         totalPrice: TotalpriceMemo,
         user: user?.id,
+        note_customers:stateUserDetail.note_customers
       });
 
       if(valueRadio === "Thanh toán khi nhận hàng") {
@@ -208,6 +216,20 @@ export default function PayProduct() {
   }
   });
 
+  const mutationGHTKshippingfeecharged = useMutationHooks(async() =>{
+    const address = user.address
+   const province= user.nameCity
+   const district= user.nameDistrict
+   const pick_province="Đà Nẵng"
+   const pick_district="Quận Liên Chiểu"
+    const value = priceMemo
+  const res = await GhtkService.shippingfeecharged(address,province,district,pick_province,pick_district,value)
+    return res
+  })
+  useEffect(() =>{
+    mutationGHTKshippingfeecharged.mutate()
+  },[user.address,user.nameCity,user.nameDistrict])
+
   useEffect(() => {
     if (stateUserDetail?.city) {
       fetchDetailDistrict.mutate(stateUserDetail?.city);
@@ -226,8 +248,9 @@ export default function PayProduct() {
   });
   const { data: getDetailAllDistrict } = fetchDetailDistrict;
   const { data: getDetailAllRard } = fetchDetailRard;
-  const { data: UsersUpdateDetail, isLoading: isLoadingUpdateUserDetail } =
-    mutationUpdate;
+  const {data: showfeeShip} = mutationGHTKshippingfeecharged;
+  console.log(showfeeShip)
+  const { data: UsersUpdateDetail, isLoading: isLoadingUpdateUserDetail } =mutationUpdate;
   const { data: orderProductPay, isLoading: isLoadingAddOrder } =
     mutationOrderProduct;
   const {data: payQR} =mutationPayQR
@@ -302,13 +325,13 @@ export default function PayProduct() {
   }, [order]);
 
   const diliveryPriceMemo = useMemo(() => {
-    if (priceMemo > 100000) {
-      return 35000;
-    } else if (priceMemo) {
-      return 20000;
+    if (valueRadioShip === 'shop_giao') {
+      return 15000;
+    } else {
+      return parseInt(valueRadioShip);
     }
     return 0;
-  }, [priceMemo]);
+  }, [valueRadioShip]);
 
   const TotalpriceMemo = useMemo(() => {
     return priceMemo + diliveryPriceMemo;
@@ -327,7 +350,14 @@ export default function PayProduct() {
       setValueRadio('Thanh toán Zalopay')
     }
   }, [value])
+  const onchangeRadioShip= (e) => {
+    setValueRadioShip(e.target.value)
+  }
 
+  const handleConfirmRadio =() => {
+    setValueRadioShip(valueRadioShip)
+    setIsOpenModalTransition(false)
+  }
 
   const steps = [
     {
@@ -396,20 +426,65 @@ export default function PayProduct() {
 
           <div className=" flex border-[1px] border-slate-400 bg-[#e9d5d5]">
             <div className="w-[600px] border-[1px] border-slate-400 p-5">
-              <span className="">Lời nhắn: </span>
-              <input />
+            <Form>
+              <Form.Item name="note_customers" label="Lời nhắn">
+              <TextArea value={stateUserDetail.note_customers} onChange={handleOnchangeDetails} name="note_customers" rows={3} placeholder="Nhập lời nhắn với shop" />
+              </Form.Item>
+            </Form>
             </div>
             <div className="w-full border-[1px] border-slate-400 p-5">
-              <div className="mr-4 flex justify-between">
+              {valueRadioShip === 'shop_giao' ? (
+                <div className="mr-4 flex justify-between">
                 <div className="text-[15px]">Đơn vị vận chuyển: </div>
                 <div>
-                  <p>Nhanh</p>
+                  <p>Được vận chuyển bởi shop</p>
                   <p>Đảm bảo nhận hàng từ 22 Tháng 4 - 23 Tháng 4</p>
                 </div>
-                <div>Thay đổi</div>
+                <div onClick={handleButtonTransport} className="cursor-pointer">Thay đổi</div>
                 <div>{convertPrice(diliveryPriceMemo)}</div>
               </div>
+              ) : (
+                <div className="mr-4 flex justify-between">
+                <div className="text-[15px]">Đơn vị vận chuyển: </div>
+                <div>
+                  <p>Tiêu chuẩn</p>
+                  <p>Giao hàng tiết kiệm</p>
+                  <div >Lưu ý: <span>Tiền ship được tính theo Kg hiện tại sản phẩm của shop chưa cập nhập khối lượng của sản phẩm nên shop để mặc định 1kg(0,5kg tiếp theo = +5.000),sau khi các bạn mua sản phẩm của shop sẽ liên hệ lại bạn để báo giá tiền ship. (Mong các bạn thông cảm cho sự bất tiện này)</span></div>
+                </div>
+                <div onClick={handleButtonTransport} className="cursor-pointer">Thay đổi</div>
+                <div>{convertPrice(diliveryPriceMemo)}</div>
+              </div>
+              )}
             </div>
+            <ModalComponent 
+            title="Cập nhập phương thức vận chuyển"
+            isOpen={isModalTransition}
+            onOk={handleConfirmRadio}
+            onCancel={() => setIsOpenModalTransition(false)}
+            okText="Cập nhập"
+            cancelText="Thoát"
+            >
+            <Radio.Group onChange={onchangeRadioShip} value={valueRadioShip}>
+      <Space direction="vertical">
+      {stateUserDetail?.nameCity === "Thành phố Đà Nẵng" && (
+        <Radio value="shop_giao">
+          <div className="flex justify-between w-full">
+          <div>Được vận chuyển bởi shop</div>
+          <div className="text-right" style={{position: "absolute", right:'0',marginRight:'30px'}}>{convertPrice(15000)}</div>
+          </div>
+          <div>Được áp dụng cho đơn hàng vận chuyện ở Tp Đà Nẵng</div>
+        </Radio>
+      )}
+        <Radio value={showfeeShip?.fee?.ship_fee_only}>
+        <div className="flex justify-between w-full">
+          <div>Được vận chuyển bởi Giao Hàng Tiết Kiệm</div>
+          <div className="text-right" style={{position: "absolute", right:'0',marginRight:'30px'}}>{convertPrice(showfeeShip?.fee?.ship_fee_only)}</div>
+          </div>
+          <div>Lưu ý: <span>Tiền ship được tính theo Kg hiện tại sản phẩm của shop chưa cập nhập khối lượng của sản phẩm nên shop để mặc định 1kg(0,5kg tiếp theo = +5.000),sau khi các bạn mua sản phẩm của shop sẽ liên hệ lại bạn để báo giá tiền ship. (Mong các bạn thông cảm cho sự bất tiện này)</span></div>
+        </Radio>
+      </Space>
+    </Radio.Group>        
+            </ModalComponent>
           </div>
           <div className="w-full bg-[#e9d5d5] p-5">
             <div className=" mr-5 flex" style={{ justifyContent: "right" }}>
@@ -441,6 +516,15 @@ export default function PayProduct() {
       ),
     },
   ];
+
+  useEffect(() => {
+    if (stateUserDetail?.nameCity === "Thành phố Đà Nẵng") {
+      setValueRadioShip("shop_giao");
+    } else {
+      setValueRadioShip(showfeeShip?.fee?.ship_fee_only);
+    }
+  }, [stateUserDetail, showfeeShip]);
+
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
   const next = () => {

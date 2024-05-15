@@ -35,18 +35,6 @@ export default function PrderProduct() {
   const handleCancelModal = () =>  {
     setOpenModal(false)
 }
-  const [valueOrderDetail, setValueOrderDetail] = useState({
-    confirmation_Order: '',
-    isDelivered: '',
-    isPaid: '',
-    itemsPrice: '',
-    oderItems: [],
-    paymentMethod: '',
-    shippingAddress: [],
-    shippingPrice: '',
-    totalPrice: ''
-  })
-
   const user = useSelector((state) => state.user);
   const fetchOrderProduct = async () => {
     const access_Token =  user.access_Token.split("=")[1];
@@ -70,13 +58,25 @@ export default function PrderProduct() {
   const queryUser = useQuery({queryKey: ['OrderProduct'], queryFn: fetchOrderProduct, retryDelay: 1000, staleTime: 1000});
   const {data: getOrderDetailProduct, isLoading: isLoadingOrderDetailProduct} = mutationsGetDetailOrderProduct
   const {data: getAllOrderProduct} = queryUser
-  const RowconFirmationOrder = () => (
-    <Button onClick={handleButtonComfirOrder}>Xác nhận đơn hàng</Button>
-  )
+
+  const RowconFirmationOrder = (record) => {
+    if (record.confirmation_Order === false) {
+      return <Button  sx={{backgroundColor: 'red',
+      '&:hover': {
+        backgroundColor: 'darkred', // Thay đổi màu khi hover
+      },}} onClick={handleButtonComfirOrder}>Xác nhận đơn hàng</Button>;
+    }else if(record.confirmation_Order === true){
+      return <Button  sx={{backgroundColor: '#3adc48',
+      '&:hover': {
+        backgroundColor: '#24b532', // Thay đổi màu khi hover
+      },}}   onClick={handleButtonComfirOrder}>Đã xác nhận đơn hàng</Button>;
+    }
+    return null;
+  };
 
   const handleButtonComfirOrder = () => {
-      setOpenModal(true)
       mutationsGetDetailOrderProduct.mutate(RowSelected)
+      setOpenModal(true)
   }
 
   const handleOkUploadOrder = ()=> {
@@ -187,9 +187,45 @@ export default function PrderProduct() {
       render: (text) => `${text} VND`
     },
     {
+      title:'Trạng thái thanh toán ',
+      dataIndex: 'isPaid',
+      render: (text) => {
+        const isPaid = text === true;
+        return (
+          <span
+            style={{
+              color: isPaid ? '#3adc48' : 'red',
+              fontWeight: 500
+            }}
+          >
+            {isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}
+          </span>
+        );
+      },
+    },
+    {
+      title:'Trạng thái Giao hàng ',
+      dataIndex: 'isDelivered',
+      render: (text) => {
+        const isDelivered = text === true;
+        return (
+          <span
+            style={{
+              color: isDelivered ? '#3adc48' : 'red',
+              fontWeight: 500
+            }}
+          >
+            {isDelivered ? 'Đã giao hàng' : 'Chưa giao hàng'}
+          </span>
+        );
+      },
+    },
+    {
       title: 'Xác Nhận đơn hàng',
-      dataIndex: 'action',
-      render: RowconFirmationOrder 
+      key: 'operation',
+      fixed: 'right',
+      width: 150,
+      render: (text, record) => RowconFirmationOrder(record),
     },
     // {
     //   title: 'Action',
@@ -280,6 +316,9 @@ export default function PrderProduct() {
       // totalPages={Users?.totalPage}
       columns= {columns} 
       // handleDeleteMany= {handleDeleteMany}
+      scroll={{
+      x: 1800,
+    }}
       expandable={{
       expandedRowRender: (record) => (
         <table className='text-center'>
@@ -333,6 +372,7 @@ export default function PrderProduct() {
     <p><strong>Người đặt:</strong> {getOrderDetailProduct?.data?.shippingAddress.fullName}</p>
     <p><strong>Địa chỉ:</strong> {getOrderDetailProduct?.data?.shippingAddress.address}</p>
     <p><strong>Số điện thoại:</strong> {getOrderDetailProduct?.data.shippingAddress.phone}</p>
+    <p><strong>Lời nhắn của khách hàng:</strong> {getOrderDetailProduct?.data.note_customers}</p>
     <p><strong>Ngày tạo:</strong> {new Date(getOrderDetailProduct?.data.createdAt).toLocaleString()}</p>
     <p><strong>Ngày cập nhật:</strong> {new Date(getOrderDetailProduct?.data.updatedAt).toLocaleString()}</p>
     <p><strong>Trạng thái xác nhận:</strong> {getOrderDetailProduct?.data.confirmation_Order ? <span className='text-[#3adc37]'>Đã xác nhận</span> : <span className='text-[red]'>Chưa xác nhận</span>}</p>

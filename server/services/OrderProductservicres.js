@@ -21,7 +21,7 @@ const getAllOrderProduct = async () => {
 
 const createOrderProductservices = async (newOrder) => {
     try {
-        const {oderItem,paymentMethod,itemsPrice,shippingPrice, totalPrice,fullName, address, city, phone,user,email} =  newOrder
+        const {oderItem,paymentMethod,itemsPrice,shippingPrice, totalPrice,fullName, address, city, phone,user,email,note_customers} =  newOrder
         const promises = oderItem.map(async(order) => {
             const productData = await ProductModel.findOneAndUpdate(
                 {
@@ -52,6 +52,7 @@ const createOrderProductservices = async (newOrder) => {
                 itemsPrice,
                 shippingPrice,
                 totalPrice,
+                note_customers,
                 user
     
             })

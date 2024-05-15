@@ -71,6 +71,9 @@ const oderSchema =  new mongoose.Schema(
         type: Boolean,
         default:false,
     },
+    note_customers: {
+        type: String,
+    },
     user: {
         type:  mongoose.Schema.Types.ObjectId,
         ref: 'User',

@@ -6,6 +6,7 @@ import { userRouters, productRouters, orderRouters,informationPageRouters } from
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import {payMentController} from './controllers/index.js'
+import axios from "axios";
 const app = express();
 
 app.use(cors());
@@ -44,6 +45,20 @@ app.post ("/transaction-refund", payMentController.transactionRefund);
 
 app.post ("/transaction-refund-status", payMentController.transactionRefundStatus);
 // end thanh toán ZaloPay API
+
+app.get('/api/shipment/fee', async (req, res) => {
+  try {
+    const response = await axios.get('https://services.giaohangtietkiem.vn/services/shipment/fee', {
+      headers: {
+        'Token': `${process.env.TOKEN_GHTK}`,
+      },
+      params: req.query,
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
 
 const url = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.wu6bakk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 app.listen(port, async () => {

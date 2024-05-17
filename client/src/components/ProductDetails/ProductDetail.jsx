@@ -5,18 +5,13 @@ import { StarFilled, ShoppingCartOutlined } from "@ant-design/icons";
 import {
   WapperProductDetailImageSmall,
   WapperStyleAddressProduct,
-  WapperStyleCollImage,
   WapperStyleNameProduct,
   WapperStylePriceProduct,
   WapperStyleTextPriceProduct,
   WapperStyleBlockProduct,
   WapperStyleBlockProductBottom,
   WapperStyleButtonAddProduct,
-  WrapperContainerLeft,
-  WrapperContainerRight,
-  WrapperTextLight,
-  WrapperRadioGroup,
-  WrapperRadio,
+
 } from "./style";
 import { ProductService } from "../../services/index";
 import { useQuery } from "@tanstack/react-query";
@@ -34,6 +29,7 @@ import {
 } from "../../components/MessageComponents/Message";
 import LikeButtonFbComponent from '../LikeButtonFbComponent/LikeButtonFb'
 import CommentFbComponent from '../CommentFbComponent/CommentFb'
+import {useMutationHooks} from '../../hooks/UseMutationHook'
 export const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;
   return (
@@ -63,13 +59,18 @@ export default function ProductDetail({ idProduct }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [valueRadio, setValueRadio] = useState();
-  const [listChecked, setListChecked] = useState([]);
+  const [valColor, setValColor] = useState();
+  const [valueColor,setValueColor] = useState()
   const onChange = (value) => {
     setNumberProduct(value);
   };
   const onChangeRadio = (e) => {
     setValueRadio(e.target.value);
   };
+
+  const onChangeColor = (e) => {
+    setValColor(e.target.value)
+  }
   const settings1 = {
     nextArrow: <SampleNextArrow />,
     prevArrow: <SamplePrevArrow />,
@@ -99,12 +100,27 @@ export default function ProductDetail({ idProduct }) {
       return res.data;
     }
   };
+  const GetDetailsColor = useMutationHooks(async (id) => {
+    if (id) {
+      const res = await ProductService.getDetailColor(id);
+      return res.data;
+    }
+  });
+
 
   const { data: productDetail, isLoading: IsLoadingProductDetail } = useQuery({
     queryKey: ["products-detail", idProduct],
     queryFn: fetchGetDetailsProduct,
     enabled: !!idProduct,
   });
+  useEffect(() => {
+    const fetchColorDetails = async () => {
+      const colorDetailsPromises = productDetail.idColor.map((colorId) => GetDetailsColor.mutateAsync(colorId));
+      const colorDetails = await Promise.all(colorDetailsPromises);
+      setValueColor(colorDetails)
+    }
+    fetchColorDetails();
+  },[productDetail?.idColor?.length])
 
   const [valuePrice, setValuePrice] = useState();
 
@@ -129,6 +145,7 @@ export default function ProductDetail({ idProduct }) {
             image: productDetail?.image,
             price: valuePrice,
             category: valueRadio,
+            color:valColor,
             product: productDetail?.categorySize.find((sizeData) => sizeData.size === valueRadio)._id,
           },
         }),
@@ -142,6 +159,7 @@ export default function ProductDetail({ idProduct }) {
             image: productDetail?.image,
             price: valuePrice,
             category: valueRadio,
+            color:valColor,
             product: productDetail?._id,
           },
         }),
@@ -165,6 +183,7 @@ export default function ProductDetail({ idProduct }) {
               image: productDetail?.image,
               price: valuePrice,
               category: valueRadio,
+              color:valColor,
               product: productDetail?.categorySize.find((sizeData) => sizeData.size === valueRadio)._id,
             },
           }),
@@ -327,6 +346,36 @@ export default function ProductDetail({ idProduct }) {
                 {productDetail?.categorySize.map((sizeData) => (
                   <Radio value={sizeData.size}>{sizeData.size}</Radio>
                 ))}
+              </Radio.Group>
+            </div>
+            </>
+          ) : ""}
+
+          {valueColor?.length >= 1 ? (
+            <>
+            <div
+              style={{
+                fontSize: "14px",
+                fontStyle: "normal",
+                fontWeight: "600",
+                lineHeight: "150%",
+                margin: "0",
+              }}
+            >
+              Màu sắc
+            </div>
+            <div>
+              <Radio.Group onChange={onChangeColor} value={valColor}>
+                {valueColor?.map((colorData) => {
+                  return (
+                    <Radio value={colorData[0].color_name}>
+                      <div className="flex">
+                      <div style={{width:'20px', height:'20px', backgroundColor: colorData[0].hex, marginRight:'5px'}}></div>
+                      <div>{colorData[0].color_name}</div>
+                      </div>
+                    </Radio>
+                  )
+                })}
               </Radio.Group>
             </div>
             </>

@@ -16,7 +16,7 @@ const shippingfeecharged = async (
           district: district,
           pick_province: pick_province,
           pick_district: pick_district,
-          weight: 500,
+          weight: 1000,
           value: value,
           // deliver_option: "xteam",
         },

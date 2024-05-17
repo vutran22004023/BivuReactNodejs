@@ -1,6 +1,68 @@
 import { UserModel } from "../model/index.js";
 import bcrypt from "bcrypt";
 import {Jwtservicres}  from './index.js'
+
+
+function generateRandomPassword(length) {
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomPassword = '';
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * charset.length);
+    randomPassword += charset[randomIndex];
+  }
+  return randomPassword;
+}
+
+const loginUserGoogle = async (data) => {
+  try {
+    const { displayName, email, photoURL } = data;
+    const password = generateRandomPassword(15);
+    const checkUser = await UserModel.findOne({ email: email });
+
+    if (checkUser) {
+      const access_Token = await Jwtservicres.generateAccessToken({
+        id: checkUser._id,
+        isAdmin: checkUser.isAdmin,
+      });
+      const refresh_Token = await Jwtservicres.generateRefreshToken({
+        id: checkUser._id,
+        isAdmin: checkUser.isAdmin,
+      });
+      return {
+        status: 200,
+        message: 'Đăng nhập thành công',
+        id: checkUser._id,
+        access_Token,
+        refresh_Token,
+      };
+    } else {
+      const hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALT_ROUNDS));
+      const createdUser = await UserModel.create({
+        name: displayName,
+        email,
+        password: hashedPassword,
+        isAdmin: false,
+        avatar: photoURL,
+      });
+
+      if (createdUser) {
+        return {
+          status: 200,
+          message: 'Đăng ký thành công',
+          data: {
+            ...createdUser._doc,
+            password: 'not password',
+          },
+        };
+      } else {
+        throw new Error('Error creating user');
+      }
+    }
+  } catch (err) {
+    console.error('Error creating user:', err);
+    throw new Error('Tạo người dùng thất bại.');
+  }
+};
 const creactUsers = async (newUser) => {
   const { name, email, password, confirmPassword, phone } = newUser;
 
@@ -219,5 +281,6 @@ export default {
   deleteUser,
   getAllUser,
   getDetailsUser,
-  deleteUserMany
+  deleteUserMany,
+  loginUserGoogle
 };

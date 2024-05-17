@@ -141,9 +141,8 @@ export default function CartProduct() {
               <div className="ml-1">{item?.name}</div>
             </div>
             <div className="w-32 flex-auto">
-              <div className="text-left " style={{ display: item.category ? 'block' : 'none' }}>
-                <div>Phân Loại hàng</div>
-                <div>{item.category}</div>
+              <div className="text-left " style={{ display: item.category && item.color ? 'block' : 'none' }}>
+                <div>{item.category}, {item.color}</div>
               </div>
             </div>
             <div className="w-32 flex-auto">{convertPrice(item?.price)}</div> 

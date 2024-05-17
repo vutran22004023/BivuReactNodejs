@@ -67,6 +67,13 @@ const getAllColor= async () => {
 }
 
 
+const getDetailColor = async(id) => {
+    const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/color/detail/${id}`)
+    return res.data
+}
+
+
+
 
 export default {
     createProduct,
@@ -77,5 +84,6 @@ export default {
     DeleteManyProduct,
     getAllTypeProduct,
     getProductType,
-    getAllColor
+    getAllColor,
+    getDetailColor
 }

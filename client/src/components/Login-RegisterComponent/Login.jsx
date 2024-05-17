@@ -50,37 +50,38 @@ export default function Login() {
     });
   };
 
-  // // đăng nhập bằng google
-  // const [userGoogle, setUserGoogle] = useState()
-  // const auth= getAuth()
-  // const handleLoginWithGoogle = async () => {
-  //   const provider = new GoogleAuthProvider();
+  // đăng nhập bằng google
+  const [userGoogle, setUserGoogle] = useState()
+  const auth= getAuth()
+  const handleLoginWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
 
-  //   const res =  await signInWithPopup(auth, provider);
-  //   // console.log(res);
-  // }
+    const res =  await signInWithPopup(auth, provider);
+    setUserGoogle(res)
+  }
 
-  // useEffect(() => {
-  //   const unsubcribed = auth.onIdTokenChanged((user) => {
-  //     if(user?.uid) {
-  //       navigate("/");
-  //       // window.location.reload();
-  //       localStorage.setItem('access_Token', JSON.stringify(user?.accessToken))
-  //       document.cookie = `access_Token=${user?.accessToken}`;
-  //       setUserGoogle(user)
-  //     }
-  //     userGoogle({})
-  //     localStorage.clear()
-  //     document.cookie = `access_Token=`;
-  //   })
+  useEffect(() => {
+    const loginUserWithGoogle = async () => {
+      const res = await UserService.loginUserGoogle({
+        displayName: userGoogle?.user?.displayName,
+        email: userGoogle?.user?.email,
+        photoURL:userGoogle?.user?.photoURL
+      });
+      if(res) {
+      if (res?.status === 200) {
+          success();
+          window.location.reload();
+          navigate("/");
+          localStorage.setItem('access_Token', JSON.stringify(res?.access_Token))
+          document.cookie = `access_Token=${res?.access_Token}`;
+        }
+    }
+    }
+    loginUserWithGoogle()
+  },[userGoogle])
 
-  //   return () => {
-  //     unsubcribed()
-  //   }
-  // },[auth])
 
-  // console.log('userGoogle',userGoogle)
-
+  
 
 
     return (
@@ -135,7 +136,7 @@ export default function Login() {
           ></ButtonFrom>
           </IsLoadingComponent>
 
-          {/* <div style={{textAlign: 'center'}}>
+          <div style={{textAlign: 'center'}}>
             <h4>Hoặc</h4>
             <ButtonFrom
             size={40}
@@ -152,7 +153,7 @@ export default function Login() {
             textButton={"Đăng nhập với google"}
             onClick={handleLoginWithGoogle}
           ></ButtonFrom>
-          </div> */}
+          </div>
       </div>
 
     );

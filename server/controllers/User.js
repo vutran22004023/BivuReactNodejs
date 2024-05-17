@@ -1,5 +1,32 @@
 import {Userservices,Jwtservicres} from '../services/index.js'
 
+
+const loginUserGoogle = async(req, res) => {
+    try {
+        const { displayName, email, photoURL } = req.body;
+        if(!displayName|| !email || !photoURL) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'Chưa điền đầy đủ thông tin'
+            })
+        }
+        const response = await Userservices.loginUserGoogle(req.body);
+        const { refresh_Token, ...newResponse } = response;
+        if (refresh_Token) {
+          res.cookie('refresh_Token', refresh_Token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+          });
+        }
+        return res.status(response.status).json(newResponse);
+      } catch (e) {
+        console.error('Error handling login with Google:', e);
+        return res.status(500).json({
+          message: 'Tạo người dùng thất bại.',
+        });
+      }
+}    
 const creactUser = async (req, res) => {
     try{
         const {name, email,password, confirmPassword,phone} = req.body
@@ -203,5 +230,6 @@ export default {
     getDetailsUser,
     refreshToken,
     logoutUser,
-    deleteManyUser
+    deleteManyUser,
+    loginUserGoogle
 }

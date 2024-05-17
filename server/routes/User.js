@@ -8,6 +8,7 @@ const router = express.Router();
 //login 
 router.post('/sign-up', userController.creactUser)
 router.post('/sign-in', userController.loginUser)
+router.post('/sign-in-google', userController.loginUserGoogle)
 router.post('/log-out', userController.logoutUser)
 
 //User

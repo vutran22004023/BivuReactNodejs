@@ -30,6 +30,7 @@ import GoogleMapComponent from '../../../../components/GoogleMapComponent/Google
 export default function PayProduct() {
   const [value, setValue] = useState(null);
   const [valueRadioShip, setValueRadioShip] = useState();
+  const [valueRadioShipcomplete, setValueRadioShipcomplete] = useState();
   const [valueRadio, setValueRadio] = useState();
   const order = useSelector((state) => state.order);
   const user = useSelector((state) => state.user);
@@ -217,9 +218,9 @@ export default function PayProduct() {
   });
 
   const mutationGHTKshippingfeecharged = useMutationHooks(async() =>{
-    const address = user.address
-   const province= user.nameCity
-   const district= user.nameDistrict
+    const address = stateUserDetail.address
+   const province= stateUserDetail.nameCity
+   const district= stateUserDetail.nameDistrict
    const pick_province="Đà Nẵng"
    const pick_district="Quận Liên Chiểu"
     const value = priceMemo
@@ -228,7 +229,7 @@ export default function PayProduct() {
   })
   useEffect(() =>{
     mutationGHTKshippingfeecharged.mutate()
-  },[user.address,user.nameCity,user.nameDistrict])
+  },[stateUserDetail.address,stateUserDetail.nameCity,stateUserDetail.nameDistrict])
 
   useEffect(() => {
     if (stateUserDetail?.city) {
@@ -355,7 +356,7 @@ export default function PayProduct() {
   }
 
   const handleConfirmRadio =() => {
-    setValueRadioShip(valueRadioShip)
+    setValueRadioShipcomplete(valueRadioShip)
     setIsOpenModalTransition(false)
   }
 
@@ -405,9 +406,9 @@ export default function PayProduct() {
                   </div>
 
                   <div className="w-5 flex-auto">
-                  <div className="" style={{ display: item.category ? 'block' : 'none' }}>
+                  <div className="" style={{ display: item.category&& item.color ? 'block' : 'none' }}>
                     <div>Phân Loại hàng</div>
-                    <div>{item.category}</div>
+                    <div>{item.category}, {item.color}</div>
               </div>
                   </div>
                   <div className="flex">
@@ -433,7 +434,7 @@ export default function PayProduct() {
             </Form>
             </div>
             <div className="w-full border-[1px] border-slate-400 p-5">
-              {valueRadioShip === 'shop_giao' ? (
+              {valueRadioShipcomplete === 'shop_giao' ? (
                 <div className="mr-4 flex justify-between">
                 <div className="text-[15px]">Đơn vị vận chuyển: </div>
                 <div>
@@ -520,12 +521,12 @@ export default function PayProduct() {
   useEffect(() => {
     if (stateUserDetail?.nameCity === "Thành phố Đà Nẵng") {
       setValueRadioShip("shop_giao");
+      setValueRadioShipcomplete(valueRadioShip)
     } else {
       setValueRadioShip(showfeeShip?.fee?.ship_fee_only);
     }
   }, [stateUserDetail, showfeeShip]);
 
-  const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
   const next = () => {
     setCurrent(current + 1);

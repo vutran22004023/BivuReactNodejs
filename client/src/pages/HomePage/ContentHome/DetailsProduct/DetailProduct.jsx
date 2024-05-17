@@ -9,11 +9,8 @@ export default function DetailProduct() {
   const [value, setValue] = useState(3);
   const desc = ["terrible", "bad", "normal", "good", "wonderful"];
   return (
-    <div className='md:p-pad-md mt-4'>
-      <h5>
-        Trang chu
-      </h5>
-      <div style={{backgroundColor: '#fff'}}>
+    <div className='md:p-pad-md mt-4 px-[10px]'>
+      <div className='bg-white rounded-lg'>
         <ProductDetail idProduct ={id}/>
       </div>
     </div>

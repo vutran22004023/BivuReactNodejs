@@ -297,54 +297,81 @@ export default function ProductDetail({ idProduct }) {
             </div>
           </div>
 
-          <div>
-            <div
-              style={{
-                fontSize: "14px",
-                fontStyle: "normal",
-                fontWeight: "600",
-                lineHeight: "150%",
-                margin: "0",
-              }}
-            >
-              Số Lượng
+          <div className="flex md:flex-col bg-[#ece9e9] rounded-lg p-[10px] mt-[6px] md:p-[16px] md:gap-[4px] md:mt-[10px]">
+            <div className="mr-[20px]">
+              <div className="text-[12px] font-[600] leading-[120%] m-[0] md:text[14px] md:leading-[150%]">
+                Số Lượng
+              </div>
+              <div>
+                <Space wrap>
+                  <InputNumber
+                    className="h-[30px] flex items-center leading-[12px] md:h-[40px]"
+                    min={1}
+                    max={100000}
+                    defaultValue={1}
+                    onChange={onChange}
+                    value={numberProduct}
+                  />
+                </Space>
+              </div>
             </div>
             <div>
-              <Space wrap>
-                <InputNumber
-                  size="large"
-                  min={1}
-                  max={100000}
-                  defaultValue={1}
-                  onChange={onChange}
-                  value={numberProduct}
-                />
-              </Space>
+              {productDetail?.categorySize.length > 1 ? (
+              <>
+              <div
+                style={{
+                  fontSize: "14px",
+                  fontStyle: "normal",
+                  fontWeight: "600",
+                  lineHeight: "150%",
+                  margin: "0",
+                }}
+              >
+                size
+              </div>
+              <div>
+                <Radio.Group onChange={onChangeRadio} value={valueRadio}>
+                  {productDetail?.categorySize.map((sizeData) => (
+                    <Radio value={sizeData.size}>{sizeData.size}</Radio>
+                  ))}
+                </Radio.Group>
+              </div>
+              </>
+            ) : ""}
             </div>
-            {productDetail?.categorySize.length > 1 ? (
-            <>
-            <div
-              style={{
-                fontSize: "14px",
-                fontStyle: "normal",
-                fontWeight: "600",
-                lineHeight: "150%",
-                margin: "0",
-              }}
-            >
-              size
-            </div>
-            <div>
-              <Radio.Group onChange={onChangeRadio} value={valueRadio}>
-                {productDetail?.categorySize.map((sizeData) => (
-                  <Radio value={sizeData.size}>{sizeData.size}</Radio>
-                ))}
-              </Radio.Group>
-            </div>
-            </>
-          ) : ""}
+            
           </div>
-
+            {valueColor?.length >= 1 ? (
+              <div className="flex md:flex-col bg-[#ece9e9] rounded-lg p-[10px] mt-[6px] md:p-[16px] md:gap-[4px] md:mt-[10px]">
+              <div
+                style={{
+                  fontSize: "14px",
+                  fontStyle: "normal",
+                  fontWeight: "600",
+                  lineHeight: "150%",
+                  margin: "0",
+                }}
+              >
+                Màu sắc
+              </div>
+              <div>
+                <Radio.Group onChange={onChangeColor} value={valColor}>
+                  {valueColor?.map((colorData) => {
+                    return (
+                      <Radio value={colorData[0].color_name}>
+                        <div className="flex">
+                        <div style={{width:'20px', height:'20px', backgroundColor: colorData[0].hex, marginRight:'5px'}}></div>
+                        <div>{colorData[0].color_name}</div>
+                        </div>
+                      </Radio>
+                    )
+                  })}
+                </Radio.Group>
+              </div>
+              </div>  
+             ) : ""}
+          
+          
           <WapperStyleButtonAddProduct className="flex justify-start w-full">
             <div className="mr-[10px] w-full ">
               <Button className="h-[40px] text-[10px] md:text-[14px] w-full mt-[10px] md:h-[60px] text-[#fff]"

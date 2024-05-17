@@ -3,14 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 import Slider from "react-slick";
 import { StarFilled, ShoppingCartOutlined } from "@ant-design/icons";
 import {
-  WapperProductDetailImageSmall,
-  WapperStyleAddressProduct,
-  WapperStyleCollImage,
-  WapperStyleNameProduct,
-  WapperStylePriceProduct,
-  WapperStyleTextPriceProduct,
-  WapperStyleBlockProduct,
-  WapperStyleBlockProductBottom,
   WapperStyleButtonAddProduct,
 
 } from "./style";
@@ -302,10 +294,10 @@ export default function ProductDetail({ idProduct }) {
                   <span style={{ color: "rgb(10, 104, 255)" }}>Đổi</span>
                 </div>
               </div>
-            </WapperStyleAddressProduct>
-          </WapperStyleBlockProductBottom>
+            </div>
+          </div>
 
-          <WapperStyleBlockProductBottom>
+          <div>
             <div
               style={{
                 fontSize: "14px",
@@ -351,9 +343,8 @@ export default function ProductDetail({ idProduct }) {
             </div>
             </>
           ) : ""}
-          </WapperStyleBlockProductBottom>
-
           </div>
+
           <WapperStyleButtonAddProduct className="flex justify-start w-full">
             <div className="mr-[10px] w-full ">
               <Button className="h-[40px] text-[10px] md:text-[14px] w-full mt-[10px] md:h-[60px] text-[#fff]"

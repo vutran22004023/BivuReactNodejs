@@ -3,14 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 import Slider from "react-slick";
 import { StarFilled, ShoppingCartOutlined } from "@ant-design/icons";
 import {
-  WapperProductDetailImageSmall,
-  WapperStyleAddressProduct,
-  WapperStyleCollImage,
-  WapperStyleNameProduct,
-  WapperStylePriceProduct,
-  WapperStyleTextPriceProduct,
-  WapperStyleBlockProduct,
-  WapperStyleBlockProductBottom,
   WapperStyleButtonAddProduct,
   WrapperContainerLeft,
   WrapperContainerRight,
@@ -201,7 +193,7 @@ export default function ProductDetail({ idProduct }) {
   return (
     <IsLoadingComponent isLoading={IsLoadingProductDetail}>
       <Row>
-        <Col style={{ padding: "30px" }} span={9}>
+        <Col className="p-[15px] md:p-[30px]" span={9}>
           <Slider
             {...settings1}
             asNavFor={nav2}
@@ -209,7 +201,7 @@ export default function ProductDetail({ idProduct }) {
           >
             {productDetail?.image.map((img) => (
               <>
-                <WapperProductDetailImageSmall src={img} alt="image-product" />
+                <img className="h-[200px] md:h-[485px] w-full rounded-lg" src={img} alt="image-product" />
               </>
             ))}
           </Slider>
@@ -224,29 +216,30 @@ export default function ProductDetail({ idProduct }) {
           >
             {productDetail?.image.map((img) => (
               <>
-                <WapperProductDetailImageSmall src={img} alt="image-product" />
+                <img src={img} alt="image-product" />
               </>
             ))}
           </Slider>
         </Col>
-        <Col span={15} style={{ marginTop: "10px", paddingRight: "20px" }}>
-          <WapperStyleBlockProduct>
-            <WapperStyleNameProduct>
+        <Col span={15} className="mt-[15px] pr-[15px] md:mt-[30px] md:pr-[30px] ">
+          <div className="flex flex-col bg-[#ece9e9] rounded-lg p-[10px] md:gap-[4px] md:p-[16px]">
+            <div className="text-[12px] font-[600] leading-[12px] break-words mb-[5px] md:text-[24px] md:leading-[32px]">
               {productDetail?.name}
-            </WapperStyleNameProduct>
+            </div>
 
             <div>
               <Rate
                 allowHalf
                 defaultValue={productDetail?.rating}
-                style={{ fontSize: "15px", color: "yellow", marginTop: "4px" }}
+                className="text-[11px] text-yellow mt-[4px] md:text-[15px]"
+                
               />
 
-              <span>(Xem 5 đánh giá) | Đã bán 34</span>
+              <span className="text-[10px] md:text[15px] pl-[1px]">(Xem 5 đánh giá) | Đã bán 34</span>
             </div>
 
-            <WapperStylePriceProduct>
-              <WapperStyleTextPriceProduct>
+            <div className="bg-[#ece9e9] rounded-[4px]">
+              <div className="text-[15px] leading-[20px] font-[500] md:p-[10px] md:mb-[10px] text-[#f00] md:text-[32px] md:leading-[40px]">
                 {!valueRadio && productDetail?.categorySize.length === 1
                   ? convertPrice(productDetail?.categorySize[0].price)
                   : !valueRadio && productDetail?.categorySize.length > 1
@@ -261,17 +254,17 @@ export default function ProductDetail({ idProduct }) {
                           ).price,
                         )
                       : ""}
-              </WapperStyleTextPriceProduct>
-            </WapperStylePriceProduct>
-          </WapperStyleBlockProduct>
+              </div>
+            </div>
+          </div>
 
-          <WapperStyleBlockProductBottom>
-            <WapperStyleAddressProduct>
-              <div className="addressheader">Thông tin vận chuyển</div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div className="flex flex-col bg-[#ece9e9] rounded-lg p-[10px] mt-[6px] md:p-[16px] md:gap-[4px] md:mt-[10px]">
+            <div>
+              <div className="font-[600] text-[12px] leading-[120%] md:text-[16px] md:leading-[150%]">Thông tin vận chuyển</div>
+              <div className="flex justify-between text-[11px] md:text[12px]">
                 <div>
-                  <span>Giao đến : </span>
-                  <span className="address">
+                  <span>Giao đến: </span>
+                  <span className="underline text-[11px] leading-[12px] font-[500] overflow-hidden text-ellipsis md:text[15px] md:leading-[24px]">
                     427 Kinh Dương Vương, Quận Liên Chiểu, Tp Đà Nẵng
                   </span>
                 </div>
@@ -279,70 +272,60 @@ export default function ProductDetail({ idProduct }) {
                   <span style={{ color: "rgb(10, 104, 255)" }}>Đổi</span>
                 </div>
               </div>
-            </WapperStyleAddressProduct>
-          </WapperStyleBlockProductBottom>
+            </div>
+          </div>
 
-          <WapperStyleBlockProductBottom>
-            <div
-              style={{
-                fontSize: "14px",
-                fontStyle: "normal",
-                fontWeight: "600",
-                lineHeight: "150%",
-                margin: "0",
-              }}
-            >
-              Số Lượng
+          <div className="flex md:flex-col bg-[#ece9e9] rounded-lg p-[10px] mt-[6px] md:p-[16px] md:gap-[4px] md:mt-[10px]">
+            <div className="mr-[20px]">
+              <div className="text-[12px] font-[600] leading-[120%] m-[0] md:text[14px] md:leading-[150%]">
+                Số Lượng
+              </div>
+              <div>
+                <Space wrap>
+                  <InputNumber
+                    className="h-[30px] flex items-center leading-[12px] md:h-[40px]"
+                    min={1}
+                    max={100000}
+                    defaultValue={1}
+                    onChange={onChange}
+                    value={numberProduct}
+                  />
+                </Space>
+              </div>
             </div>
             <div>
-              <Space wrap>
-                <InputNumber
-                  size="large"
-                  min={1}
-                  max={100000}
-                  defaultValue={1}
-                  onChange={onChange}
-                  value={numberProduct}
-                />
-              </Space>
+              {productDetail?.categorySize.length > 1 ? (
+              <>
+              <div
+                style={{
+                  fontSize: "14px",
+                  fontStyle: "normal",
+                  fontWeight: "600",
+                  lineHeight: "150%",
+                  margin: "0",
+                }}
+              >
+                size
+              </div>
+              <div>
+                <Radio.Group onChange={onChangeRadio} value={valueRadio}>
+                  {productDetail?.categorySize.map((sizeData) => (
+                    <Radio value={sizeData.size}>{sizeData.size}</Radio>
+                  ))}
+                </Radio.Group>
+              </div>
+              </>
+            ) : ""}
             </div>
-            {productDetail?.categorySize.length > 1 ? (
-            <>
-            <div
-              style={{
-                fontSize: "14px",
-                fontStyle: "normal",
-                fontWeight: "600",
-                lineHeight: "150%",
-                margin: "0",
-              }}
-            >
-              size
-            </div>
-            <div>
-              <Radio.Group onChange={onChangeRadio} value={valueRadio}>
-                {productDetail?.categorySize.map((sizeData) => (
-                  <Radio value={sizeData.size}>{sizeData.size}</Radio>
-                ))}
-              </Radio.Group>
-            </div>
-            </>
-          ) : ""}
-          </WapperStyleBlockProductBottom>
 
-          <WapperStyleButtonAddProduct
-            style={{ display: "flex", justifyContent: "center" }}
-          >
-            <div style={{ marginRight: "10px", width: "100%" }}>
-              <Button
+          </div>
+          <WapperStyleButtonAddProduct className="flex justify-start w-full">
+            <div className="mr-[10px] w-full ">
+              <Button className="h-[40px] text-[10px] md:text-[14px] w-full mt-[10px] md:h-[60px] text-[#fff]"
                 style={{
                  backgroundColor: !valueRadio && productDetail?.categorySize.length === 1 ?
                  "rgb(255, 66, 78)" : 
                  (productDetail?.categorySize.length > 1 && !valueRadio ? "#ccc" : "rgb(255, 66, 78)"),
-                  height: "60px",
-                  width: "100%",
-                  marginTop: "10px",
-                  color: "#fff",
                 }}
                 disabled= {!valueRadio && productDetail?.categorySize.length === 1 ?
                  false : 
@@ -360,21 +343,11 @@ export default function ProductDetail({ idProduct }) {
               />
             </div>
 
-            <div style={{ marginRight: "10px", width: "100%" }}>
-              <Button
-                style={{ height: "60px", width: "100%", marginTop: "10px" }}
-                icon={<ShoppingCartOutlined />}
-                className="buttonAddProduct"
-              >
-                Mua trước trả sau
-              </Button>
-            </div>
 
-            <div style={{ width: "100%" }}>
+            <div className="w-full mb-[10px]">
               <Button
-                style={{ height: "60px", width: "100%", marginTop: "10px" }}
                 icon={<ShoppingCartOutlined />}
-                className="buttonAddProduct"
+                className="buttonAddProduct h-[40px] md:h-[60px] w-full mt-[10px] text-[10px] md:text-[14px]"
                 onClick={hangleAddCartProduct}
               >
                 Thêm vào giỏ hàng

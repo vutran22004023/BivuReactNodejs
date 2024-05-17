@@ -19,11 +19,20 @@ body {
     border-radius: 10px;
 }
 
-.slick-prev:before, .slick-next:before {
+@media screen and (max-width: 767px) {
+  .slick-prev:before, .slick-next:before {
     color: rgba(0, 0, 0, 0.564);
-    
+    font-size: 15px;
+    display: none;
+  }
 }
 
+@media screen and (min-width: 767px) {
+  .slick-prev:before, .slick-next:before {
+    color: rgba(0, 0, 0, 0.564);
+    font-size: 20px;
+  }
+}
 
 
 .movie--isloading {

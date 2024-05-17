@@ -452,6 +452,21 @@ export default function UserAdmin() {
   return (
     <>
         <Outlet />
+        <Box sx={{
+        position: 'sticky',
+        top: 0,
+        bottom: 0,
+        height: '100dvh',
+        overflowY: 'auto',
+        width: '100%',
+        px: { xs: 2, md: 6 },
+            pt: {
+              xs: 'calc(12px + var(--Header-height))',
+              sm: 'calc(12px + var(--Header-height))',
+              md: 3,
+            },
+            pb: { xs: 2, sm: 2, md: 3 },
+    }}>
         <Box sx={{ display: "flex", alignItems: "center" }}>
         <Breadcrumbs
           size="sm"
@@ -493,7 +508,7 @@ export default function UserAdmin() {
         }}
       >
         <Typography level="h2" component="h1">
-          User
+          Người dùng
         </Typography>
         <Button
           color="primary"
@@ -868,7 +883,7 @@ export default function UserAdmin() {
    />
   </LoadingComponent>
       </Box>
-      
+      </Box>
     </>
   )
 }

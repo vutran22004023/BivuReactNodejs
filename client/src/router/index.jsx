@@ -43,6 +43,13 @@ const OrderProductDetails = React.lazy(() =>
   import("../pages/HomePage/ContentHome/OrderDetail/OrderProductDetail.jsx")
 );
 
+const InforPageAdmin = React.lazy(() =>
+  import("../pages/AdminPage/ContentAdmin/InformationPageAdmin/InforPageAdmin.jsx")
+);
+const OrderProductAdmin = React.lazy(() =>
+  import("../pages/AdminPage/ContentAdmin/OrderProductAdmin/OrderProduct.jsx")
+)
+
 
 export default createBrowserRouter([
   {
@@ -111,6 +118,14 @@ export default createBrowserRouter([
               {
                 element: <UserAdmin />,
                 path: "nguoi-dung",
+              },
+              {
+                element: <InforPageAdmin />,
+                path: "thong-tin",
+              },
+              {
+                element: <OrderProductAdmin />,
+                path: "don-hang",
               },
             ],
           },

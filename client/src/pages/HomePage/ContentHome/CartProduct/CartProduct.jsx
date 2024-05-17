@@ -100,17 +100,9 @@ export default function CartProduct() {
       return 0
     },[order])
 
-    const diliveryPriceMemo = useMemo(()=> {
-      if(priceMemo> 100000) {
-        return 35000
-      }else if(priceMemo){
-        return 20000
-      }
-      return 0
-    },[priceMemo])
     const totalPriceMemo = useMemo(()=> {
-      return Number(priceMemo)  - Number(priceDiscountMemo) + Number(diliveryPriceMemo)
-    },[priceMemo,priceDiscountMemo,diliveryPriceMemo])
+      return Number(priceMemo)  - Number(priceDiscountMemo) 
+    },[priceMemo,priceDiscountMemo])
 
     const handleDeteteOrder =(idProduct) => {
       dispatch(RemoveOrderProduct({idProduct}))
@@ -148,7 +140,11 @@ export default function CartProduct() {
               </div>
               <div className="ml-1">{item?.name}</div>
             </div>
-            <div className="w-32 flex-auto"></div>
+            <div className="w-32 flex-auto">
+              <div className="text-left " style={{ display: item.category && item.color ? 'block' : 'none' }}>
+                <div>{item.category}, {item.color}</div>
+              </div>
+            </div>
             <div className="w-32 flex-auto">{convertPrice(item?.price)}</div> 
             <div className="w-32 flex-auto flex" style={{justifyContent:'center'}}>
             <button style={{ border:'1px solid #000',background: '#fff', cursor: 'pointer',borderRadius: '5px 0 0 5px', padding: '0 5px' }}
@@ -178,10 +174,6 @@ export default function CartProduct() {
             <div className="flex justify-between">
                 <div>Giảm giá</div>
                 <div>{`${priceDiscountMemo } %`}</div>
-            </div>
-            <div className="flex justify-between">
-                <div>Phí giao hàng</div>
-                <div>{convertPrice(diliveryPriceMemo)}</div>
             </div>
 
             <div className=" flex  justify-between w-full">

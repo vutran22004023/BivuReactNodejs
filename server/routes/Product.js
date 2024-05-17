@@ -10,4 +10,6 @@ router.put('/update-product/:id',authMiddleware.auth,productController.updatePro
 router.delete('/delete-product/:id',authMiddleware.auth,productController.deleteProduct)
 router.post('/delete-many-product', authMiddleware.auth,productController.deleteManyProduct)
 router.get('/get-all-type',productController.getAlltypeProduct)
+router.get('/color',productController.getColor)
+router.get('/color/detail/:id',productController.getColorDetail)
 export default router

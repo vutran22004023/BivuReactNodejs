@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import GlobalStyles from '@mui/joy/GlobalStyles';
 import Avatar from '@mui/joy/Avatar';
 import Box from '@mui/joy/Box';
@@ -52,20 +52,35 @@ function Toggler({ defaultExpanded = false, renderToggle, children }) {
 export default function Sidebar() {
   const user = useSelector((state) => state.user);
   const navigate = useNavigate()
-  const [selectedIndex, setSelectedIndex] = React.useState('san-pham');
+  const [selectedIndex, setSelectedIndex] = useState('san-pham');
+  useEffect(() => {
+    const savedIndex = localStorage.getItem('selectedIndex');
+    if (savedIndex) {
+      setSelectedIndex(savedIndex);
+      navigate(`/admin/${savedIndex}`);
+    }
+  }, [navigate]);
 
   const handleListItemClick = (event, index) => {
+    setSelectedIndex(index);
+    localStorage.setItem('selectedIndex', index);
     switch (index) {
       case 'san-pham':
-        setSelectedIndex(index);
         navigate('/admin/san-pham');
         break;
       case 'nguoi-dung':
-        setSelectedIndex(index);
         navigate('/admin/nguoi-dung');
         break;
+      case 'thong-tin':
+        navigate('/admin/thong-tin');
+        break;
+      case 'don-hang':
+        navigate('/admin/don-hang');
+        break;
+      default:
+        break;
     }
-    }
+  }
 
   return (
     <Sheet
@@ -81,6 +96,7 @@ export default function Sidebar() {
         height: '100dvh',
         width: 'var(--Sidebar-width)',
         top: 0,
+        bottom: 0,
         p: 2,
         flexShrink: 0,
         display: 'flex',
@@ -164,6 +180,15 @@ export default function Sidebar() {
               </ListItemContent>
             </ListItemButton>
           </ListItem>
+          <ListItem>
+            <ListItemButton selected={selectedIndex === 'thong-tin'}
+            onClick={(event) => handleListItemClick(event, 'thong-tin')}>
+              <ShoppingCartRoundedIcon />
+              <ListItemContent>
+                <Typography level="title-sm">Thông tin Page</Typography>
+              </ListItemContent>
+            </ListItemButton>
+          </ListItem>
 
           <ListItem>
             <ListItemButton selected={selectedIndex === 'san-pham'}
@@ -175,14 +200,24 @@ export default function Sidebar() {
             </ListItemButton>
           </ListItem>
           <ListItem>
+            <ListItemButton selected={selectedIndex === 'don-hang'}
+            onClick={(event) => handleListItemClick(event, 'don-hang')}>
+                <GroupRoundedIcon />
+              <ListItemContent>
+              <Typography level="title-sm">Đơn hàng</Typography>
+              </ListItemContent>
+            </ListItemButton>
+          </ListItem>
+          <ListItem>
             <ListItemButton selected={selectedIndex === 'nguoi-dung'}
             onClick={(event) => handleListItemClick(event, 'nguoi-dung')}>
                 <GroupRoundedIcon />
               <ListItemContent>
-              <Typography level="title-sm">Users</Typography>
+              <Typography level="title-sm">Người dùng</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
+
 
           {/* <ListItem nested>
             <Toggler

@@ -12,10 +12,16 @@ const oderSchema =  new mongoose.Schema(
                 type: Number,
                 required: true,
             },
-            image: {
-                type: String,
-                required: true,
-            },
+            image: [
+                {
+                    type: String,
+                    required: true,
+                }
+            ],
+            category: 
+                {
+                    type: String,
+                },
             price: {
                 type: Number,
                 required: true,
@@ -60,6 +66,13 @@ const oderSchema =  new mongoose.Schema(
     totalPrice: {
         type: Number,
         required: true,
+    },
+    confirmation_Order: {
+        type: Boolean,
+        default:false,
+    },
+    note_customers: {
+        type: String,
     },
     user: {
         type:  mongoose.Schema.Types.ObjectId,

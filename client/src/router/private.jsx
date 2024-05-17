@@ -7,6 +7,8 @@ import { UserService } from "../services/index.js";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUser } from "../redux/Slides/userSlide";
 import IsLoadingComponent from "../components/LoadComponent/Loading.jsx";
+import {setDoc, doc, serverTimestamp} from 'firebase/firestore'
+import {txtDB} from "../Firebase/config.jsx"
 export const PrivateUser = () => {
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user);
@@ -16,6 +18,27 @@ export const PrivateUser = () => {
         handleGetDetailsUser(decoded?.id, cookieData);
       }
     }, []);
+
+    useEffect(() => {
+      const setUserInDb = async () => {
+        try { 
+          await setDoc(
+            doc(txtDB, 'users',String(user.id)),
+            {
+              email: user?.email,
+              lastSeen: serverTimestamp(),
+              photoUrl: user?.avatar,
+            },
+            {merge: true}
+          )
+        } catch (err) {
+          console.log(err)
+        }
+      }
+      if(user) {
+        setUserInDb()
+      }
+    },[user])
   
     const handleDecoded = () => {
       let cookieData = document.cookie;

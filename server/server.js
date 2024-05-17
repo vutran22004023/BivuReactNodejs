@@ -2,10 +2,11 @@ import express from "express";
 import * as dotenv from "dotenv";
 dotenv.config();
 import mongoose from "mongoose";
-import { userRouters, productRouters, orderRouters } from "./routes/index.js";
+import { userRouters, productRouters, orderRouters,informationPageRouters } from "./routes/index.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import {payMentController} from './controllers/index.js'
+import axios from "axios";
 const app = express();
 
 app.use(cors());
@@ -20,6 +21,7 @@ const port = process.env.PORT || 3001;
 app.use("/api/user", userRouters);
 app.use("/api/product", productRouters);
 app.use("/api/order-product", orderRouters);
+app.use("/api/informations-pages",informationPageRouters)
 // api thanh toán
 //begin api thanh toán PayOS
 app.post("/api/create-payment-link",payMentController.createLinkPayOs);
@@ -43,6 +45,20 @@ app.post ("/transaction-refund", payMentController.transactionRefund);
 
 app.post ("/transaction-refund-status", payMentController.transactionRefundStatus);
 // end thanh toán ZaloPay API
+
+app.get('/api/shipment/fee', async (req, res) => {
+  try {
+    const response = await axios.get('https://services.giaohangtietkiem.vn/services/shipment/fee', {
+      headers: {
+        'Token': `${process.env.TOKEN_GHTK}`,
+      },
+      params: req.query,
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
 
 const url = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.wu6bakk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 app.listen(port, async () => {

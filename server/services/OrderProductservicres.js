@@ -1,22 +1,43 @@
 import { OrderProductModel,ProductModel } from "../model/index.js";
 import {Emailservicres} from './index.js'
 
+const getAllOrderProduct = async () => {
+    try {
+        const dataOrderProduct = await OrderProductModel.find()
+        if(dataOrderProduct) {
+            return {
+                status: 200,
+                message: "Xem tất cả sản phẩm",
+                data: dataOrderProduct,
+                // total: totalProduct,
+                // pageCurrent: Number(page),
+                // totalPage: Math.ceil(totalProduct / limit)
+            };
+        }
+    }catch (e){
+        throw e;
+    }
+}
+
 const createOrderProductservices = async (newOrder) => {
     try {
-        const {oderItem,paymentMethod,itemsPrice,shippingPrice, totalPrice,fullName, address, city, phone,user,email} =  newOrder
+        const {oderItem,paymentMethod,itemsPrice,shippingPrice, totalPrice,fullName, address, city, phone,user,email,note_customers} =  newOrder
         const promises = oderItem.map(async(order) => {
             const productData = await ProductModel.findOneAndUpdate(
                 {
-                    _id: order.product,
-                    counInStock: { $gte: order.amount }
+                    name: order.name,
+                    'categorySize.counInStock': { $gte: order.amount } 
                 },
                 {
                     $inc: {
-                        counInStock: -order.amount,
+                        "categorySize.$[elem].counInStock": -order.amount,
                         selled: +order.amount 
                     }
                 },
-                { new: true }
+                { 
+                    arrayFilters: [{ "elem.size": order.category }],
+                    new: true // Trả về document sau khi cập nhật
+                }
             );
             if(productData) {
                 const createProduct = await OrderProductModel.create({
@@ -31,6 +52,7 @@ const createOrderProductservices = async (newOrder) => {
                 itemsPrice,
                 shippingPrice,
                 totalPrice,
+                note_customers,
                 user
     
             })
@@ -112,8 +134,35 @@ const getOrderDetailProduct = async(uidorder) => {
 
     }
 }
+const updateOrderProduct = async(id,data) => {
+      
+    try {
+        const checkProduct = await OrderProductModel.findOne({
+          _id: id,
+        });
+        if(!checkProduct) {
+          return {
+            status: "ERR",
+            message: "Id không tồn tại",
+          };
+        }
+        const updateProduct = await OrderProductModel.findByIdAndUpdate(id, data,{ new: true })
+        return {
+          status: 200,
+          message: `Cập nhập thành công id : ${updateProduct._id}`,
+          data: {
+            ...updateProduct._doc,
+          }
+    
+        };
+      } catch (error) {
+        throw error;
+      }
+}
 export default {
     createOrderProductservices,
     getOrderDetail,
-    getOrderDetailProduct
+    getOrderDetailProduct,
+    getAllOrderProduct,
+    updateOrderProduct
 }

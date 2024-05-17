@@ -60,6 +60,8 @@ import { ProductService } from "../../services/index";
 import { useQuery } from "@tanstack/react-query";
 import Slider from "react-slick";
 import { convertPrice } from "../../utils";
+import { signOut } from "firebase/auth";
+import { auth } from "../../Firebase/config";
 export const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;
   return (
@@ -174,13 +176,13 @@ export default function headerHome({isHeaderVisible}) {
   });
   //Xử lý phần Loading Logout
   const handLogout = async () => {
+    await signOut(auth)
     localStorage.removeItem("access_Token");
     document.cookie =
       "access_Token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     try {
       setLoading(true);
       UserService.LogOutUser();
-
       navigate("/");
       dispatch(resetUser());
       window.location.reload();

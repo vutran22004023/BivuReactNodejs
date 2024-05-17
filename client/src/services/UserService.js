@@ -5,6 +5,11 @@ const axiosJWT = axios.create()
     return res.data
 }
 
+const loginUserGoogle = async (data) => {
+    const res = await axios.post(`${import.meta.env.REACT_APP_API_URL}/user/sign-in-google`,data)
+    return res.data
+}
+
 const RegistUser = async (data) => {
     const res = await axios.post(`${import.meta.env.REACT_APP_API_URL}/user/sign-up`,data)
     return res.data
@@ -72,6 +77,7 @@ const DeleteManyUser = async (id,access_Token) => {
 
 
 export default {
+    loginUserGoogle,
     loginUser,
     RegistUser,
     getDetailUser,

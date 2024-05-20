@@ -14,12 +14,14 @@ import {useDebounce} from '../../../../hooks/UseMutationHook'
 import {DataSearchProduct,IsloadingSearchProduct,IsloadingSearchProductFebounce} from '../../../../redux/Slides/productSlide'
 import IsLoadingCardComponent from '../../../../components/LoadComponent/LoadingCard'
 export default function ProductHome() {
-  const [limit, setLimit] = useState(6)
+  const [limit, setLimit] = useState(20)
 
   const fetchProductAllLimit = async (context) => {
     const limit = context.queryKey[1]
     const search = ''
-      const res = await ProductService.getAllProduct(limit,search);
+    const sort = ''
+    const page = ''
+      const res = await ProductService.getAllProduct(limit,search,page,sort);
       return res; 
   }
 

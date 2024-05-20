@@ -50,6 +50,10 @@ const OrderProductAdmin = React.lazy(() =>
   import("../pages/AdminPage/ContentAdmin/OrderProductAdmin/OrderProduct.jsx")
 )
 
+const DiscountAdmin = React.lazy(() =>
+  import("../pages/AdminPage/ContentAdmin/DiscountAdmin/discount.jsx")
+)
+
 
 export default createBrowserRouter([
   {
@@ -126,6 +130,10 @@ export default createBrowserRouter([
               {
                 element: <OrderProductAdmin />,
                 path: "don-hang",
+              },
+              {
+                element: <DiscountAdmin />,
+                path: "giam-gia",
               },
             ],
           },

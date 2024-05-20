@@ -105,7 +105,7 @@ const getAllProduct = async(limit = 10, page =0,sort ,filter) => {
           
       }else if (filter) {
         const filterObject = {};
-        filterObject[filter[0]] = {'$regex': filter[1]};
+        filterObject[filter[0]] = {'$regex': filter[1],'$options': 'i'};
         const allProductfilter = await ProductModel.find(filterObject)
         return {
             status: 200,

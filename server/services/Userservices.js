@@ -247,7 +247,6 @@ const getDetailsUser = async (id) => {
       message: `Show thông tin của id: ${checkUser.id}`,
       data: {
         ...checkUser._doc,
-        password: 'Not password'
       }
     };
   } catch (error) {

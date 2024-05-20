@@ -3,10 +3,12 @@ import productController from './Product.js';
 import orderProductController from './OrderProduct.js'
 import payMentController from './Payment.js'
 import informationPageController from './InformationPage.js'
+import discountController from './Discount.js'
 export {
     userController,
     productController,
     orderProductController,
     payMentController,
-    informationPageController
+    informationPageController,
+    discountController
 }

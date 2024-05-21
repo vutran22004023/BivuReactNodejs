@@ -5,6 +5,7 @@ import OrderProductservices from './orderProductservicres.js'
 import Emailservicres from './Emailservicres.js'
 import InforPageServicres from './InformationPageServicres.js'
 import DiscountServicres from './DisCountserver.js'
+import ReviewProductServicres from './ReviewProduct.js'
 export {
     Userservices,
     Jwtservicres,
@@ -12,5 +13,6 @@ export {
     OrderProductservices,
     Emailservicres,
     InforPageServicres,
-    DiscountServicres
+    DiscountServicres,
+    ReviewProductServicres
 }

@@ -142,6 +142,7 @@ export default function ProductDetail({ idProduct }) {
             category: valueRadio,
             color:valColor,
             product: productDetail?.categorySize.find((sizeData) => sizeData.size === valueRadio)._id,
+            productId:productDetail?._id
           },
         }),
       )
@@ -156,6 +157,7 @@ export default function ProductDetail({ idProduct }) {
             category: valueRadio,
             color:valColor,
             product: productDetail?._id,
+            productId:productDetail?._id
           },
         }),
       )
@@ -180,6 +182,7 @@ export default function ProductDetail({ idProduct }) {
               category: valueRadio,
               color:valColor,
               product: productDetail?.categorySize.find((sizeData) => sizeData.size === valueRadio)._id,
+              productId:productDetail?._id
             },
           }),
         )
@@ -194,10 +197,11 @@ export default function ProductDetail({ idProduct }) {
               price: valuePrice,
               category: valueRadio,
               product: productDetail?._id,
+              productId:productDetail?._id
             },
           }),
         )
-        navigate("/gio-hang", { state: { listChecked: idProduct } });
+        navigate("/gio-hang", { state: { listChecked: productDetail?._id } });
       }
     }
   };

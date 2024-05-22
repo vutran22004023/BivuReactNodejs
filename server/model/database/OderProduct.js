@@ -30,6 +30,11 @@ const oderSchema =  new mongoose.Schema(
                 type: mongoose.Schema.Types.ObjectId,
                 ref:'Product',
                 required: true,
+            },
+            productId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref:'Product',
+                required: true,
             }
         }
     ],

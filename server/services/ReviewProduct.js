@@ -16,9 +16,9 @@ const createReviewProduct = async(newreview) => {
             userId,
             product: [
                 {
-                    name,
-                    size,
-                    color
+                    name: product[0].name,
+                    size: product[0].size,
+                    color: product[0].color,
                 }
             ],
             userName,

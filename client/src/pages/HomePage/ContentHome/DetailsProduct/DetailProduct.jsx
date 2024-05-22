@@ -10,7 +10,7 @@ export default function DetailProduct() {
   const desc = ["terrible", "bad", "normal", "good", "wonderful"];
   return (
     <div className='md:p-pad-md mt-4 px-[10px]'>
-      <div className='bg-white rounded-lg'>
+      <div>
         <ProductDetail idProduct ={id}/>
       </div>
     </div>

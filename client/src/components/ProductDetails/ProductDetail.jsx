@@ -1,7 +1,7 @@
-import { Col, Row, Image, Space, InputNumber, Button, Rate, Radio } from "antd";
+import { Col, Row, Image, Space, InputNumber, Button, Rate, Radio, Avatar } from "antd";
 import React, { useState, useEffect, useRef } from "react";
 import Slider from "react-slick";
-import { StarFilled, ShoppingCartOutlined } from "@ant-design/icons";
+import { StarFilled, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons";
 import {
   WapperStyleButtonAddProduct,
 
@@ -47,6 +47,8 @@ export const SamplePrevArrow = (props) => {
 
 export default function ProductDetail({ idProduct }) {
   const [numberProduct, setNumberProduct] = useState(1);
+  const [value, setValue] = useState(3);
+  const desc = ["terrible", "bad", "normal", "good", "wonderful"];
   const user = useSelector((state) => state.user);
   const location = useLocation();
   const dispatch = useDispatch();
@@ -214,7 +216,7 @@ export default function ProductDetail({ idProduct }) {
 
   return (
     <IsLoadingComponent isLoading={IsLoadingProductDetail}>
-      <Row>
+      <Row className="bg-white  rounded-lg">
         <Col className="p-[15px] md:p-[30px]" span={9}>
           <Slider
             {...settings1}
@@ -410,6 +412,86 @@ export default function ProductDetail({ idProduct }) {
         </Col>
         <CommentFbComponent dataHref="https://developers.facebook.com/docs/plugins/comments#configurator"/>
       </Row>
+
+      <div className="motasanpham bg-white p-[15px] rounded-lg md:p-[30px] mt-[20px] mb-[20px]">
+        <div className="mb-[10px]">
+          <h1 className="pl-[5px] text-[20px] bg-[#ece9e9] mt-[10px]">Chi tiết sản phẩm</h1>
+          <Row>
+            <Col className="w-[200px] pl-[5px] mt-[10px]">
+              Danh mục
+            </Col>
+            <Col>
+              Mĩ phẩm
+            </Col>
+          </Row>
+        </div>
+        <div>
+          <h1 className="pl-[5px] text-[20px] bg-[#ece9e9]">Mô tả sản phẩm</h1>        
+        </div>
+      </div>
+
+      <div>
+        <div className="rounded-lg bg-[#ccc] p-5">
+          <h2 style={{ fontWeight: "600" }}>Đánh giá sản phẩm</h2>
+          <div className="h-10 bg-[#af5e5e]"></div>
+          <div style={{ padding: "5px 10px" }}>
+            <div className="mt-3">
+              <div className="flex " style={{alignItems: "start"}}>
+                <Space Spacewrap size={10} className="mt-2">
+                  <Avatar size="large" icon={<UserOutlined />} />
+                </Space>
+                <div className="ml-3">
+                  <p>Vu Tran</p>
+                  <div className="">
+                    <Rate tooltips={desc} onChange={setValue} value={value} />
+                  </div>
+                  <div
+                    className="flex text-center"
+                    style={{ alignItems: "center" }}
+                  >
+                    <div>thời gian</div>
+                    <div className=" h-5 w-[2px] bg-[#c12c2c]" style={{margin: '0 5px'}}></div>
+                    <div>Phân loại hàng: adsadasdsa</div>
+                  </div>
+                  <div>Chất liệu: <span>Tốt</span></div>
+                  <div>Màu sắc: <span>đen</span></div>
+                  <div>Hàng đc đóng gói rất chắc chắn và chất lượng nên mua thử để dùng</div>
+                </div>
+              </div>
+            </div>
+          
+            <div className="mt-3">
+              <div className="flex " style={{alignItems: "start"}}>
+                <Space Spacewrap size={10} className="mt-2">
+                  <Avatar size="large" icon={<UserOutlined />} />
+                </Space>
+                <div className="ml-3">
+                  <p>Vu Tran</p>
+                  <div className="">
+                    <Rate tooltips={desc} onChange={setValue} value={value} />
+                  </div>
+                  <div
+                    className="flex text-center"
+                    style={{ alignItems: "center" }}
+                  >
+                    <div>thời gian</div>
+                    <div className=" h-5 w-[2px] bg-[#c12c2c]" style={{margin: '0 5px'}}></div>
+                    <div>Phân loại hàng: adsadasdsa</div>
+                  </div>
+                  <div>Chất liệu: <span>Tốt</span></div>
+                  <div>Màu sắc: <span>đen</span></div>
+                  <div>Hàng đc đóng gói rất chắc chắn và chất lượng nên mua thử để dùng</div>
+                </div>
+              </div>
+            </div>
+
+            
+          </div>
+        </div>
+      </div>
+
+
     </IsLoadingComponent>
+    
   );
 }

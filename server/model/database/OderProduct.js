@@ -90,6 +90,10 @@ const oderSchema =  new mongoose.Schema(
         type: Boolean,
         default: false,
     },
+    review: {
+        type: Boolean,
+        default: false,
+    },
     deliveredAt: {
         type: Date,
     }

@@ -11,6 +11,7 @@ import { InformationPageService } from "../../../../services/index.js";
 import { useMutationHooks } from "../../../../hooks/UseMutationHook.js";
 import { useQuery } from "@tanstack/react-query";
 import IsLoadingComponent from "../../../../components/LoadComponent/Loading.jsx";
+import { useSelector, useDispatch } from "react-redux";
 import {
   success,
   error,
@@ -19,6 +20,7 @@ import {
 import UploadComponent from '../../../../components/UploadComponent/UploadComponent.jsx'
 import UploadImgManyComponent from '../../../../components/UploadComponent/UploadImgManyComponent.jsx'
 export default function InforPageAdmin() {
+  const user = useSelector((state) => state.user);
   const inittial = () => ({
     namePage: "",
     description: "",
@@ -64,20 +66,23 @@ export default function InforPageAdmin() {
 
   const mutationcreateInforTitle = useMutationHooks(async (data) => {
     const { ...rests } = data;
-    const res = await InformationPageService.createInforPage(data);
+    const access_Token = user?.access_Token.split("=")[1];
+    const res = await InformationPageService.createInforPage(data,access_Token);
     return res;
   });
 
   const mutationUpdateInforTitle = useMutationHooks(async (data) => {
     const id = getDetailInforPage?.data?._id;
     const { ...rests } = data;
-    const res = await InformationPageService.updateInforPage(id, data);
+    const access_Token = user?.access_Token.split("=")[1];
+    const res = await InformationPageService.updateInforPage(id, data,access_Token);
     return res;
   });
 
   const mutationGetInforDetails = async () => {
     const id = "663ef62acc49005e8db09793";
-    const res = await InformationPageService.getDetailInforPage(id);
+    const access_Token = user?.access_Token.split("=")[1];
+    const res = await InformationPageService.getDetailInforPage(id,access_Token);
     return res;
   };
 

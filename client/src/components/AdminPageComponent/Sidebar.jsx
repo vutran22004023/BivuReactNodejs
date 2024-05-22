@@ -77,6 +77,9 @@ export default function Sidebar() {
       case 'don-hang':
         navigate('/admin/don-hang');
         break;
+        case 'giam-gia':
+          navigate('/admin/giam-gia');
+          break;  
       default:
         break;
     }
@@ -196,6 +199,16 @@ export default function Sidebar() {
               <ShoppingCartRoundedIcon />
               <ListItemContent>
                 <Typography level="title-sm">Sản Phẩm</Typography>
+              </ListItemContent>
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem>
+            <ListItemButton selected={selectedIndex === 'giam-gia'}
+            onClick={(event) => handleListItemClick(event, 'giam-gia')}>
+              <ShoppingCartRoundedIcon />
+              <ListItemContent>
+                <Typography level="title-sm">Giảm giá</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>

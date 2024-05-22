@@ -10,12 +10,13 @@ import IsLoadingComponent from "../components/LoadComponent/Loading.jsx";
 import {setDoc, doc, serverTimestamp} from 'firebase/firestore'
 import {txtDB} from "../Firebase/config.jsx"
 export const PrivateUser = () => {
+
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user);
     useEffect(() => {
       const { cookieData, decoded } = handleDecoded();
       if (decoded?.id) {
-        handleGetDetailsUser(decoded?.id, cookieData);
+        handleGetDetailsUser(decoded?.id, cookieData,decoded?.isAdmin);
       }
     }, []);
 
@@ -62,22 +63,27 @@ export const PrivateUser = () => {
     UserService.axiosJWT.interceptors.request.use(
       async (config) => {
         const currentTime = new Date();
-        const { decoded } = handleDecoded();
+        const { decoded, cookieData } = handleDecoded();
+        const access_Token = cookieData.split('=')[1];
         if (decoded?.exp < currentTime.getTime() / 1000) {
-          const data = await UserService.refreshToken();
-          config.headers["token"] = `Bearer ${data?.access_Token}`;
-          console.log("data?.access_Token", data?.access_Token);
+          try {
+            const data = await UserService.refreshToken(access_Token, decoded?.id);
+            if (data?.access_token) {
+              config.headers['authorization'] = `Bearer ${data.access_token}`;
+              document.cookie = `access_Token=${data.access_token}`;
+            }
+          } catch (err) {
+          }
         }
         return config;
       },
       (err) => {
-        return Promise.reject(err);
       }
     );
   
-    const handleGetDetailsUser = async (id, token) => {
+    const handleGetDetailsUser = async (id, token, isAdmin) => {
       let accessTokenValue = token.split("=")[1];
-      const res = await UserService.getDetailUser(id, accessTokenValue);
+      const res = await UserService.getDetailUser(id, accessTokenValue, isAdmin);
       dispatch(updateUser({ ...res?.data, access_Token: token }));
     };
     return (

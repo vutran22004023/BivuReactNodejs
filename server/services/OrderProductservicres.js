@@ -3,7 +3,7 @@ import {Emailservicres} from './index.js'
 
 const getAllOrderProduct = async () => {
     try {
-        const dataOrderProduct = await OrderProductModel.find()
+        const dataOrderProduct = await OrderProductModel.find().sort({ createdAt: -1 });
         if(dataOrderProduct) {
             return {
                 status: 200,

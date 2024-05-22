@@ -2,7 +2,7 @@ import express from "express";
 import * as dotenv from "dotenv";
 dotenv.config();
 import mongoose from "mongoose";
-import { userRouters, productRouters, orderRouters,informationPageRouters } from "./routes/index.js";
+import { userRouters, productRouters, orderRouters,informationPageRouters,discountRouters,reviewRouters } from "./routes/index.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import {payMentController} from './controllers/index.js'
@@ -22,6 +22,8 @@ app.use("/api/user", userRouters);
 app.use("/api/product", productRouters);
 app.use("/api/order-product", orderRouters);
 app.use("/api/informations-pages",informationPageRouters)
+app.use("/api/discount", discountRouters);
+app.use("/api/reviews", reviewRouters);
 // api thanh toán
 //begin api thanh toán PayOS
 app.post("/api/create-payment-link",payMentController.createLinkPayOs);

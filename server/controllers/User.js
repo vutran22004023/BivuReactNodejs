@@ -161,27 +161,26 @@ const getDetailsUser =async (req, res) => {
 }
 
 const refreshToken = async (req, res) => {
-
-    try{
-        const authHeader = req.headers.authorization;
-        // const authHeader = req.cookies.refresh_Token;
-        const Idauth = req.headers.id;
-        const isAdmin = req.headers.isadmin;
-        if(!authHeader) {
-            return res.status(200).json({
-                status: 'ERR',
-                message: 'Token không tồn tại'
-            })
-
-        }
-        const response = await Jwtservicres.refreshTokenServices(authHeader,Idauth);
-        return res.status(200).json(response)
-    }catch(e) {
-        return res.status(404).json({
-            message: e
-        })
+    try {
+      const authHeader = req.headers.authorization;
+      const Idauth = req.headers.id;
+      const isAdmin = req.headers.isadmin;
+      if (!authHeader) {
+        return res.status(200).json({
+          status: 'ERR',
+          message: 'Token không tồn tại'
+        });
+      }
+  
+      const token = authHeader.split(' ')[1]; // Extract Bearer token
+      const response = await Jwtservicres.refreshTokenServices(token, Idauth, isAdmin);
+      return res.status(200).json(response);
+    } catch (e) {
+      return res.status(404).json({
+        message: e.message
+      });
     }
-}
+  };
 
 
 const logoutUser = async (req, res) => {

@@ -307,7 +307,8 @@ const saveData = () => {
     const search = "";
     const limit = "";
     const page = context.queryKey[1];
-    const res = await ProductService.getAllProduct(limit, search, page);
+    const sort = 'desc'
+    const res = await ProductService.getAllProduct(limit, search, page,sort);
     return res;
   };
 
@@ -510,12 +511,11 @@ const saveData = () => {
       ...getColumnSearchProps("type"),
     },
     {
-      title: "Mô tả",
-      dataIndex: "description",
-    },
-    {
       title: "Action",
       dataIndex: "action",
+              key: 'operation',
+        fixed: 'right',
+        width: 100,
       render: RowMenu,
     },
   ];
@@ -784,7 +784,6 @@ const saveData = () => {
     try {
       const file = await selectImageFromUser(); // Tạo hàm này để người dùng chọn ảnh mới từ máy tính của họ
       const uploadedURLs = [...stateProductDetail?.image];
-      console.log(uploadedURLs)
       const replacedImgRef = ref(imgDB, `Logo/${v4()}`);
       const uploadTaskSnapshot = await uploadBytes(replacedImgRef, file);
       const downloadURL = await getDownloadURL(uploadTaskSnapshot.ref);

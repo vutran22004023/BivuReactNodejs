@@ -5,6 +5,7 @@ import OrderProduct from './OrderProduct.js'
 import PaymentService from './Payment.js'
 import InformationPageService from './InforPageService.js'
 import GhtkService from './ghtk.js'
+import DiscountService from './Discount.js'
 export {
     UserService,
     ProductService,
@@ -12,5 +13,6 @@ export {
     OrderProduct,
     PaymentService,
     InformationPageService,
-    GhtkService
+    GhtkService,
+    DiscountService
 }

@@ -24,6 +24,7 @@
     "@tanstack/react-query-devtools": "4.x.x",
     "antd": "^5.15.3",
     "axios": "^1.6.8",
+    "dayjs": "^1.11.11",
     "dotenv": "^16.4.5",
     "firebase": "^10.10.0",
     "froala-editor": "^4.2.0",

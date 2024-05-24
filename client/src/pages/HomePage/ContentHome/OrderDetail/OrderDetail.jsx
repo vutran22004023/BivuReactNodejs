@@ -13,13 +13,14 @@ import { AddOrderProduct } from "../../../../redux/Slides/orderProductSlide";
 import { useMutationHooks } from "../../../../hooks/UseMutationHook";
 import IsModalComponent from "../../../../components/ModalComponent/Modal";
 import {convertPrice} from '../../../../utils.js'
-import { Form, Input, Rate } from "antd";
+import { Badge, Form, Input, Rate } from "antd";
 import {
   success,
   error,
   warning,
 } from "../../../../components/MessageComponents/Message.jsx";
 const { TextArea } = Input;
+import IsLoadingComponent from '../../../../components/LoadComponent/Loading.jsx'
 export default function OrderDetail() {
   const desc = ["Tệ", "Không hài lòng", "Bình thường", "Hài lòng", "Tuyệt vời"];
   const [value, setValue] = useState("1");
@@ -147,6 +148,7 @@ export default function OrderDetail() {
           return item;
         })
       : []; 
+    console.log(reviewOrders)
       useEffect(() => {
         if (reviewOrders) {
           const tempReviews = reviewOrders.map((item) => ({
@@ -179,7 +181,9 @@ export default function OrderDetail() {
             <Tab label="Chờ giao hàng" value="4" />
             <Tab label="Hoàn thành" value="5" />
             <Tab label="Trả hàng/ Hoàn tiền" value="6" />
-            <Tab label="Đánh giá" value="7" />
+            <Tab label={
+              <Badge count={unreviewOrders?.length} size="small" offset={[7, 0]}>Đánh giá</Badge>
+            } value="7" />
           </TabList>
         </Box>
         <TabPanel value="1" sx={{ p: "15px 0" }}>
@@ -638,6 +642,7 @@ export default function OrderDetail() {
   okText="Đánh giá"
   cancelText="Thoát"
 >
+<IsLoadingComponent isLoading={isLoadingDataReview}>
   <Form
     name="basic"
     labelCol={{ span: 8 }}
@@ -702,6 +707,7 @@ export default function OrderDetail() {
       </div>
     </div>
   </Form>
+  </IsLoadingComponent>
 </IsModalComponent>
 
         </TabPanel>

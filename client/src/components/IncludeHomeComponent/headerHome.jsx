@@ -212,7 +212,7 @@ export default function headerHome({isHeaderVisible}) {
 
   useEffect(() => {
     setUserName(user?.name);
-    setUserAvatar(user?.avatar);
+    setUserAvatar(user?.avatar[0]);
   }, [user?.name, user?.avatar]);
 
   const DrawerList = (

@@ -25,9 +25,11 @@ const UserSchema =  new mongoose.Schema(
     address: {
         type: String,
     },
-    avatar: {
-        type: String,
-    },
+    avatar: [
+        {
+            type: String,
+        }
+    ],
     city: {
         type: String,
     },

@@ -6,7 +6,7 @@ import {
   WapperStyleButtonAddProduct,
 
 } from "./style";
-import { ProductService } from "../../services/index";
+import { ProductService,ReviewService} from "../../services/index";
 import { useQuery } from "@tanstack/react-query";
 import IsLoadingComponent from "../LoadComponent/Loading";
 import { useSelector, useDispatch } from "react-redux";
@@ -48,7 +48,7 @@ export const SamplePrevArrow = (props) => {
 export default function ProductDetail({ idProduct }) {
   const [numberProduct, setNumberProduct] = useState(1);
   const [value, setValue] = useState(3);
-  const desc = ["terrible", "bad", "normal", "good", "wonderful"];
+  const desc = ["Tệ", "Không hài lòng", "Bình thường", "Hài lòng", "Tuyệt vời"];
   const user = useSelector((state) => state.user);
   const location = useLocation();
   const dispatch = useDispatch();
@@ -102,10 +102,26 @@ export default function ProductDetail({ idProduct }) {
     }
   });
 
+  const fetchGetDetailsReview = async (context) => {
+    const id = context?.queryKey[1];
+
+    if (id) {
+      const res = await ReviewService.getDetailReviewProduct(id);
+      return res.data;
+    }
+  };
+
+
 
   const { data: productDetail, isLoading: IsLoadingProductDetail } = useQuery({
     queryKey: ["products-detail", idProduct],
     queryFn: fetchGetDetailsProduct,
+    enabled: !!idProduct,
+  });
+
+  const { data: productReview, isLoading: IsLoadingProductDetailReview } = useQuery({
+    queryKey: ["products-review", idProduct],
+    queryFn: fetchGetDetailsReview,
     enabled: !!idProduct,
   });
   useEffect(() => {
@@ -216,6 +232,22 @@ export default function ProductDetail({ idProduct }) {
 
   const handleCancel = () => {
     setIsModalOpen(false);
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    console.log(date);
+    // Get the day, month, and year
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-indexed
+    const year = date.getFullYear();
+    
+    // Get the hours and minutes
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    let seconds = date.getSeconds().toString().padStart(2, '0');
+    seconds = seconds.substring(0, 2);
+    return `${day}-${month}-${year} lúc ${hours}:${minutes}:${seconds}`;
   };
 
   return (
@@ -439,57 +471,37 @@ export default function ProductDetail({ idProduct }) {
           <h2 style={{ fontWeight: "600" }}>Đánh giá sản phẩm</h2>
           <div className="h-10 bg-[#af5e5e]"></div>
           <div style={{ padding: "5px 10px" }}>
+          <IsLoadingComponent isLoading={IsLoadingProductDetailReview}>
+          {productReview?.map((item) => 
             <div className="mt-3">
               <div className="flex " style={{alignItems: "start"}}>
                 <Space Spacewrap size={10} className="mt-2">
-                  <Avatar size="large" icon={<UserOutlined />} />
+                  <Avatar size="large" src={item.avatar} />
                 </Space>
                 <div className="ml-3">
-                  <p>Vu Tran</p>
+                  <p>{item.userName}</p>
                   <div className="">
-                    <Rate tooltips={desc} onChange={setValue} value={value} />
+                    <Rate tooltips={desc} disabled value={item.rating} />
                   </div>
                   <div
                     className="flex text-center"
                     style={{ alignItems: "center" }}
                   >
-                    <div>thời gian</div>
-                    <div className=" h-5 w-[2px] bg-[#c12c2c]" style={{margin: '0 5px'}}></div>
-                    <div>Phân loại hàng: adsadasdsa</div>
+                    <div>Thời gian: {formatDate(item.date)}</div>
+                    {item?.size?.length > 0 ? (
+                      <>
+                      <div className=" h-5 w-[2px] bg-[#c12c2c]" style={{margin: '0 5px'}}></div>
+                      <div>Phân loại hàng: {item.size}</div>
+                      </>
+                    ): ''}
                   </div>
-                  <div>Chất liệu: <span>Tốt</span></div>
                   <div>Màu sắc: <span>đen</span></div>
-                  <div>Hàng đc đóng gói rất chắc chắn và chất lượng nên mua thử để dùng</div>
+                  <div>Bình luận: {item.comments}</div>
                 </div>
               </div>
             </div>
-          
-            <div className="mt-3">
-              <div className="flex " style={{alignItems: "start"}}>
-                <Space Spacewrap size={10} className="mt-2">
-                  <Avatar size="large" icon={<UserOutlined />} />
-                </Space>
-                <div className="ml-3">
-                  <p>Vu Tran</p>
-                  <div className="">
-                    <Rate tooltips={desc} onChange={setValue} value={value} />
-                  </div>
-                  <div
-                    className="flex text-center"
-                    style={{ alignItems: "center" }}
-                  >
-                    <div>thời gian</div>
-                    <div className=" h-5 w-[2px] bg-[#c12c2c]" style={{margin: '0 5px'}}></div>
-                    <div>Phân loại hàng: adsadasdsa</div>
-                  </div>
-                  <div>Chất liệu: <span>Tốt</span></div>
-                  <div>Màu sắc: <span>đen</span></div>
-                  <div>Hàng đc đóng gói rất chắc chắn và chất lượng nên mua thử để dùng</div>
-                </div>
-              </div>
-            </div>
-
-            
+          )}
+          </IsLoadingComponent>
           </div>
         </div>
       </div>

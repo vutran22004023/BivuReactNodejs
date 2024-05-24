@@ -1,8 +1,9 @@
 import  express  from "express";
 import {reviewProductController} from '../controllers/index.js';
+import {authMiddleware} from '../Middlewares/index.js';
 const router = express.Router();
 
-router.post('/create-review-product',reviewProductController.createReviewProduct)
-router.put('/update-review-product/:id/:iduser',reviewProductController.updateReviewProduct)
+router.post('/create-review-product',authMiddleware.authUser,reviewProductController.createReviewProduct)
+router.put('/update-review-product/:id/:iduser',authMiddleware.authUser,reviewProductController.updateReviewProduct)
 router.get('/get-review-product/:productId', reviewProductController.getReviewProduct)
 export default router

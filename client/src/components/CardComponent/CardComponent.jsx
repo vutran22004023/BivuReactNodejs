@@ -15,9 +15,10 @@ import { convertPrice } from "../../utils";
 
 
 const CardComponent =(props) => {
-  const {counInStock, description, image, name, price,rating,type,discount,selled,id,categorySize, slug} = props
+  const {counInStock, description, image, name, price,rating,type,discount,selled,id,categorySize, slug, onClick} = props
   const navigate = useNavigate()
   const handleDetailsProduct =(id,slug) => {
+    onClick(props)
     navigate(`/chi-tiet/${id}/${slug}`)
   }
   return (
@@ -25,7 +26,9 @@ const CardComponent =(props) => {
       // hoverable= {counInStock !== 0 ? true: false}
       hoverable= {true}
       // onClick={()=> counInStock !== 0 && handleDetailsProduct(id)}
-      onClick={() => handleDetailsProduct(id,slug)}
+      onClick={() => {
+        handleDetailsProduct(id,slug)
+      }}
       bodyStyle={{padding:'5px'}}
       // style={{display: counInStock === 0 ? 'none': ''}}
       // className={counInStock === 0 ? "cursor-not-allowed" : ''}

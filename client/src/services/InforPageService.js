@@ -12,6 +12,13 @@ const createInforPage= async ( data,access_Token) => {
     return res.data
 }
 
+const getAllInforPage= async () => {
+    const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/informations-pages/get-all-information-pages`)
+    return res.data
+}
+
+
+
 const getDetailInforPage= async (id,access_Token) => {
     const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/informations-pages/get-information-page-detail/${id}`
     , 
@@ -39,5 +46,6 @@ const updateInforPage= async (id,data,access_Token) => {
 export default {
     createInforPage,
     getDetailInforPage,
-    updateInforPage
+    updateInforPage,
+    getAllInforPage
 }

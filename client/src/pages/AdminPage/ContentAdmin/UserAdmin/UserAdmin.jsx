@@ -1,6 +1,6 @@
 import React, {useState, useEffect,useRef} from 'react'
 import {Outlet} from 'react-router-dom'
-import { Modal, Form, Input, Upload, Avatar,Space  } from "antd";
+import { Modal, Form, Input, Upload, Avatar,Space, Radio  } from "antd";
 
 import {Menu,MenuButton,Dropdown, MenuItem, Divider,Button,Link,Typography,Box,Breadcrumbs } from '@mui/joy';
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
@@ -26,6 +26,7 @@ import {
 import {useQuery} from '@tanstack/react-query'
 import DrawerComponent from '../../../../components/DrawerComponent/Drawer.jsx'
 import ModalComponent from '../../../../components/ModalComponent/Modal.jsx'
+import UploadComponent from '../../../../components/UploadComponent/UploadComponent.jsx'
 export default function UserAdmin() {
     const [form] = Form.useForm();
     const RowMenu = () => (
@@ -152,8 +153,19 @@ export default function UserAdmin() {
         {
           title: 'IsAdmin',
           dataIndex: 'isAdmin',
-          sorter: (a, b) => a.isAdmin - b.isAdmin,
-          ...getColumnSearchProps('isAdmin')
+          render: (text) => {
+            const isPaid = text === true;
+            return (
+              <span
+                style={{
+                  color: isPaid ? '#3adc48' : 'red',
+                  fontWeight: 500
+                }}
+              >
+                {isPaid ? 'Admin' : 'Người dùng'}
+              </span>
+            );
+          },
         },
         {
             title: 'Phone',
@@ -175,16 +187,16 @@ export default function UserAdmin() {
         }
       ];
 
-    const options = [
-        {
-            label: 'Quyền Admin',
-            value: true, 
-          },
-          {
-            label: 'Quyền user',
-            value: false, 
-          },
-      ];
+    // const options = [
+    //     {
+    //         label: 'Quyền Admin',
+    //         value: true, 
+    //       },
+    //       {
+    //         label: 'Quyền user',
+    //         value: false, 
+    //       },
+    //   ];
 
     //checkbox modal create use
     const user = useSelector((state) => state.user);
@@ -200,29 +212,42 @@ export default function UserAdmin() {
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
     const [typePage,setTypePage] = useState(0)
+    const [valueRadio, setvalueRadio] = useState(false);
+    const [valueRadioDetail, setValueRadioDetail] = useState();
+
+    const handleValueRadio = (e) =>{
+      setStateUser({
+        ...stateUser,
+        isAdmin: e.target.value
+      })
+    }
+
+    const handleValueRadioDetail = (e) =>{
+      setStateUserDetail({
+        ...stateUserDetail,
+        isAdmin: e.target.value
+      })
+    }
     useEffect(() => {
       if (pages) { // Đảm bảo pages không phải là undefined hoặc null
           setTypePage(pages.page)
       }
   }, [pages?.page]);
-    const [stateUser, setStateUser] = useState({
-        name: '',
-        email: '',
-        password: '',
-        isAdmin: false,
-        phone: '',
-        address: '',
-        avatar: '',
-        confirmPassword: ''
-    })
-    const [stateUserDetail, setStateUserDetail] = useState({
-        name: '',
-        email: '',
-        isAdmin: false,
-        phone: '',
-        address: '',
-        avatar: '',
-    })
+
+  const inittial =() => (
+    {
+      name: '',
+      email: '',
+      password: '',
+      isAdmin: false,
+      phone: '',
+      address: '',
+      avatar: [],
+      confirmPassword: ''
+  })
+    const [stateUser, setStateUser] = useState(inittial)
+
+    const [stateUserDetail, setStateUserDetail] = useState(inittial)
 
     const handleOnchanges = (e) => {
         setStateUser({
@@ -258,30 +283,6 @@ export default function UserAdmin() {
     const onFinishFailed = () => {
         setIsModalOpen(false);
     }
-    // end bật tắt modal add user
-
-
-    //Phần xử lý hình ảnh avatar
-    const handleOnchangeAvatar = async ({ fileList }) => {
-        const file = fileList[0];
-        if (!file.url && !file.preview) {
-          file.preview = await getBase64(file.originFileObj);
-        }
-        setStateUser({
-          ...stateUser,
-          avatar: file.preview,
-        });
-      };
-      const handleOnchangeAvatarDetailUser = async ({ fileList }) => {
-        const file = fileList[0];
-        if (!file.url && !file.preview) {
-          file.preview = await getBase64(file.originFileObj);
-        }
-        setStateUserDetail({
-          ...stateUser,
-          avatar: file.preview,
-        });
-      };
     
       // begin Xử lý api create, getAllUser, getUserDetail, UpdateUserDetail user api
     const mutation = useMutationHooks ((data) => {
@@ -330,16 +331,7 @@ export default function UserAdmin() {
     useEffect(() => {
         if(data?.status === 200) {
             success()
-            setStateUser({
-                name: '',
-                email: '',
-                password: '',
-                isAdmin: false,
-                phone: '',
-                address: '',
-                avatar: '',
-                confirmPassword: ''
-            })
+            setStateUser(inittial)
             setIsModalOpen(false);
         }else if(data?.status === 'ERR') {
             error()
@@ -347,12 +339,24 @@ export default function UserAdmin() {
     },[data?.status])
 
     useEffect(() => {
+      form.setFieldsValue(stateUser)
+    },[form, stateUser])
+
+    useEffect(() => {
         if(UsersUpdateDetail?.status === 200) {
             success()
+            setIsOpenDrawer(false)
         }else if(UsersUpdateDetail?.status === 'ERR') {
             error()
         }
     }, [UsersUpdateDetail?.data])
+    useEffect(() => {
+      if (!isModalOpen) {
+        form.setFieldsValue(setStateUserDetail);
+      } else {
+        form.setFieldsValue(inittial());
+      }
+    }, [form, setStateUserDetail, isModalOpen]);
 
     useEffect(() => {
       if(dataDeleteMany?.status === 200) {
@@ -396,6 +400,7 @@ export default function UserAdmin() {
                 address:res?.data?.address,
                 avatar:res?.data?.avatar,
             })
+            setValueRadioDetail(res?.data?.isAdmin)
         }
         setIsLoadingUpdate(false)
     }
@@ -632,7 +637,10 @@ export default function UserAdmin() {
                 },
               ]}
             >
-              <CheckBoxComponent options= {options} defaultValue={[false]} onChange={handleOnchanges} />
+            <Radio.Group onChange={handleValueRadio} defaultValue={valueRadio}>
+            <Radio value={true}>Admin</Radio>
+            <Radio value={false}>Người dùng</Radio>
+            </Radio.Group>
             </Form.Item>
             <Form.Item
               label="Số điện thoại"
@@ -697,16 +705,7 @@ export default function UserAdmin() {
                 },
               ]}
             >
-              <Upload
-                onChange={handleOnchangeAvatar}
-                listType="picture"
-                defaultFileList={stateUser?.avatar}
-                maxCount={1}
-              >
-                <Button style={{ marginTop: "10px" }} icon={<UploadOutlined />}>
-                  Ảnh Avatar
-                </Button>
-              </Upload>
+              <UploadComponent setInforPageDetail={setStateUser} InforPageDetail={stateUser} valueImge={stateUser?.avatar} amount={1} valueName="avatar" />
             </Form.Item>
           </Form>
           </LoadingComponent>
@@ -785,7 +784,10 @@ export default function UserAdmin() {
                 },
               ]}
             >
-              <CheckBoxComponent options= {options} defaultValue={[false]} onChange={handleOnchangeDetails} />
+            <Radio.Group onChange={handleValueRadioDetail} value={valueRadioDetail}>
+            <Radio value={true}>Admin</Radio>
+            <Radio value={false}>Người dùng</Radio>
+            </Radio.Group>
             </Form.Item>
             <Form.Item
               label="Số điện thoại"
@@ -838,16 +840,7 @@ export default function UserAdmin() {
                 },
               ]}
             >
-              <Upload
-                onChange={handleOnchangeAvatarDetailUser}
-                listType="picture"
-                defaultFileList={stateUserDetail?.avatar}
-                maxCount={1}
-              >
-                <Button style={{ marginTop: "10px" }} icon={<UploadOutlined />}>
-                  Ảnh Avatar
-                </Button>
-              </Upload>
+              <UploadComponent setInforPageDetail={setStateUserDetail} InforPageDetail={stateUserDetail} valueImge={stateUserDetail?.avatar} amount={1} valueName="avatar" />
             </Form.Item>
           </Form>
           </LoadingComponent>

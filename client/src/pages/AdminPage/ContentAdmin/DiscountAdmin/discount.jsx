@@ -246,7 +246,6 @@ const inittial = () => (
 )
   const [stateDiscount, setStateDiscount] = useState(inittial)
   const [stateDiscountDetail, setStateDiscountDetail] = useState(inittial)
-console.log(stateDiscountDetail)
   const disabledDate = (current) => {
     return current && current < dayjs().endOf('day');
   }

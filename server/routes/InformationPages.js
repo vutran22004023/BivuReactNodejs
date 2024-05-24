@@ -6,4 +6,5 @@ const router = express.Router();
 router.post("/create-information-page",authMiddleware.auth, informationPageController.createInforPage)
 router.get("/get-information-page-detail/:id",authMiddleware.auth, informationPageController.getInforPage)
 router.put("/update-information-page/:id",authMiddleware.auth, informationPageController.updateInforPage)
+router.get("/get-all-information-pages", informationPageController.getAllInforPage)
 export default router

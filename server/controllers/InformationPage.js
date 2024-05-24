@@ -74,8 +74,21 @@ const updateInforPage = async(req, res) => {
     }
 }
 
+const getAllInforPage = async(req, res) => {
+  try{
+
+    const response = await InforPageServicres.getAllInforPage()
+    return res.status(200).json(response)
+}catch(e) {
+    return res.status(404).json({
+        message: e
+    })
+}
+}
+
 export default {
   createInforPage,
   getInforPage,
-  updateInforPage
+  updateInforPage,
+  getAllInforPage
 };

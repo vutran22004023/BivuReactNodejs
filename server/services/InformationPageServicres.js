@@ -115,8 +115,23 @@ const updateInforPage = async(id, data) => {
       }
 }
 
+
+const getAllInforPage = async() => {
+  try {
+    const getAllPage = await InformationPageRouter.find()
+    return {
+      status: 200,
+      message: `Show thành công sản phẩm`,
+      data: getAllPage
+
+    };
+  } catch (error) {
+    throw error;
+  }
+}
 export default {
     createInforPage,
     getInforPageDetail,
-    updateInforPage
+    updateInforPage,
+    getAllInforPage
 }

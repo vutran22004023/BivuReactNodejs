@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import * as tf from '@tensorflow/tfjs';
 export const isJsonString = (data) => {
     try {
         JSON.parse(data)
@@ -117,3 +118,29 @@ export const vietnameseToSlug = (str) => {
     return null
   }
 }
+
+
+// Hàm để xây dựng mô hình
+export const buildModel = (inputSize, outputSize) => {
+  const model = tf.sequential();
+  model.add(tf.layers.dense({ units: 128, activation: 'relu', inputShape: [inputSize] }));
+  model.add(tf.layers.dense({ units: outputSize, activation: 'softmax' }));
+  model.compile({ optimizer: 'adam', loss: 'categoricalCrossentropy' });
+  return model;
+};
+
+// Hàm để huấn luyện mô hình
+export const trainModel = async (model, trainingData, trainingLabels) => {
+  // Ensure trainingData and trainingLabels are arrays of numbers
+  const xs = tf.tensor2d(trainingData, [trainingData.length, trainingData[0].length], 'float32');
+  const ys = tf.tensor2d(trainingLabels, [trainingLabels.length, trainingLabels[0].length], 'float32');
+  await model.fit(xs, ys, { epochs: 10 });
+};
+
+// Hàm để gợi ý sản phẩm
+export const recommendProducts = (model, userPreferences) => {
+  // Ensure userPreferences is an array of numbers
+  const inputTensor = tf.tensor2d([userPreferences], [1, userPreferences.length], 'float32');
+  const prediction = model.predict(inputTensor);
+  return prediction.argMax(-1).dataSync()[0];
+};

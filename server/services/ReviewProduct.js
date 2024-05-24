@@ -1,6 +1,6 @@
 import { ProductModel,ReviewModel } from "../model/index.js";
 const createReviewProduct = async(newreview) => {
-    const {productId,userId,product,userName,rating,comments} = newreview;
+    const {productId,userId,product,userName,rating,comments,avatar} = newreview;
     try{
         const checkProduct = await ProductModel.findOne({
             _id: productId,
@@ -21,6 +21,7 @@ const createReviewProduct = async(newreview) => {
                     color: product[0].color,
                 }
             ],
+            avatar,
             userName,
             rating,
             comments,
@@ -63,7 +64,6 @@ const updateReviewProduct = async(id,iduser,data) => {
 
 const getReviewProduct = async(productId) => {
   try {
-
     const checkProductReview = await ReviewModel.find({
       productId: productId,
     });
@@ -75,10 +75,8 @@ const getReviewProduct = async(productId) => {
     }
     return {
       status: 200,
-      message: `Show thông tin của id: ${checkProductReview.id}`,
-      data: {
-        ...checkProductReview._doc,
-      }
+      message: `Show thông tin của id: `,
+      data: checkProductReview.map(review => ({ ...review._doc }))
     };
   } catch (error) {
     throw error;

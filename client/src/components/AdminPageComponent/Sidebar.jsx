@@ -343,7 +343,7 @@ export default function Sidebar() {
         <Avatar
           variant="outlined"
           size="sm"
-          src={user?.avatar}
+          src={user[0]?.avatar}
         />
         <Box sx={{ minWidth: 0, flex: 1 }}>
           <Typography level="title-sm">{user?.name}</Typography>

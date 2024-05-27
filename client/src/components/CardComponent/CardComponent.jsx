@@ -18,7 +18,6 @@ const CardComponent =(props) => {
   const {counInStock, description, image, name, price,rating,type,discount,selled,id,categorySize, slug, onClick} = props
   const navigate = useNavigate()
   const handleDetailsProduct =(id,slug) => {
-    onClick(props)
     navigate(`/chi-tiet/${id}/${slug}`)
   }
   return (
@@ -50,16 +49,12 @@ const CardComponent =(props) => {
       </div>
       <div className="text-[10px] md:text-[12px]"> 
         <span>{rating}</span>
-        <span>
-          <StarFilled className="text-[10px] md:text-[12px] text-yellow-500 mt-[4px]"
-            
-          />
-        </span>
+
         <span>| Đã Bán {selled || null}+</span>
       </div>
       <div className="text-[10px] md:text-[16px] text-red-500 font-semibold flex">
       <span>{convertPrice(categorySize[0].price)}</span>
-        <span><div className="ml-[3px] text-[10px] md:text-[12px] font-medium">-5%</div></span>
+        <span><div className="ml-[3px] text-[10px] md:text-[12px] font-medium">{discount}%</div></span>
       </div>
     </Card>
   );

@@ -144,3 +144,19 @@ export const recommendProducts = (model, userPreferences) => {
   const prediction = model.predict(inputTensor);
   return prediction.argMax(-1).dataSync()[0];
 };
+
+
+export const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  // Get the day, month, and year
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-indexed
+  const year = date.getFullYear();
+
+  // Get the hours and minutes
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  let seconds = date.getSeconds().toString().padStart(2, "0");
+  seconds = seconds.substring(0, 2);
+  return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+};

@@ -9,6 +9,7 @@ import IsLoadingComponent from '../../../../components/LoadComponent/Loading.jsx
 export default function CategoryHome() {
   const {state} = useLocation()
   const [products, setProduct] = useState([])
+  console.log(products)
   const [isLoadingres,setIsLoadingres] = useState(false)
   const [panigate, setPanigate] = useState({
     page : 0,
@@ -17,8 +18,9 @@ export default function CategoryHome() {
   })
   const fetchProductType =  async(type, page, limit) => {
     const res = await ProductService.getProductType(type,page, limit )
+    console.log(res)
     if(res?.status === 200) {
-      setProduct(res?.data)
+      setProduct(res)
       setPanigate({...panigate, total: res?.totalPage})
       setIsLoadingres(false)
     }
@@ -49,25 +51,24 @@ export default function CategoryHome() {
       </Col>
 
       <Col span={19} style={{display: 'grid', alignItems: 'center',gridTemplateColumns: 'repeat(5 ,1fr)',}}>
-      { products?.map((product,index)=> {
-            return (
+      { products?.data?.map((product, index) => (
               <>
               <CardComponent
-              key={index}
-              counInStock ={product.counInStock}
+              key={product._id}
               description={product.description}
               image ={product.image}
               name = {product.name}
-              price = {product.price}
+              categorySize = {product.categorySize}
               rating = {product.rating}   
               type = {product.type}
               discount = {product.discount}
+              slug = {product.slug}
               selled = {product.selled}
               id = {product._id}
               />
               </>
             )
-          })}
+          )}
       </Col>
     </WapperCategory>
     <Pagination showSizeChanger onShowSizeChange={onShowSizeChange} style={{width: '100%', justifyItems: 'center', textAlign:'center'}} defaultCurrent={panigate?.page + 1} total={panigate?.total}/>

@@ -52,7 +52,6 @@ const updateDiscount= async (id, data) => {
 }
 
 const DeleteDiscount= async (id) => {
-    console.log(id)
     const res = await axios.delete(`${import.meta.env.REACT_APP_API_URL}/discount/delete-discount/${id}`
     // , 
     // {

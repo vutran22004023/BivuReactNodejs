@@ -123,7 +123,7 @@ export default function headerHome({isHeaderVisible}) {
   useEffect(() => {
     const handleScroll = () => {
       const offset = window.scrollY;
-      const threshold = 65; // Điều kiện để header trở nên dính cố định
+      const threshold = 67; // Điều kiện để header trở nên dính cố định
       setSticky(offset > threshold);
     };
 
@@ -447,7 +447,12 @@ export default function headerHome({isHeaderVisible}) {
         />
       </div>
 
-      <div style={{ position: "relative" }}>
+      <div 
+      style={{ position: isSticky ? "fixed" : "static", zIndex:100000}}
+      // position: isSticky ? "fixed" : "static",
+      // relative
+      className="z-[100000]"
+      >
         <ButtonInputSearch
           size="large"
           placeholder="Nhập dữ liệu"
@@ -461,7 +466,7 @@ export default function headerHome({isHeaderVisible}) {
             <AntdList
               ordered
               dataSource={dataSearch}
-              className="absolute left-0 top-[100%] z-[100000] mt-1 w-full bg-[#FFFFFF] p-2 shadow-lg"
+              className=" left-0 top-[100%] w-full bg-[#FFFFFF] p-2 shadow-lg"
               renderItem={(item, index) => (
                 <AntdList.Item>{item.title}</AntdList.Item>
               )}
@@ -520,15 +525,15 @@ export default function headerHome({isHeaderVisible}) {
         style={{
           textAlign: "center",
           // transform: isSticky ? "translateY(-100%)" : "translateY(0)",
-          position: isSticky ? "fixed" : "",
+          position: isSticky ? "fixed" : "static",
           top: isSticky ? "0" : "",
-          zIndex: isSticky ? "1000" : "",
-          transition: isSticky ? "top 0.3s" : "",
+          zIndex: isSticky ? "500" : "",
+          transition: "all 0.5s ease",
         }}
       >
         <WrapperHeaderMid
           className="w-full items-center p-pad-sm md:p-pad-md"
-          style={{ position: isSticky ? "fixed" : "" }}
+          style={{ position: isSticky ? "fixed" : "static",transition: "all 0.5s ease" }}
         >
           <Col xs={4} md={4}>
             <img
@@ -669,19 +674,27 @@ export default function headerHome({isHeaderVisible}) {
         <div
           className="align-center hidden  bg-[#60609B]  text-white md:block"
           style={{
-            height: "auto",
-            zIndex: "1000",
+            height: "54px",
             position: isSticky ? "fixed" : "static",
             top: isSticky ? "80px" : "",
             width: isSticky ? "100%" : "",
-            padding: "0 160px",
+            padding: "0 180px",
+            alignItems: "left",
           }}
         >
+        {productType?.data.length >= 10 ? (
           <Slider {...settings}>
             {productType?.data?.map((item, index) => {
               return <TypeProduct style name={item} />;
             })}
           </Slider>
+        ) : (
+          <div className="flex">
+            {productType?.data?.map((item, index) => {
+              return <TypeProduct name={item} />;
+            })}
+          </div>
+        )}
         </div>
       </div>
     </div>

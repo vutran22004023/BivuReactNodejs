@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import ProductDetail from "../../../../components/ProductDetails/ProductDetail";
-import { Avatar, Rate, Space } from "antd";
-import { UserOutlined } from "@ant-design/icons";
 
 export default function DetailProduct() {
   const { id } = useParams();

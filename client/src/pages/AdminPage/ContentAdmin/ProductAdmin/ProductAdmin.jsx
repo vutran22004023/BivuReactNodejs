@@ -1035,6 +1035,8 @@ const saveData = () => {
                         onChange={(e) =>
                           handleOnchanges(index, e, "categorySize")
                         }
+                        type="number"
+                        min="0"
                       />
                     </Form.Item>
                     <Form.Item>
@@ -1069,6 +1071,9 @@ const saveData = () => {
                         onChange={(e) =>
                           handleOnchanges(index, e, "categorySize")
                         }
+                        className="w-20"
+                        type="number"
+                        min="0"
                       />
                     </Form.Item>
                   </div>
@@ -1144,6 +1149,10 @@ const saveData = () => {
                   value={stateProduct.discount}
                   onChange={(e) => handleOnchanges(null, e, "discount")}
                   name="discount"
+                  className="w-20"
+                  type="number"
+                  min='0'
+                  max='100'
                 />
               </Form.Item>
               <Form.Item
@@ -1403,6 +1412,8 @@ const saveData = () => {
                               handleOnchangeDetails(key, e, "categorySize")
                             }
                             name="price"
+                            type="number"
+                            min="0"
                           />
                         </Form.Item>
 
@@ -1423,6 +1434,8 @@ const saveData = () => {
                               handleOnchangeDetails(key, e, "categorySize")
                             }
                             name="counInStock"
+                            type="number"
+                            min="0"
                           />
                         </Form.Item>
                         {fields.length > 1 ? (
@@ -1517,8 +1530,12 @@ const saveData = () => {
               >
                 <Input
                   value={stateProductDetail.discount}
-                  onChange={handleOnchangeDetails}
+                  onChange={(e) => handleOnchangeDetails(null, e, "discount")}
                   name="discount"
+                  className="w-20"
+                  type="number"
+                  min='0'
+                  max='100'
                 />
               </Form.Item>
 
@@ -1533,7 +1550,7 @@ const saveData = () => {
               >
                 <Input
                   value={stateProductDetail.linksshopee}
-                  onChange={(e) => handleOnchanges(null, e, "linksshopee")}
+                  onChange={(e) => handleOnchangeDetails(null, e, "linksshopee")}
                   name="linksshopee"
                 />
               </Form.Item>

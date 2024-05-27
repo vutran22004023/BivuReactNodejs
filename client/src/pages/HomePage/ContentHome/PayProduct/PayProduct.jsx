@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import ButtonComponent from "../../../../components/ButtonSearch/Button";
 import { useSelector, useDispatch } from "react-redux";
-import { convertPrice } from "../../../../utils";
+import { convertPrice, formatDate } from "../../../../utils";
 import ModalComponent from "../../../../components/ModalComponent/Modal";
 import TextField from "@mui/material/TextField";
 import FormLabel from "@mui/material/FormLabel";
@@ -14,7 +14,8 @@ import {
   UserService,
   OrderProduct,
   PaymentService,
-  GhtkService
+  GhtkService,
+  DiscountService,
 } from "../../../../services/index";
 import { useQuery } from "@tanstack/react-query";
 import { useMutationHooks } from "../../../../hooks/UseMutationHook";
@@ -24,9 +25,13 @@ import {
   warning,
 } from "../../../../components/MessageComponents/Message.jsx";
 import IsLoadingComponent from "../../../../components/LoadComponent/Loading.jsx";
-import { Steps, theme, Radio, Space, Input,Form } from "antd";
+import { Steps, theme, Radio, Space, Input, Form } from "antd";
 const { TextArea } = Input;
-import GoogleMapComponent from '../../../../components/GoogleMapComponent/GoogleMap.jsx'
+import GoogleMapComponent from "../../../../components/GoogleMapComponent/GoogleMap.jsx";
+import { updateUser } from "../../../../redux/Slides/userSlide";
+import SellIcon from "@mui/icons-material/Sell";
+import IconVoucher from '../../../../assets/font-end/imgs/icon/iconVoucher.png';
+import PlaceIcon from '@mui/icons-material/Place';
 export default function PayProduct() {
   const [value, setValue] = useState(null);
   const [valueRadioShip, setValueRadioShip] = useState();
@@ -38,10 +43,17 @@ export default function PayProduct() {
   const [SleectDistrict, setSleectDistrict] = useState("");
   const [SleectRard, setSleectRard] = useState("");
   const [isModalUpdateInfo, setIsOpenModalUpdateInfo] = useState(false);
-  const [isModalTransition, setIsOpenModalTransition] = useState(false)
+  const [isModalTransition, setIsOpenModalTransition] = useState(false);
+  const [isModalVoucher, setIsModalVoucher] = useState(false);
+  const [valueRadiovoucher, setValueRadiovoucher] = useState()
+  const [valueVoucher, setValueVoucher] = useState();
+  const handleButtonVoucher = () => {
+    setIsModalVoucher(true);
+  };
+  const dispatch = useDispatch();
   const handleButtonTransport = () => {
-    setIsOpenModalTransition(true)
-  }
+    setIsOpenModalTransition(true);
+  };
   const [stateUserDetail, setStateUserDetail] = useState({
     name: "",
     phone: "",
@@ -125,12 +137,11 @@ export default function PayProduct() {
         shippingPrice: diliveryPriceMemo,
         totalPrice: TotalpriceMemo,
         user: user?.id,
-        note_customers:stateUserDetail.note_customers
+        note_customers: stateUserDetail.note_customers,
       });
 
-      if(valueRadio === "Thanh toán khi nhận hàng") {
-        
-      }else if(valueRadio === "Thanh toán QR") {
+      if (valueRadio === "Thanh toán khi nhận hàng") {
+      } else if (valueRadio === "Thanh toán QR") {
         mutationPayQR.mutate({
           oderItem: order?.orderItemsSlected,
           fullName: user?.name,
@@ -143,8 +154,8 @@ export default function PayProduct() {
           shippingPrice: diliveryPriceMemo,
           totalPrice: TotalpriceMemo,
           user: user?.id,
-        })
-      }else if(valueRadio === "Thanh toán Zalopay") {
+        });
+      } else if (valueRadio === "Thanh toán Zalopay") {
         mutationPayZaloPay.mutate({
           oderItem: order?.orderItemsSlected,
           fullName: user?.name,
@@ -156,11 +167,10 @@ export default function PayProduct() {
           shippingPrice: diliveryPriceMemo,
           totalPrice: TotalpriceMemo,
           user: user?.id,
-        })
+        });
       }
     }
   };
-
 
   const handleUpdateModal = () => {
     mutationUpdate.mutate(stateUserDetail);
@@ -195,41 +205,53 @@ export default function PayProduct() {
     return res;
   });
 
-  const mutationPayQR = useMutationHooks(async(data) => {
+  const mutationsVoucherShop = useMutationHooks(() => {
+    const res = DiscountService.getAllDiscount();
+    return res;
+  });
+
+  const mutationPayQR = useMutationHooks(async (data) => {
     try {
       const { ...rests } = data;
       const res = await PaymentService.createPaymentLink(data);
       // Kiểm tra xem API đã trả về thành công hay không
       return res;
-  } catch (error) {
+    } catch (error) {
       console.error("Lỗi khi gọi API thanh toán:", error);
-  }
+    }
   });
 
-  const mutationPayZaloPay = useMutationHooks(async(data) => {
+  const mutationPayZaloPay = useMutationHooks(async (data) => {
     try {
       const { ...rests } = data;
       const res = await PaymentService.createPaymentZaloPay(data);
       // Kiểm tra xem API đã trả về thành công hay không
-      return res
-  } catch (error) {
+      return res;
+    } catch (error) {
       console.error("Lỗi khi gọi API thanh toán:", error);
-  }
+    }
   });
 
-  const mutationGHTKshippingfeecharged = useMutationHooks(async() =>{
-    const address = stateUserDetail.address
-   const province= stateUserDetail.nameCity
-   const district= stateUserDetail.nameDistrict
-   const pick_province="Đà Nẵng"
-   const pick_district="Quận Liên Chiểu"
-    const value = priceMemo
-  const res = await GhtkService.shippingfeecharged(address,province,district,pick_province,pick_district,value)
-    return res
-  })
-  useEffect(() =>{
-    mutationGHTKshippingfeecharged.mutate()
-  },[stateUserDetail.address,stateUserDetail.nameCity,stateUserDetail.nameDistrict])
+  const mutationGHTKshippingfeecharged = useMutationHooks(async () => {
+    const address = user?.address;
+    const province = user?.nameCity;
+    const district = user?.nameDistrict;
+    const pick_province = "Đà Nẵng";
+    const pick_district = "Quận Liên Chiểu";
+    const value = priceMemo;
+    const res = await GhtkService.shippingfeecharged(
+      address,
+      province,
+      district,
+      pick_province,
+      pick_district,
+      value,
+    );
+    return res;
+  });
+  useEffect(() => {
+    mutationGHTKshippingfeecharged.mutate();
+  }, [user?.address, user?.nameCity, user?.nameDistrict]);
 
   useEffect(() => {
     if (stateUserDetail?.city) {
@@ -243,31 +265,39 @@ export default function PayProduct() {
     }
   }, [stateUserDetail?.district]);
 
+  useEffect(() => {
+    if (isModalVoucher === true) {
+      mutationsVoucherShop.mutate();
+    }
+  }, [isModalVoucher]);
+
   const { data: getAllCity } = useQuery({
     queryKey: ["fetchProvincevn"],
     queryFn: fetchProvincevn,
   });
   const { data: getDetailAllDistrict } = fetchDetailDistrict;
   const { data: getDetailAllRard } = fetchDetailRard;
-  const {data: showfeeShip} = mutationGHTKshippingfeecharged;
-  console.log(showfeeShip)
-  const { data: UsersUpdateDetail, isLoading: isLoadingUpdateUserDetail } =mutationUpdate;
+  const { data: showfeeShip } = mutationGHTKshippingfeecharged;
+  const { data: UsersUpdateDetail, isLoading: isLoadingUpdateUserDetail } =
+    mutationUpdate;
   const { data: orderProductPay, isLoading: isLoadingAddOrder } =
     mutationOrderProduct;
-  const {data: payQR} =mutationPayQR
-  const {data: PayZalo}=mutationPayZaloPay
-  useEffect(()=> {
+  const { data: payQR } = mutationPayQR;
+  const { data: PayZalo } = mutationPayZaloPay;
+  const { data: dataVoucher, isLoading: isLoadingVoucher } =
+    mutationsVoucherShop;
+  useEffect(() => {
     if (payQR) {
       // Chuyển hướng người dùng đến URL được trả về từ API
       window.location.href = payQR.checkoutUrl;
-  }
-  },[payQR])
-  useEffect(()=> {
+    }
+  }, [payQR]);
+  useEffect(() => {
     if (PayZalo) {
       // Chuyển hướng người dùng đến URL được trả về từ API
       window.location.href = PayZalo.order_url;
-  }
-  },[PayZalo])
+    }
+  }, [PayZalo]);
 
   useEffect(() => {
     if (orderProductPay?.status === 200) {
@@ -276,9 +306,17 @@ export default function PayProduct() {
       error();
     }
   }, [orderProductPay]);
+
   useEffect(() => {
     if (UsersUpdateDetail?.status === 200) {
       success();
+      dispatch(
+        updateUser({
+          ...UsersUpdateDetail?.data,
+          access_Token: user?.access_Token,
+        }),
+      );
+      setIsOpenModalUpdateInfo(false);
     } else if (UsersUpdateDetail?.status === "ERR") {
       error();
     }
@@ -326,7 +364,7 @@ export default function PayProduct() {
   }, [order]);
 
   const diliveryPriceMemo = useMemo(() => {
-    if (valueRadioShip === 'shop_giao') {
+    if (valueRadioShip === "shop_giao") {
       return 15000;
     } else {
       return parseInt(valueRadioShip);
@@ -335,46 +373,90 @@ export default function PayProduct() {
   }, [valueRadioShip]);
 
   const TotalpriceMemo = useMemo(() => {
-    return priceMemo + diliveryPriceMemo;
-  }, [priceMemo, diliveryPriceMemo]);
+    if (valueVoucher) {
+      const discountedPrice = priceMemo * (1 - valueVoucher / 100); // Giảm giá theo phần trăm
+      return discountedPrice + diliveryPriceMemo;
+    } else {
+      return priceMemo + diliveryPriceMemo;
+    }
+  }, [priceMemo, diliveryPriceMemo, valueVoucher]);
 
   const onChange = (e) => {
     setValue(e.target.value);
-  }
+  };
+
+
 
   useEffect(() => {
-    if(value === 1){
-      setValueRadio('Thanh toán khi nhận hàng')
-    }else if(value ===2) {
-      setValueRadio('Thanh toán QR')
-    }else if(value === 3) {
-      setValueRadio('Thanh toán Zalopay')
+    if (value === 1) {
+      setValueRadio("Thanh toán khi nhận hàng");
+    } else if (value === 2) {
+      setValueRadio("Thanh toán QR");
+    } else if (value === 3) {
+      setValueRadio("Thanh toán Zalopay");
     }
-  }, [value])
-  const onchangeRadioShip= (e) => {
-    setValueRadioShip(e.target.value)
-  }
+  }, [value]);
+  const onchangeRadioShip = (e) => {
+    setValueRadioShip(e.target.value);
+  };
 
-  const handleConfirmRadio =() => {
-    setValueRadioShipcomplete(valueRadioShip)
-    setIsOpenModalTransition(false)
-  }
+  const handleConfirmRadio = () => {
+    setValueRadioShipcomplete(valueRadioShip);
+    setIsOpenModalTransition(false);
+  };
+  const isVoucherActive = (startDate) => {
+    const now = new Date();
+    return new Date(startDate) <= now;
+  };
 
+  const getTimeUntilStart = (startDate) => {
+    const now = new Date();
+    const start = new Date(startDate);
+    const diff = start - now;
+  
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+  
+    return { days, hours, minutes, seconds };
+  };
+
+  const hasVoucherEnded = (endDate) => {
+    const now = new Date();
+    return new Date(endDate) < now;
+  };
+
+
+   const onChangeRadioVoucher = (e) => {
+    setValueRadiovoucher(e.target.value)
+   }
+
+   const handleButtonOkVoucher = () => {
+    setValueVoucher(valueRadiovoucher)
+    setIsModalVoucher(false)
+   }
   const steps = [
     {
       title: "Chi tiết thông tin đơn hàng",
       content: (
         <>
-          <div className="bg-[#e9d5d5] p-5 md:p-10">
-            <h2 className="mb-2 text-[20px]">Địa chỉ nhà Hàng</h2>
+          <div className="bg-[#ebe6e6] p-5 md:p-10">
+            <h2 className="mb-2 text-[18px] md:text-[25px] text-[#ee4d2d]"><span><PlaceIcon/></span> Địa chỉ nhận Hàng</h2>
             <div className="flex">
-              <div className="">
+            {user?.name && user?.phone &&  user?.specific_address ? (
+              <>
+              <div className="text-[10px] md:text-[16px]"  style={{fontWeight:'600'}}>
                 {" "}
-                {user?.name} ({user?.phone})
+                {user?.name} (+84){user?.phone} 
               </div>
-              <div className="">{user?.specific_address}</div>
+              <div className="ml-2 text-[10px] md:text-[16px]">{user?.specific_address}</div>
+              </>
+            ): (
+              <div className="text-[10px] md:text-[16px] text-[red]">Vui lòng cập nhập thông tin giao hàng</div>
+            )}
               <span
-                className="ml-2 cursor-pointer text-[#727aa4] hover:text-[#3050ec] "
+                className="ml-1 md:ml-2 cursor-pointer text-[#2544a1] hover:text-[#3161f0]  text-[10px] md:text-[16px]"
                 onClick={handleOpenModal}
               >
                 {" "}
@@ -383,7 +465,7 @@ export default function PayProduct() {
             </div>
           </div>
 
-          <div className="mt-5 w-full bg-[#e9d5d5] p-5 text-center md:p-10">
+          <div className="mt-5 w-full bg-[#ebe6e6] p-5 text-center md:p-10">
             <div className="flex justify-between">
               <div className="w-35 flex-auto text-left md:w-32">Sản phẩm</div>
               <div className="w-5 flex-auto"></div>
@@ -406,10 +488,17 @@ export default function PayProduct() {
                   </div>
 
                   <div className="w-5 flex-auto">
-                  <div className="" style={{ display: item.category&& item.color ? 'block' : 'none' }}>
-                    <div>Phân Loại hàng</div>
-                    <div>{item.category}, {item.color}</div>
-              </div>
+                    <div
+                      className=""
+                      style={{
+                        display: item.category && item.color ? "block" : "none",
+                      }}
+                    >
+                      <div>Phân Loại hàng</div>
+                      <div>
+                        {item.category}, {item.color}
+                      </div>
+                    </div>
                   </div>
                   <div className="flex">
                     <div className="w-20 flex-auto md:w-40">
@@ -425,75 +514,215 @@ export default function PayProduct() {
             })}
           </div>
 
-          <div className=" flex border-[1px] border-slate-400 bg-[#e9d5d5]">
+          <div className=" flex border-[1px] border-slate-400 bg-[#ebe6e6]">
             <div className="w-[600px] border-[1px] border-slate-400 p-5">
-            <Form>
-              <Form.Item name="note_customers" label="Lời nhắn">
-              <TextArea value={stateUserDetail.note_customers} onChange={handleOnchangeDetails} name="note_customers" rows={3} placeholder="Nhập lời nhắn với shop" />
-              </Form.Item>
-            </Form>
+              <Form>
+                <Form.Item name="note_customers" label="Lời nhắn">
+                  <TextArea
+                    value={stateUserDetail.note_customers}
+                    onChange={handleOnchangeDetails}
+                    name="note_customers"
+                    rows={3}
+                    placeholder="Nhập lời nhắn với shop"
+                  />
+                </Form.Item>
+              </Form>
             </div>
             <div className="w-full border-[1px] border-slate-400 p-5">
-              {valueRadioShipcomplete === 'shop_giao' ? (
+              {valueRadioShipcomplete === "shop_giao" ? (
                 <div className="mr-4 flex justify-between">
-                <div className="text-[15px]">Đơn vị vận chuyển: </div>
-                <div>
-                  <p>Được vận chuyển bởi shop</p>
-                  <p>Đảm bảo nhận hàng từ 22 Tháng 4 - 23 Tháng 4</p>
+                  <div className="text-[15px]">Đơn vị vận chuyển: </div>
+                  <div>
+                    <p>Được vận chuyển bởi shop</p>
+                  </div>
+                  <div
+                    onClick={handleButtonTransport}
+                    className="cursor-pointer text-[#2544a1] hover:text-[#3161f0]"
+                  >
+                    Thay đổi
+                  </div>
+                  <div>{convertPrice(diliveryPriceMemo)}</div>
                 </div>
-                <div onClick={handleButtonTransport} className="cursor-pointer">Thay đổi</div>
-                <div>{convertPrice(diliveryPriceMemo)}</div>
-              </div>
               ) : (
                 <div className="mr-4 flex justify-between">
-                <div className="text-[15px]">Đơn vị vận chuyển: </div>
-                <div>
-                  <p>Tiêu chuẩn</p>
-                  <p>Giao hàng tiết kiệm</p>
-                  <div >Lưu ý: <span>Tiền ship được tính theo Kg hiện tại sản phẩm của shop chưa cập nhập khối lượng của sản phẩm nên shop để mặc định 1kg(0,5kg tiếp theo = +5.000),sau khi các bạn mua sản phẩm của shop sẽ liên hệ lại bạn để báo giá tiền ship. (Mong các bạn thông cảm cho sự bất tiện này)</span></div>
+                  <div className="text-[15px]">Đơn vị vận chuyển: </div>
+                  <div>
+                    <p>Tiêu chuẩn</p>
+                    <p>Giao hàng tiết kiệm</p>
+                    <div>
+                      Lưu ý:{" "}
+                      <span>
+                        Tiền ship được tính theo Kg hiện tại sản phẩm của shop
+                        chưa cập nhập khối lượng của sản phẩm nên shop để mặc
+                        định 1kg(0,5kg tiếp theo = +5.000),sau khi các bạn mua
+                        sản phẩm của shop sẽ liên hệ lại bạn để báo giá tiền
+                        ship. (Mong các bạn thông cảm cho sự bất tiện này)
+                      </span>
+                    </div>
+                  </div>
+                  <div
+                    onClick={handleButtonTransport}
+                    className="cursor-pointer"
+                  >
+                    Thay đổi
+                  </div>
+                  <div>{convertPrice(diliveryPriceMemo)}</div>
                 </div>
-                <div onClick={handleButtonTransport} className="cursor-pointer">Thay đổi</div>
-                <div>{convertPrice(diliveryPriceMemo)}</div>
-              </div>
               )}
             </div>
-            <ModalComponent 
-            title="Cập nhập phương thức vận chuyển"
-            isOpen={isModalTransition}
-            onOk={handleConfirmRadio}
-            onCancel={() => setIsOpenModalTransition(false)}
-            okText="Cập nhập"
-            cancelText="Thoát"
+            <ModalComponent
+              title="Cập nhập phương thức vận chuyển"
+              isOpen={isModalTransition}
+              onOk={handleConfirmRadio}
+              onCancel={() => setIsOpenModalTransition(false)}
+              okText="Cập nhập"
+              cancelText="Thoát"
             >
-            <Radio.Group onChange={onchangeRadioShip} value={valueRadioShip}>
-      <Space direction="vertical">
-      {stateUserDetail?.nameCity === "Thành phố Đà Nẵng" && (
-        <Radio value="shop_giao">
-          <div className="flex justify-between w-full">
-          <div>Được vận chuyển bởi shop</div>
-          <div className="text-right" style={{position: "absolute", right:'0',marginRight:'30px'}}>{convertPrice(15000)}</div>
-          </div>
-          <div>Được áp dụng cho đơn hàng vận chuyện ở Tp Đà Nẵng</div>
-        </Radio>
-      )}
-        <Radio value={showfeeShip?.fee?.ship_fee_only}>
-        <div className="flex justify-between w-full">
-          <div>Được vận chuyển bởi Giao Hàng Tiết Kiệm</div>
-          <div className="text-right" style={{position: "absolute", right:'0',marginRight:'30px'}}>{convertPrice(showfeeShip?.fee?.ship_fee_only)}</div>
-          </div>
-          <div>Lưu ý: <span>Tiền ship được tính theo Kg hiện tại sản phẩm của shop chưa cập nhập khối lượng của sản phẩm nên shop để mặc định 1kg(0,5kg tiếp theo = +5.000),sau khi các bạn mua sản phẩm của shop sẽ liên hệ lại bạn để báo giá tiền ship. (Mong các bạn thông cảm cho sự bất tiện này)</span></div>
-        </Radio>
-      </Space>
-    </Radio.Group>        
+              <Radio.Group onChange={onchangeRadioShip} value={valueRadioShip}>
+                <Space direction="vertical">
+                  {stateUserDetail?.nameCity === "Thành phố Đà Nẵng" && (
+                    <Radio value="shop_giao">
+                      <div className="flex w-full justify-between">
+                        <div>Được vận chuyển bởi shop</div>
+                        <div
+                          className="text-right"
+                          style={{
+                            position: "absolute",
+                            right: "0",
+                            marginRight: "30px",
+                          }}
+                        >
+                          {convertPrice(15000)}
+                        </div>
+                      </div>
+                      <div>
+                        Được áp dụng cho đơn hàng vận chuyện ở Tp Đà Nẵng
+                      </div>
+                    </Radio>
+                  )}
+                  <Radio value={showfeeShip?.fee?.ship_fee_only}>
+                    <div className="flex w-full justify-between">
+                      <div>Được vận chuyển bởi Giao Hàng Tiết Kiệm</div>
+                      <div
+                        className="text-right"
+                        style={{
+                          position: "absolute",
+                          right: "0",
+                          marginRight: "30px",
+                        }}
+                      >
+                        {convertPrice(showfeeShip?.fee?.ship_fee_only)}
+                      </div>
+                    </div>
+                    <div>
+                      Lưu ý:{" "}
+                      <span>
+                        Tiền ship được tính theo Kg hiện tại sản phẩm của shop
+                        chưa cập nhập khối lượng của sản phẩm nên shop để mặc
+                        định 1kg(0,5kg tiếp theo = +5.000),sau khi các bạn mua
+                        sản phẩm của shop sẽ liên hệ lại bạn để báo giá tiền
+                        ship. (Mong các bạn thông cảm cho sự bất tiện này)
+                      </span>
+                    </div>
+                  </Radio>
+                </Space>
+              </Radio.Group>
             </ModalComponent>
           </div>
-          <div className="w-full bg-[#e9d5d5] p-5">
+          <div className="w-full bg-[#ebe6e6] p-5">
             <div className=" mr-5 flex" style={{ justifyContent: "right" }}>
               <div>
                 Tổng số tiền ({order?.orderItemsSlected?.length || "0"} sản
                 phẩm):{" "}
               </div>
               <div className="ml-1">{convertPrice(TotalpriceMemo)}</div>
+            </div>
+          </div>
+
+          <div className=" mt-5 border-[1px] border-slate-400 bg-[#ebe6e6] p-5">
+            <div className=""></div>
+            <div className="flex  justify-between" style={{alignItems:'center'}}>
+              <div className="w-full text-[17px]  md:text-[22px]">
+                <SellIcon className="text-[red]" />
+                Voucher của shop
+              </div>
+              <div className="flex w-full justify-between">
+                <div>
+                </div>
+                <div className="flex " style={{alignItems:'center'}}>
+                  <div>
+                  {valueVoucher && (
+                    <div className="flex" style={{alignItems:'center'}} >
+                    <img src={IconVoucher} className="w-[65px] h-[50px]" style={{position:'relative'}}/>
+                    <span className="text-[10px] text-[red]">đã áp dụng mẫ giảm giá</span>
+                    <div style={{ position: 'absolute', color: '#000', fontSize: '10px' }}
+                    className=" transform translate-x-[80%] -translate-y-[0%] md:translate-x-[120%] md:-translate-y-[5%]"
+                    >
+                        -{valueVoucher}%
+                    </div>
+                    </div>
+                )}
+                  </div>
+                  <div
+                    className="cursor-pointer text-[#2544a1] hover:text-[#3161f0] ml-3 text-[12px]  md:text-[16px]"
+                    onClick={handleButtonVoucher}
+                  >
+                    Chọn Voucher
+                  </div>
+                </div>
+                <ModalComponent
+                  title="Voucher shop"
+                  isOpen={isModalVoucher}
+                  onOk={handleButtonOkVoucher}
+                  onCancel={() => setIsModalVoucher(false)}
+                  okText="Ok"
+                  cancelText="Thoát"
+                >
+                  <IsLoadingComponent isLoading={isLoadingVoucher}>
+                      <div style={{ maxHeight: '500px', overflowY: 'auto', marginTop:'20px' }}>
+                    <Radio.Group onChange={onChangeRadioVoucher} value={valueRadiovoucher}>
+                      {dataVoucher?.data?.map((item) => {
+                        const active = isVoucherActive(item.startDate);
+                        const timeUntilStart = getTimeUntilStart(item.startDate);
+                        const ended = hasVoucherEnded(item.endDate);
+
+                        if (ended) {
+                          return null; // Do not render if the voucher has ended
+                        }
+                        return (
+                          <Radio value={item.discountPercent} disabled={!active} key={item.id}>
+                            <div
+                              className={`mb-4 ml-[5px] rounded-lg md:ml-[30px] ${active ? "bg-gradient-to-r from-pink-500 to-orange-500" : "bg-gray-400"} w-full p-4 shadow-md md:p-6`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <h1 className="text-[16px] font-bold text-white md:text-[17px]">
+                                  VOUCHERBIVU
+                                </h1>
+                                <div className="text-white">
+                                  <div className="w-[200px]">{item.name}</div>
+                                  <div>Số lượng: {item.quantity}</div>
+                                </div>
+                              </div>
+                              <div>
+                                <div className="mt-4 text-white">
+                                  HSD: {formatDate(item.startDate)} -{" "}
+                                  {formatDate(item.endDate)}
+                                </div>
+                                {!active && (
+                                  <div className="mt-2 text-yellow-300">
+                                    Voucher bắt đầu trong: {timeUntilStart.days}d: {timeUntilStart.hours}h: {timeUntilStart.minutes}m: {timeUntilStart.seconds}s
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </Radio>
+                        );
+                      })}
+                    </Radio.Group>
+                    </div>
+                  </IsLoadingComponent>
+                </ModalComponent>
+              </div>
             </div>
           </div>
         </>
@@ -503,7 +732,7 @@ export default function PayProduct() {
       title: "Chọn phương thức thanh toán",
       content: (
         <>
-          <div className="bg-[#e9d5d5] p-5 md:p-10">
+          <div className="bg-[#ebe6e6] p-5 md:p-10">
             <h2 className="mb-2 text-[20px]">Phương thức thanh toán</h2>
             <Radio.Group onChange={onChange} value={value}>
               <Space direction="vertical">
@@ -519,13 +748,13 @@ export default function PayProduct() {
   ];
 
   useEffect(() => {
-    if (stateUserDetail?.nameCity === "Thành phố Đà Nẵng") {
+    if (user?.nameCity === "Thành phố Đà Nẵng") {
       setValueRadioShip("shop_giao");
-      setValueRadioShipcomplete(valueRadioShip)
+      setValueRadioShipcomplete(valueRadioShip);
     } else {
       setValueRadioShip(showfeeShip?.fee?.ship_fee_only);
     }
-  }, [stateUserDetail, showfeeShip]);
+  }, [user?.nameCity, showfeeShip]);
 
   const [current, setCurrent] = useState(0);
   const next = () => {
@@ -541,9 +770,11 @@ export default function PayProduct() {
   return (
     <IsLoadingComponent isLoading={isLoadingAddOrder}>
       <div className="mt-5 w-full p-pad-sm md:p-pad-md">
-        <Steps current={current} items={items} />
+        <div className="mt-5  bg-[#ebe6e6] p-8 mb-3"> 
+          <Steps current={current} items={items} />
+        </div>
         <div>{steps[current].content}</div>
-        <div className="mt-5  bg-[#e9d5d5] p-5">
+        <div className="mt-5  bg-[#ebe6e6] p-5">
           <div className="w-full">
             <div className=" flex justify-between">
               <div></div>
@@ -556,6 +787,12 @@ export default function PayProduct() {
                   <div>Phí vận chuyển:</div>
                   <div>{convertPrice(diliveryPriceMemo)}</div>
                 </div>
+                {valueVoucher ? (
+                  <div className="flex justify-between">
+                    <div>Voucher:</div>
+                    <div>{valueVoucher}%</div>
+                  </div>
+                ): ''}
                 <div className="flex justify-between">
                   <div>Tổng thanh Toán:</div>
                   <div>{convertPrice(TotalpriceMemo)}</div>
@@ -565,7 +802,7 @@ export default function PayProduct() {
           </div>
         </div>
 
-        <div className="flex justify-between bg-[#e9d5d5] p-10">
+        <div className="flex justify-between bg-[#ebe6e6] p-10">
           <div className="text-[10px]">
             Nhấn "Đặt hàng" đồng nghĩa với việc bạn đồng ý tuân theo Điều khoản
             Shopee
@@ -594,13 +831,21 @@ export default function PayProduct() {
               <ButtonComponent
                 textButton="Mua hàng"
                 disabled={
-                  !user?.phone || !user?.address || !user?.name || !user?.city || !valueRadio
+                  !user?.phone ||
+                  !user?.address ||
+                  !user?.name ||
+                  !user?.city ||
+                  !valueRadio
                     ? true
                     : false
                 }
                 styleButton={{
                   background:
-                    !user?.phone || !user?.address || !user?.name || !user?.city || !valueRadio
+                    !user?.phone ||
+                    !user?.address ||
+                    !user?.name ||
+                    !user?.city ||
+                    !valueRadio
                       ? "#ccc"
                       : "rgb(255, 57,69)",
                   height: "40px",
@@ -842,7 +1087,7 @@ export default function PayProduct() {
                 </div>
               </FormLabel>
             </div>
-            <GoogleMapComponent  stateUserDetail= {stateUserDetail}/>
+            <GoogleMapComponent stateUserDetail={stateUserDetail} />
           </IsLoadingComponent>
         </ModalComponent>
       </div>

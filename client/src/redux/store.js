@@ -3,6 +3,7 @@ import userReducer  from './Slides/userSlide.js'
 import productReducer from './Slides/productSlide.js'
 import orderReducer from './Slides/orderProductSlide.js'
 import paginationReducer from './Slides/pagination.js'
+import informationReducer from './Slides/InformationPageSlide.js'
 import {
     persistStore,
     persistReducer,
@@ -26,7 +27,8 @@ const persistConfig = {
     user:userReducer,
     product:productReducer,
     order: orderReducer,
-    pagination:paginationReducer
+    pagination:paginationReducer,
+    information:informationReducer
 })
   
   const persistedReducer = persistReducer(persistConfig, rootReducer)

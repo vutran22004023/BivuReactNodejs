@@ -28,9 +28,11 @@ const oderSchema =  new mongoose.Schema(
         userName: {
             type: String,
         },
-        avatar: {
-            type: String,
-        },
+        avatar: [
+            {
+                type: String,
+            }
+        ],
         rating: {
             type: Number,
         },

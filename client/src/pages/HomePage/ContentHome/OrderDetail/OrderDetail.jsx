@@ -148,7 +148,6 @@ export default function OrderDetail() {
           return item;
         })
       : []; 
-    console.log(reviewOrders)
       useEffect(() => {
         if (reviewOrders) {
           const tempReviews = reviewOrders.map((item) => ({
@@ -175,7 +174,10 @@ export default function OrderDetail() {
     <div className="mt-5 w-full p-pad-sm md:p-pad-md">
       <TabContext value={value}>
         <Box sx={{ borderBottom: 0.5, borderColor: "divider" }}>
-          <TabList onChange={handleChange} aria-label="lab API tabs example">
+          <TabList onChange={handleChange} aria-label="lab API tabs example"
+          variant="scrollable"
+          scrollButtons="auto"
+          >
             <Tab label="Tất cả" value="1" />
             <Tab label="Chờ thanh toán" value="2" />
             <Tab label="Chờ giao hàng" value="4" />

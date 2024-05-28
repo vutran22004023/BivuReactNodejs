@@ -27,6 +27,9 @@ import { useSelector, useDispatch } from "react-redux";
 import ColorSchemeToggle from './ColorSchemeToggle';
 import { closeSidebar } from '../../utils';
 import { useNavigate } from 'react-router-dom';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import DiscountIcon from '@mui/icons-material/Discount';
+import FeedIcon from '@mui/icons-material/Feed';
 
 function Toggler({ defaultExpanded = false, renderToggle, children }) {
   const [open, setOpen] = useState(defaultExpanded);
@@ -186,7 +189,7 @@ export default function Sidebar() {
           <ListItem>
             <ListItemButton selected={selectedIndex === 'thong-tin'}
             onClick={(event) => handleListItemClick(event, 'thong-tin')}>
-              <ShoppingCartRoundedIcon />
+              <FeedIcon />
               <ListItemContent>
                 <Typography level="title-sm">Thông tin Page</Typography>
               </ListItemContent>
@@ -196,7 +199,7 @@ export default function Sidebar() {
           <ListItem>
             <ListItemButton selected={selectedIndex === 'san-pham'}
             onClick={(event) => handleListItemClick(event, 'san-pham')}>
-              <ShoppingCartRoundedIcon />
+              <AddShoppingCartIcon />
               <ListItemContent>
                 <Typography level="title-sm">Sản Phẩm</Typography>
               </ListItemContent>
@@ -206,7 +209,7 @@ export default function Sidebar() {
           <ListItem>
             <ListItemButton selected={selectedIndex === 'giam-gia'}
             onClick={(event) => handleListItemClick(event, 'giam-gia')}>
-              <ShoppingCartRoundedIcon />
+              <DiscountIcon />
               <ListItemContent>
                 <Typography level="title-sm">Giảm giá</Typography>
               </ListItemContent>
@@ -215,7 +218,7 @@ export default function Sidebar() {
           <ListItem>
             <ListItemButton selected={selectedIndex === 'don-hang'}
             onClick={(event) => handleListItemClick(event, 'don-hang')}>
-                <GroupRoundedIcon />
+                <ShoppingCartRoundedIcon />
               <ListItemContent>
               <Typography level="title-sm">Đơn hàng</Typography>
               </ListItemContent>

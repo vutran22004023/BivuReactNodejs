@@ -99,6 +99,27 @@ const oderSchema =  new mongoose.Schema(
         type: Boolean,
         default: false,
     },
+    order_cancellation_status : {
+        type: Boolean,
+        default: false,
+    },
+    voucher: [
+        {
+            discountId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref:'discounts',
+            },
+            namediscount: {
+                type: String,
+            },
+            discountPercentdiscount: {
+                type: Number,
+            },
+            discountAmountdiscount: {
+                type:Number,
+            }
+        }
+    ],
     deliveredAt: {
         type: Date,
     }

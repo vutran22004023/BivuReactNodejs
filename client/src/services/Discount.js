@@ -14,7 +14,6 @@ const getAllDiscount= async () => {
 }
 
 const getDetailDiscount= async (id) => {
-    console.log(id)
     const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/discount/get-discount-detail/${id}`
     // , 
     // {

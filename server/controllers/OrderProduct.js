@@ -13,7 +13,7 @@ const getAllOrderProduct = async(req, res) => {
 
 const createOrderProduct = async(req, res) => {
     try {
-        const {oderItem,paymentMethod,itemsPrice,shippingPrice, totalPrice,fullName, address, city, phone,user,email,note_customers} = req.body
+        const {oderItem,paymentMethod,itemsPrice,shippingPrice, totalPrice,fullName, address, city, phone,user,email,note_customers,voucher} = req.body
     if(!oderItem||!paymentMethod ||!itemsPrice ||!shippingPrice||!totalPrice||!fullName||!address||!city||!phone|| !user || !email) {
         return res.status.json({
             status: 'ERR',

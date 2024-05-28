@@ -35,7 +35,10 @@ const oderSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-  }
+  },
+  selled: {
+    type: Number,
+},
 });
 
 const disCount = mongoose.model('disCount',oderSchema)

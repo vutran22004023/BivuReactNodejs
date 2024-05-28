@@ -47,6 +47,7 @@ export default function PayProduct() {
   const [isModalVoucher, setIsModalVoucher] = useState(false);
   const [valueRadiovoucher, setValueRadiovoucher] = useState()
   const [valueVoucher, setValueVoucher] = useState();
+  const [valueVouchermutation,setvalueVouchermutation] = useState();
   const handleButtonVoucher = () => {
     setIsModalVoucher(true);
   };
@@ -138,6 +139,14 @@ export default function PayProduct() {
         totalPrice: TotalpriceMemo,
         user: user?.id,
         note_customers: stateUserDetail.note_customers,
+        voucher: [
+          {
+            discountId: valueVouchermutation?.data?._id,
+            namediscount: valueVouchermutation?.data?.name,
+            discountPercentdiscount:valueVouchermutation?.data?.discountPercent,
+            discountAmountdiscount: valueVouchermutation?.data?.discountAmount,
+          }
+        ]
       });
 
       if (valueRadio === "Thanh toán khi nhận hàng") {
@@ -210,6 +219,11 @@ export default function PayProduct() {
     return res;
   });
 
+  const mutationsVoucherShopDetail = useMutationHooks((id) => {
+    const res = DiscountService.getDetailDiscount(id);
+    return res;
+  });
+
   const mutationPayQR = useMutationHooks(async (data) => {
     try {
       const { ...rests } = data;
@@ -221,6 +235,8 @@ export default function PayProduct() {
     }
   });
 
+
+
   const mutationPayZaloPay = useMutationHooks(async (data) => {
     try {
       const { ...rests } = data;
@@ -231,6 +247,8 @@ export default function PayProduct() {
       console.error("Lỗi khi gọi API thanh toán:", error);
     }
   });
+
+
 
   const mutationGHTKshippingfeecharged = useMutationHooks(async () => {
     const address = user?.address;
@@ -249,6 +267,10 @@ export default function PayProduct() {
     );
     return res;
   });
+
+  useEffect(() => {
+    mutationsVoucherShopDetail.mutate(valueVoucher)
+  },[valueVoucher])
   useEffect(() => {
     mutationGHTKshippingfeecharged.mutate();
   }, [user?.address, user?.nameCity, user?.nameDistrict]);
@@ -286,6 +308,14 @@ export default function PayProduct() {
   const { data: PayZalo } = mutationPayZaloPay;
   const { data: dataVoucher, isLoading: isLoadingVoucher } =
     mutationsVoucherShop;
+
+  const {data: datavoucherdetail} = mutationsVoucherShopDetail
+
+  useEffect(() => {
+    if(datavoucherdetail) {
+      setvalueVouchermutation(datavoucherdetail)
+    }
+  },[datavoucherdetail])
   useEffect(() => {
     if (payQR) {
       // Chuyển hướng người dùng đến URL được trả về từ API
@@ -373,13 +403,13 @@ export default function PayProduct() {
   }, [valueRadioShip]);
 
   const TotalpriceMemo = useMemo(() => {
-    if (valueVoucher) {
-      const discountedPrice = priceMemo * (1 - valueVoucher / 100); // Giảm giá theo phần trăm
+    if (valueVouchermutation) {
+      const discountedPrice = priceMemo * (1 - valueVouchermutation?.data?.discountPercent / 100); // Giảm giá theo phần trăm
       return discountedPrice + diliveryPriceMemo;
     } else {
       return priceMemo + diliveryPriceMemo;
     }
-  }, [priceMemo, diliveryPriceMemo, valueVoucher]);
+  }, [priceMemo, diliveryPriceMemo, valueVouchermutation]);
 
   const onChange = (e) => {
     setValue(e.target.value);
@@ -651,14 +681,14 @@ export default function PayProduct() {
                 </div>
                 <div className="flex " style={{alignItems:'center'}}>
                   <div>
-                  {valueVoucher && (
+                  {valueVouchermutation?.data?.discountPercent && (
                     <div className="flex" style={{alignItems:'center'}} >
                     <img src={IconVoucher} className="w-[65px] h-[50px]" style={{position:'relative'}}/>
                     <span className="text-[10px] text-[red]">đã áp dụng mẫ giảm giá</span>
                     <div style={{ position: 'absolute', color: '#000', fontSize: '10px' }}
                     className=" transform translate-x-[80%] -translate-y-[0%] md:translate-x-[120%] md:-translate-y-[5%]"
                     >
-                        -{valueVoucher}%
+                        -{valueVouchermutation?.data?.discountPercent}%
                     </div>
                     </div>
                 )}
@@ -690,7 +720,7 @@ export default function PayProduct() {
                           return null; // Do not render if the voucher has ended
                         }
                         return (
-                          <Radio value={item.discountPercent} disabled={!active} key={item.id}>
+                          <Radio value={item._id} disabled={!active} key={item.id}>
                             <div
                               className={`mb-4 ml-[5px] rounded-lg md:ml-[30px] ${active ? "bg-gradient-to-r from-pink-500 to-orange-500" : "bg-gray-400"} w-full p-4 shadow-md md:p-6`}
                             >
@@ -787,10 +817,10 @@ export default function PayProduct() {
                   <div>Phí vận chuyển:</div>
                   <div>{convertPrice(diliveryPriceMemo)}</div>
                 </div>
-                {valueVoucher ? (
+                {valueVouchermutation?.data?.discountPercent ? (
                   <div className="flex justify-between">
                     <div>Voucher:</div>
-                    <div>{valueVoucher}%</div>
+                    <div>{valueVouchermutation?.data?.discountPercent}%</div>
                   </div>
                 ): ''}
                 <div className="flex justify-between">

@@ -80,6 +80,8 @@ export default function OrderDetail() {
     enabled: Boolean(state?.id && state?.token),
   });
 
+  console.log(productsLimit)
+
   const {data: dataReview, isLoading: isLoadingDataReview} = mutationsCreateReview
   useEffect(() => {
     if(dataReview?.status === 200 ) {
@@ -182,7 +184,6 @@ export default function OrderDetail() {
             <Tab label="Chờ thanh toán" value="2" />
             <Tab label="Chờ giao hàng" value="4" />
             <Tab label="Hoàn thành" value="5" />
-            <Tab label="Trả hàng/ Hoàn tiền" value="6" />
             <Tab label={
               <Badge count={unreviewOrders?.length} size="small" offset={[7, 0]}>Đánh giá</Badge>
             } value="7" />
@@ -191,16 +192,16 @@ export default function OrderDetail() {
         <TabPanel value="1" sx={{ p: "15px 0" }}>
           {productsLimit?.data.map((order, index) => {
             return (
-              <div className="mb-3 bg-slate-300 p-5">
+              <div className="mb-3 bg-[#ebe6e6] p-5">
                 <div className="flex justify-between">
                   <div></div>
                   <div className="flex " style={{ alignItems: "center" }}>
-                    <div>Đơn hàng đã được giao thành công</div>
+                    <div>{order?.confirmation_Order ? <span className="text-[#4bc83d]">Đã xác thực đơn hàng</span>: <span className="text-[#da3636]">Chưa xác thực đơn hàng</span>}</div>
                     <div
-                      className="h-full w-[2px] bg-slate-300"
+                      className="h-full w-[2px] bg-[#838282]"
                       style={{ margin: "0 3px", alignItems: "center" }}
                     ></div>
-                    <div>HOÀN THÀNH</div>
+                    <div>{order?.isDelivered ? <span className="text-[red]" style={{fontWeight:600}}>HOÀN THÀNH</span>: <span className="text-[#4466e0]" style={{fontWeight:600}}>CHƯA HOÀN THÀNH</span>}</div>
                   </div>
                 </div>
                 <hr style={{ margin: "10px 0" }} />
@@ -243,7 +244,7 @@ export default function OrderDetail() {
                       <ButtonFrom
                         size={40}
                         styleButton={{
-                          background: "#ccc",
+                          background: "rgb(227 2 2)",
                           height: "40px",
                           width: "100%",
                           border: "none",
@@ -261,16 +262,17 @@ export default function OrderDetail() {
                       <ButtonFrom
                         size={40}
                         styleButton={{
-                          background: "#ccc",
+                          border:'1px solid rgba(255, 255, 255)',
                           height: "40px",
                           width: "100%",
-                          border: "none",
                           borderRadius: "4px",
-                          color: "#fff",
                           fontSize: "15px",
                           fontWeight: "700",
                           margin: "10px 0",
+                          color:'rgb(133 130 130)'
+                        
                         }}
+                        className="hover:text-[rgb(165 163 163)]"
                         onClick={() => handleButtonDetailOrder(order?._id)}
                         textButton={"Chi tiết đơn hàng"}
                       ></ButtonFrom>
@@ -284,13 +286,13 @@ export default function OrderDetail() {
         <TabPanel value="2" sx={{ p: "15px 0" }}>
           {unpaidOrders?.map((order, index) => {
             return (
-              <div className="mb-3 bg-slate-300 p-5">
+              <div className="mb-3 bg-[#ebe6e6] p-5">
                 <div className="flex justify-between">
                   <div></div>
                   <div className="flex " style={{ alignItems: "center" }}>
                     <div>Đơn hàng đã được giao thành công</div>
                     <div
-                      className="h-full w-[2px] bg-slate-300"
+                      className="h-full w-[2px] bg-[#ebe6e6]"
                       style={{ margin: "0 3px", alignItems: "center" }}
                     ></div>
                     <div>HOÀN THÀNH</div>
@@ -377,13 +379,13 @@ export default function OrderDetail() {
         <TabPanel value="4" sx={{ p: "15px 0" }}>
           {unisDeliveredOrders?.map((order, index) => {
             return (
-              <div className="mb-3 bg-slate-300 p-5">
+              <div className="mb-3 bg-[#ebe6e6] p-5">
                 <div className="flex justify-between">
                   <div></div>
                   <div className="flex " style={{ alignItems: "center" }}>
                     <div>Đơn hàng đã được giao thành công</div>
                     <div
-                      className="h-full w-[2px] bg-slate-300"
+                      className="h-full w-[2px] bg-[#ebe6e6]"
                       style={{ margin: "0 3px", alignItems: "center" }}
                     ></div>
                     <div>HOÀN THÀNH</div>
@@ -470,13 +472,13 @@ export default function OrderDetail() {
         <TabPanel value="5" sx={{ p: "15px 0" }}>
           {CompleteOrders?.map((order, index) => {
             return (
-              <div className="mb-3 bg-slate-300 p-5">
+              <div className="mb-3 bg-[#ebe6e6] p-5">
                 <div className="flex justify-between">
                   <div></div>
                   <div className="flex " style={{ alignItems: "center" }}>
                     <div>Đơn hàng đã được giao thành công</div>
                     <div
-                      className="h-full w-[2px] bg-slate-300"
+                      className="h-full w-[2px] bg-[#ebe6e6]"
                       style={{ margin: "0 3px", alignItems: "center" }}
                     ></div>
                     <div>HOÀN THÀNH</div>
@@ -560,20 +562,17 @@ export default function OrderDetail() {
             );
           })}
         </TabPanel>
-        <TabPanel value="6" sx={{ p: "15px 0" }}>
-          <div>2</div>
-        </TabPanel>
 
         <TabPanel value="7" sx={{ p: "15px 0" }}>
           {unreviewOrders?.map((order, index) => {
             return (
-              <div className="mb-3 bg-slate-300 p-5">
+              <div className="mb-3 bg-[#ebe6e6] p-5">
                 <div className="flex justify-between">
                   <div></div>
                   <div className="flex " style={{ alignItems: "center" }}>
                     <div>Đơn hàng đã được giao thành công</div>
                     <div
-                      className="h-full w-[2px] bg-slate-300"
+                      className="h-full w-[2px] bg-[#ebe6e6]"
                       style={{ margin: "0 3px", alignItems: "center" }}
                     ></div>
                     <div>HOÀN THÀNH</div>

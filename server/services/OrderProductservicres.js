@@ -1,4 +1,4 @@
-import { OrderProductModel,ProductModel } from "../model/index.js";
+import { OrderProductModel,ProductModel,DisCountModel } from "../model/index.js";
 import {Emailservicres} from './index.js'
 
 const getAllOrderProduct = async () => {
@@ -21,7 +21,36 @@ const getAllOrderProduct = async () => {
 
 const createOrderProductservices = async (newOrder) => {
     try {
-        const {oderItem,paymentMethod,itemsPrice,shippingPrice, totalPrice,fullName, address, city, phone,user,email,note_customers} =  newOrder
+        const {oderItem,paymentMethod,itemsPrice,shippingPrice, totalPrice,fullName, address, city, phone,user,email,note_customers, voucher} =  newOrder
+
+        // Check and update voucher if present
+        if (voucher && voucher.length > 0) {
+            for (let i = 0; i < voucher.length; i++) {
+                const discount = voucher[i];
+                const discountData = await DisCountModel.findOneAndUpdate(
+                    {
+                        _id: discount.discountId,
+                        quantity: { $gt: 0 } // Ensure there are vouchers left
+                    },
+                    {
+                        $inc: {
+                            quantity: -1,
+                            selled: 1
+                        }
+                    },
+                    {
+                        new: true // Return the updated document
+                    }
+                );
+                if (!discountData) {
+                    return {
+                        status: 'ERR',
+                        message: "Voucher không hợp lệ hoặc đã hết",
+                        data: [discount.discountId]
+                    };
+                }
+            }
+        }
         const promises = oderItem.map(async(order) => {
             const productData = await ProductModel.findOneAndUpdate(
                 {
@@ -53,8 +82,8 @@ const createOrderProductservices = async (newOrder) => {
                 shippingPrice,
                 totalPrice,
                 note_customers,
-                user
-    
+                user,
+                voucher,
             })
             if(createProduct) {
                 await Emailservicres.sendEmailCreateOrder(newOrder)

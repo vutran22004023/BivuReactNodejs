@@ -21,7 +21,6 @@ const shippingfeecharged = async (
           // deliver_option: "xteam",
         },
       });
-  console.log(response)
   return response.data;
 };
 

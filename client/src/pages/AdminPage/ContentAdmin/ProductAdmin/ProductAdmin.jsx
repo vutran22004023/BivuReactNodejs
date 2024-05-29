@@ -18,12 +18,14 @@ import {
   Col,
   Row,
   Checkbox,
+  Rate,
+  Tabs
 } from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { SearchOutlined } from "@ant-design/icons";
 import { getBase64 } from "../../../../utils.js";
 import { UploadOutlined, WarningOutlined } from "@ant-design/icons";
-import { ProductService } from "../../../../services/index.js";
+import { ProductService,ReviewService } from "../../../../services/index.js";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
@@ -76,6 +78,7 @@ export default function ProductAdmin() {
       </MenuButton>
       <Menu size="sm" sx={{ minWidth: 140 }}>
         <MenuItem onClick={handleDetailProduct}>Chỉnh sửa</MenuItem>
+        <MenuItem onClick={handleButtonShowReview}>Bình luận sản phẩm</MenuItem>
         {/* <MenuItem>Rename</MenuItem>
         <MenuItem>Move</MenuItem> */}
         <Divider />
@@ -97,11 +100,11 @@ export default function ProductAdmin() {
   const [typeSelect, setTypeSelect] = useState("");
   const [typeSelectDetail, setTypeSelectDetail] = useState("");
   const [typePage, setTypePage] = useState(0);
-  const [model, setModel] = useState("");
   const [valueSwitch, setValueSwitch] = useState(false);
   const [valueCheckBox, setValueCheckBox] = useState([]);
-
-
+  const [isModalOpenView, setIsModalOpenView] = useState(false);
+  const [valueTab, setValueTab] = useState("1");
+  const desc = ["Tệ", "Không hài lòng", "Bình thường", "Hài lòng", "Tuyệt vời"];
   const onChange = (checked) => {
     setValueSwitch(checked);
   };
@@ -361,8 +364,12 @@ const saveData = () => {
     return res;
   });
 
-  
 
+  const mutationGetDetailsReview = useMutationHooks(async() => {
+      const res = await ReviewService.getDetailReviewProduct(RowSelected);
+      return res?.data;
+  });
+  
   // các biến dữ liệu
   const {
     data,
@@ -387,6 +394,7 @@ const saveData = () => {
     queryFn: fetchTypeProduct,
   });
   const {data: dataAllColor,isLoading:isLoadingColor} = fetchAllColor
+  const { data: dataDetailReview,isLoading: isLoadingDetailReview} = mutationGetDetailsReview
   // xử lý search trong table
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
@@ -606,6 +614,11 @@ const saveData = () => {
     }
     // console.log("handleDetailProduct",RowSelected)
   };
+
+  const handleButtonShowReview = () => {
+    setIsModalOpenView(true)
+    mutationGetDetailsReview.mutate()
+  }
 
   // xử lý khi bấm vào submit update product
   const onUpdateProduct = () => {
@@ -831,6 +844,386 @@ const saveData = () => {
       </div>
     </button>
   );
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    // Get the day, month, and year
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-indexed
+    const year = date.getFullYear();
+
+    // Get the hours and minutes
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    let seconds = date.getSeconds().toString().padStart(2, "0");
+    seconds = seconds.substring(0, 2);
+    return `${day}-${month}-${year} lúc ${hours}:${minutes}:${seconds}`;
+  };
+
+
+  const handleChangeReview = (key) => {
+    setValueTab(key);
+  };
+
+  const fiveStarReviewsCount = dataDetailReview?.filter(
+    (review) => review.rating === 5,
+  ).length;
+  const fourStarReviewsCount = dataDetailReview?.filter(
+    (review) => review.rating === 4,
+  ).length;
+  const threeStarReviewsCount = dataDetailReview?.filter(
+    (review) => review.rating === 3,
+  ).length;
+  const twoStarReviewsCount = dataDetailReview?.filter(
+    (review) => review.rating === 2,
+  ).length;
+  const oneStarReviewsCount = dataDetailReview?.filter(
+    (review) => review.rating === 1,
+  ).length;
+  const ratings = [
+    { star: 5, count: fiveStarReviewsCount },
+    { star: 4, count: fourStarReviewsCount },
+    { star: 3, count: threeStarReviewsCount },
+    { star: 2, count: twoStarReviewsCount },
+    { star: 1, count: oneStarReviewsCount }
+  ];
+  const calculateAverageRating = (ratings) => {
+    let totalStars = 0;
+    let totalCount = 0;
+  
+    ratings.forEach(rating => {
+      totalStars += rating.star * rating.count;
+      totalCount += rating.count;
+    });
+  
+    return totalStars / totalCount;
+  };
+  const averageRating = calculateAverageRating(ratings);
+  
+
+  const items = [
+    {
+      key: '1',
+      label: 'Tất cả',
+      children: (
+        <>
+        {dataDetailReview?.length > 0 ? (
+          <LoadingComponent isLoading={isLoadingDetailReview}>
+        {dataDetailReview?.map((item) => (
+          <div className="mt-3">
+            <div className="flex " style={{ alignItems: "start" }}>
+              <Space Spacewrap size={10} className="mt-2">
+                <Avatar size="large" src={item.avatar[0]} />
+              </Space>
+              <div className="ml-3">
+                <p>{item.userName}</p>
+                <div className="">
+                  <Rate
+                    tooltips={desc}
+                    disabled
+                    value={item.rating}
+                  />
+                </div>
+                <div
+                  className="flex text-center"
+                  style={{ alignItems: "center" }}
+                >
+                  <div>Thời gian: {formatDate(item.date)}</div>
+                  {item?.size?.length > 0 ? (
+                    <>
+                      <div
+                        className=" h-5 w-[2px] bg-[#c12c2c]"
+                        style={{ margin: "0 5px" }}
+                      ></div>
+                      <div>Phân loại hàng: {item.size}</div>
+                    </>
+                  ) : (
+                    ""
+                  )}
+                </div>
+                <div>
+                  Màu sắc: <span>đen</span>
+                </div>
+                <div>Bình luận: {item.comments}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </LoadingComponent>
+        ) :(
+          <div className="flex items-center justify-center h-[400px] mr-[130px] text-[16px] md:text-[20px] text-[#ba3636]">Chưa có đánh giá</div>
+        )} 
+        </>
+      ),
+    },
+    {
+      key: '2',
+      label: (<span>5 sao ({fiveStarReviewsCount})</span>),
+      children: (
+        <>
+      {dataDetailReview?.filter((item) => item.rating === 5)?.length > 0 ? (
+        <LoadingComponent isLoading={isLoadingDetailReview}>
+        {dataDetailReview?.filter((item) => item.rating === 5)?.map((item) => (
+          <div className="mt-3">
+            <div className="flex " style={{ alignItems: "start" }}>
+              <Space Spacewrap size={10} className="mt-2">
+                <Avatar size="large" src={item.avatar[0]} />
+              </Space>
+              <div className="ml-3">
+                <p>{item.userName}</p>
+                <div className="">
+                  <Rate
+                    tooltips={desc}
+                    disabled
+                    value={item.rating}
+                  />
+                </div>
+                <div
+                  className="flex text-center"
+                  style={{ alignItems: "center" }}
+                >
+                  <div>Thời gian: {formatDate(item.date)}</div>
+                  {item?.size?.length > 0 ? (
+                    <>
+                      <div
+                        className=" h-5 w-[2px] bg-[#c12c2c]"
+                        style={{ margin: "0 5px" }}
+                      ></div>
+                      <div>Phân loại hàng: {item.size}</div>
+                    </>
+                  ) : (
+                    ""
+                  )}
+                </div>
+                <div>
+                  Màu sắc: <span>đen</span>
+                </div>
+                <div>Bình luận: {item.comments}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </LoadingComponent>
+      ):(
+        <div className="flex items-center justify-center h-[400px] mr-[130px] text-[16px] md:text-[20px] text-[#ba3636]">Chưa có đánh giá</div>
+      )}
+      </>
+      ),
+    },
+    {
+      key: '3',
+      label: (<span>4 sao ({fourStarReviewsCount})</span>),
+      children: (
+        <>
+      {dataDetailReview?.filter((item) => item.rating === 4)?.length > 0 ? (
+        <LoadingComponent isLoading={isLoadingDetailReview}>
+        {dataDetailReview?.filter((item) => item.rating === 4)?.map((item) => (
+          <div className="mt-3">
+            <div className="flex " style={{ alignItems: "start" }}>
+              <Space Spacewrap size={10} className="mt-2">
+                <Avatar size="large" src={item.avatar[0]} />
+              </Space>
+              <div className="ml-3">
+                <p>{item.userName}</p>
+                <div className="">
+                  <Rate
+                    tooltips={desc}
+                    disabled
+                    value={item.rating}
+                  />
+                </div>
+                <div
+                  className="flex text-center"
+                  style={{ alignItems: "center" }}
+                >
+                  <div>Thời gian: {formatDate(item.date)}</div>
+                  {item?.size?.length > 0 ? (
+                    <>
+                      <div
+                        className=" h-5 w-[2px] bg-[#c12c2c]"
+                        style={{ margin: "0 5px" }}
+                      ></div>
+                      <div>Phân loại hàng: {item.size}</div>
+                    </>
+                  ) : (
+                    ""
+                  )}
+                </div>
+                <div>
+                  Màu sắc: <span>đen</span>
+                </div>
+                <div>Bình luận: {item.comments}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </LoadingComponent>
+      ):(
+        <div className="flex items-center justify-center h-[400px] mr-[130px] text-[16px] md:text-[20px] text-[#ba3636]">Chưa có đánh giá</div>
+      )}</>
+      ),
+    },
+    {
+      key: '4',
+      label: (<span>3 sao ({threeStarReviewsCount})</span>),
+      children: (
+        <>
+      {dataDetailReview?.filter((item) => item.rating === 3)?.length > 0 ? (
+        <LoadingComponent isLoading={isLoadingDetailReview}>
+        {dataDetailReview?.filter((item) => item.rating === 3)?.map((item) => (
+          <div className="mt-3">
+            <div className="flex " style={{ alignItems: "start" }}>
+              <Space Spacewrap size={10} className="mt-2">
+                <Avatar size="large" src={item.avatar[0]} />
+              </Space>
+              <div className="ml-3">
+                <p>{item.userName}</p>
+                <div className="">
+                  <Rate
+                    tooltips={desc}
+                    disabled
+                    value={item.rating}
+                  />
+                </div>
+                <div
+                  className="flex text-center"
+                  style={{ alignItems: "center" }}
+                >
+                  <div>Thời gian: {formatDate(item.date)}</div>
+                  {item?.size?.length > 0 ? (
+                    <>
+                      <div
+                        className=" h-5 w-[2px] bg-[#c12c2c]"
+                        style={{ margin: "0 5px" }}
+                      ></div>
+                      <div>Phân loại hàng: {item.size}</div>
+                    </>
+                  ) : (
+                    ""
+                  )}
+                </div>
+                <div>
+                  Màu sắc: <span>đen</span>
+                </div>
+                <div>Bình luận: {item.comments}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </LoadingComponent>
+      ):(
+        <div className="flex items-center justify-center h-[400px] mr-[130px] text-[16px] md:text-[20px] text-[#ba3636]">Chưa có đánh giá</div>
+      )}</>
+      ),
+    },
+    {
+      key: '5',
+      label: (<span>2 sao ({twoStarReviewsCount})</span>),
+      children: (
+        <>
+      {dataDetailReview?.filter((item) => item.rating === 2)?.length > 0 ? (
+        <LoadingComponent isLoading={isLoadingDetailReview}>
+        {dataDetailReview?.filter((item) => item.rating === 2)?.map((item) => (
+          <div className="mt-3">
+            <div className="flex " style={{ alignItems: "start" }}>
+              <Space Spacewrap size={10} className="mt-2">
+                <Avatar size="large" src={item.avatar[0]} />
+              </Space>
+              <div className="ml-3">
+                <p>{item.userName}</p>
+                <div className="">
+                  <Rate
+                    tooltips={desc}
+                    disabled
+                    value={item.rating}
+                  />
+                </div>
+                <div
+                  className="flex text-center"
+                  style={{ alignItems: "center" }}
+                >
+                  <div>Thời gian: {formatDate(item.date)}</div>
+                  {item?.size?.length > 0 ? (
+                    <>
+                      <div
+                        className=" h-5 w-[2px] bg-[#c12c2c]"
+                        style={{ margin: "0 5px" }}
+                      ></div>
+                      <div>Phân loại hàng: {item.size}</div>
+                    </>
+                  ) : (
+                    ""
+                  )}
+                </div>
+                <div>
+                  Màu sắc: <span>đen</span>
+                </div>
+                <div>Bình luận: {item.comments}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </LoadingComponent>
+      ):(
+        <div className="flex items-center justify-center h-[400px] mr-[130px] text-[16px] md:text-[20px] text-[#ba3636]">Chưa có đánh giá</div>
+      )}</>
+      ),
+    },
+    {
+      key: '6',
+      label: (<span>1 sao ({oneStarReviewsCount})</span>),
+      children: (
+        <>
+      {dataDetailReview?.filter((item) => item.rating === 1)?.length > 0 ? (
+        <LoadingComponent isLoading={isLoadingDetailReview}>
+        {dataDetailReview?.filter((item) => item.rating === 1)?.map((item) => (
+          <div className="mt-3">
+            <div className="flex " style={{ alignItems: "start" }}>
+              <Space Spacewrap size={10} className="mt-2">
+                <Avatar size="large" src={item.avatar[0]} />
+              </Space>
+              <div className="ml-3">
+                <p>{item.userName}</p>
+                <div className="">
+                  <Rate
+                    tooltips={desc}
+                    disabled
+                    value={item.rating}
+                  />
+                </div>
+                <div
+                  className="flex text-center"
+                  style={{ alignItems: "center" }}
+                >
+                  <div>Thời gian: {formatDate(item.date)}</div>
+                  {item?.size?.length > 0 ? (
+                    <>
+                      <div
+                        className=" h-5 w-[2px] bg-[#c12c2c]"
+                        style={{ margin: "0 5px" }}
+                      ></div>
+                      <div>Phân loại hàng: {item.size}</div>
+                    </>
+                  ) : (
+                    ""
+                  )}
+                </div>
+                <div>
+                  Màu sắc: <span>đen</span>
+                </div>
+                <div>Bình luận: {item.comments}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </LoadingComponent>
+      ): (
+        <div className="flex items-center justify-center h-[400px] mr-[130px] text-[16px] md:text-[20px] text-[#ba3636]">Chưa có đánh giá</div>
+      )}</>
+      ),
+    },
+  ];
+
 
   return (
     <>
@@ -1657,6 +2050,34 @@ const saveData = () => {
           />
         </LoadingComponent>
       </Box>
+
+      <DrawerComponent
+          width={720}
+          title="Đánh giá sản phẩm"
+          isOpen={isModalOpenView}
+          onClose={() => setIsModalOpenView(false)}
+        >
+            <div
+              className="flex bg-[#ece6e6] p-5"
+              style={{ border: "1px solid red" }}
+            >
+              <div className="w-[120px] md:w-[200px] ">
+              {averageRating ? (
+                <div className="text-[1rem] text-[#ee4d2d] md:text-[1.125rem] ">
+                  <span className="text-[1.125rem] text-[#ee4d2d] md:text-[1.875rem] ">
+                    {averageRating?.toFixed(1)}
+                  </span>{" "}
+                  trên 5 với
+                </div>
+              ): (
+                <div className="text-[1rem] text-[#ee4d2d] md:text-[1.125rem]">Chưa có đánh giá</div>
+              )}
+              </div>
+              <div className="flex w-full flex-1" style={{ padding: "0 20px" }}>
+                <Tabs defaultActiveKey="0" items={items} onChange={handleChangeReview}/>
+              </div>
+            </div>
+        </DrawerComponent>
       </Box>
     </>
   );

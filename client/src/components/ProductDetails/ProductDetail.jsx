@@ -502,7 +502,7 @@ export default function ProductDetail({ idProduct }) {
               </div>
             </div>
           ) : (
-            ""
+            null
           )}
 
           <WapperStyleButtonAddProduct className="flex w-full justify-start">
@@ -547,7 +547,7 @@ export default function ProductDetail({ idProduct }) {
             </div>
           </WapperStyleButtonAddProduct>
         </Col>
-      </Row>d
+      </Row>
       <div className=" mb-[20px] mt-[20px] rounded-lg bg-[#ece9e9] p-[15px] md:p-[30px]">
         <div className="mb-[10px]">
           <h1 className="mb-3  mt-[10px] w-full rounded-sm bg-[#d5d5d5] p-3 text-[20px]">

@@ -97,6 +97,47 @@ const oderSchema =  new mongoose.Schema(
         link_qc_5: {
             type: String,
         },
+        header_footer1: {
+            type: String,
+        },
+        content_footer1: [
+            {
+                name: {
+                    type: String,
+                }
+            }
+        ],
+        header_footer2: {
+            type: String,
+        },
+        content_footer2: [
+            {
+                name: {
+                    type: String,
+                }
+            }
+        ],
+        header_footer3: {
+            type: String,
+        },
+        content_footer3: [
+            {
+                name: {
+                    type: String,
+                }
+            }
+        ],
+        header_footer4: {
+            type: String,
+        },
+        content_footer4: [
+            {
+                name: {
+                    type: String,
+                }
+            }
+        ],
+
         
     }
 )

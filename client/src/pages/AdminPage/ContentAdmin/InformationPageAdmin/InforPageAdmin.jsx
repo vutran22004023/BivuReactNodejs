@@ -3,10 +3,10 @@ import { Outlet } from "react-router-dom";
 import { Link, Typography, Box, Breadcrumbs } from "@mui/joy";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
-import { Form, Input, Upload, Button } from "antd";
+import { Form, Input, Upload, Button,Space } from "antd";
 
 const { TextArea } = Input;
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined,MinusCircleOutlined } from "@ant-design/icons";
 import { InformationPageService } from "../../../../services/index.js";
 import { useMutationHooks } from "../../../../hooks/UseMutationHook.js";
 import { useQuery } from "@tanstack/react-query";
@@ -46,9 +46,32 @@ export default function InforPageAdmin() {
     link_qc_3: "",
     link_qc_4: "",
     link_qc_5: "",
+    header_footer1: "",
+    header_footer2: "",
+    header_footer3: "",
+    header_footer4: "",
+    content_footer1: [
+      {
+        name: '',
+      }
+    ],
+    content_footer2: [
+      {
+        name: '',
+      }
+    ],
+    content_footer3: [
+      {
+        name: '',
+      }
+    ],
+    content_footer4: [
+      {
+        name: '',
+      }
+    ],
   });
   const [InforPageDetail, setInforPageDetail] = useState(inittial);
-  console.log(InforPageDetail)
   // const [InforPage, setInforPage] = useState(inittial)
 
   // const handleOchangeInforTitle = (e) => {
@@ -63,6 +86,47 @@ export default function InforPageAdmin() {
       [e.target.name]: e.target.value,
     });
   };
+
+  const handleOchangeInforFooter = (index, e, fieldName) => {
+    let value = e.target.value;
+    if(fieldName=== 'content_footer1') {
+      const newSize = [...InforPageDetail.content_footer1];
+      newSize[index][e.target.name] = e.target.value;
+      setInforPageDetail({
+        ...InforPageDetail,
+        [fieldName]: newSize,
+      });
+    }else if (fieldName=== 'content_footer2') {
+      const newSize = [...InforPageDetail.content_footer2];
+      newSize[index][e.target.name] = e.target.value;
+      setInforPageDetail({
+        ...InforPageDetail,
+        [fieldName]: newSize,
+      });
+    }
+    else if (fieldName=== 'content_footer3') {
+      const newSize = [...InforPageDetail.content_footer3];
+      newSize[index][e.target.name] = e.target.value;
+      setInforPageDetail({
+        ...InforPageDetail,
+        [fieldName]: newSize,
+      });
+    }
+    else if (fieldName=== 'content_footer4') {
+      const newSize = [...InforPageDetail.content_footer4];
+      newSize[index][e.target.name] = e.target.value;
+      setInforPageDetail({
+        ...InforPageDetail,
+        [fieldName]: newSize,
+      });
+    }
+    else {
+      setInforPageDetail({
+        ...InforPageDetail,
+        [fieldName]: e.target.value,
+      })
+    }
+  }
 
   const mutationcreateInforTitle = useMutationHooks(async (data) => {
     const { ...rests } = data;
@@ -122,6 +186,14 @@ export default function InforPageAdmin() {
         link_qc_3: getDetailInforPage?.data?.link_qc_3,
         link_qc_4: getDetailInforPage?.data?.link_qc_4,
         link_qc_5: getDetailInforPage?.data?.link_qc_5,
+        header_footer1: getDetailInforPage?.data?.header_footer1,
+        header_footer2: getDetailInforPage?.data?.header_footer2,
+        header_footer3: getDetailInforPage?.data?.header_footer3,
+        header_footer4: getDetailInforPage?.data?.header_footer4,
+        content_footer1: getDetailInforPage?.data?.content_footer1,
+        content_footer2: getDetailInforPage?.data?.content_footer2,
+        content_footer3: getDetailInforPage?.data?.content_footer3,
+        content_footer4: getDetailInforPage?.data?.content_footer4,
       });
     }
   }, [getDetailInforPage]);
@@ -141,6 +213,25 @@ export default function InforPageAdmin() {
   }, [dataUpdateInforPages?.status]);
   const handleButtonUpdateInforTitle = () => {
     mutationUpdateInforTitle.mutate(InforPageDetail);
+  };
+
+  const handleAddInputDetail = (nameinput) => {
+    setInforPageDetail((prevInforPageDetail) => ({
+      ...prevInforPageDetail,
+      [nameinput]: [
+        ...(prevInforPageDetail[nameinput] || []),
+        { name: '' }
+      ]
+    }));
+  };
+
+  const handleRemoveInputDetail = (index, nameInput) => {
+    const newSize = [...InforPageDetail[nameInput]];
+    newSize.splice(index, 1);
+    setInforPageDetail({
+      ...InforPageDetail,
+      [nameInput]: newSize,
+    });
   };
 
 
@@ -189,7 +280,7 @@ export default function InforPageAdmin() {
               Dashboard
             </Link>
             <Typography color="primary" fontWeight={500} fontSize={12}>
-              User
+              Thông tin page
             </Typography>
           </Breadcrumbs>
         </Box>
@@ -635,6 +726,438 @@ export default function InforPageAdmin() {
               </div>
             </Form>
 
+            <div className="flex justify-between">
+              <div></div>
+              <div>
+                <Button
+                  type="primary"
+                  size="large"
+                  onClick={handleButtonUpdateInforTitle}
+                >
+                  Cập Nhập
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            mb: 1,
+            gap: 1,
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: { xs: "start", sm: "center" },
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            marginTop:'20px'
+          }}
+        >
+          <Typography level="h2" component="h1">
+            Thông tin footer Page
+          </Typography>
+        </Box>
+
+
+        <Box className="mt-5 block md:flex">
+          <div className="w-full rounded-lg border-[1px] border-slate-400 p-5">
+            <Form
+            name="basic"
+              initialValues={{
+                remember: true,
+              }}
+              labelCol={{
+                span: 6,
+              }}
+              wrapperCol={{
+                span: 18,
+              }}
+              // onFinish={onFinish}
+              // onFinishFailed={onFinishFailed}
+              form={form}
+
+            >
+            <Form.Item
+                  label="Tiều đề footer 1"
+                  name="header_footer1"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập tiêu đề footer 1",
+                    },
+                  ]}
+                  className=""
+                >
+                  <Input
+                    value={InforPageDetail?.header_footer1}
+                    onChange={(e) =>handleOchangeInforFooter(null, e, "header_footer1")}
+                    name="header_footer1"
+                    className=" w-full md:w-[500px]"
+                  />
+                </Form.Item>
+
+                <Form.List
+                name="content_footer1"
+                rules={[
+                  {
+                    validator: async (_, categorySize) => {
+                      if (!categorySize || categorySize.length < 2) {
+                        return Promise.reject(
+                          new Error("At least 2 passengers"),
+                        );
+                      }
+                    },
+                  },
+                ]}
+              >
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map(({ key, name, ...restField }) => (
+                      <Space
+                        key={key}
+                        style={{
+                          display: "flex",
+                          marginBottom: 8,
+                        }}
+                        align="baseline"
+                      >
+                        <Form.Item
+                          label={`nội dung ${key + 1} header 1`}
+                          key={key}
+                          {...restField}
+                          name={[name, "name"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Vui lòng nhập nội dung",
+                            },
+                          ]}
+                          className="ml-0 md:ml-[160px]"
+                        >
+                          <Input
+                            value={name}
+                            onChange={(e) =>
+                              handleOchangeInforFooter(key, e, "content_footer1")
+                            }
+                            name="name"
+                            className=" w-full md:w-[400px]"
+                          />
+                        </Form.Item>
+                    
+                        {fields.length > 1 ? (
+                          <MinusCircleOutlined
+                            className="dynamic-delete-button"
+                            onClick={() => {
+                              remove(name);
+                              handleRemoveInputDetail(name,"content_footer1");
+                            }}
+                          />
+                        ) : null}
+                      </Space>
+                    ))}
+                    <Form.Item
+                    >
+                      <Button
+                        type="dashed"
+                        onClick={() => {
+                          add();
+                          handleAddInputDetail('content_footer1');
+                        }}
+                        className="ml-0 md:ml-[160px]"
+                      >
+                        Thêm content footer 1
+                      </Button>
+                    </Form.Item>
+                  </>
+                )}
+              </Form.List>
+
+              <Form.Item
+                  label="Tiều đề footer 2"
+                  name="header_footer2"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập tiêu đề footer 2",
+                    },
+                  ]}
+                  className=""
+                >
+                  <Input
+                    value={InforPageDetail?.header_footer2}
+                    onChange={(e) =>handleOchangeInforFooter(null, e, "header_footer2")}
+                    name="header_footer2"
+                    className=" w-full md:w-[500px]"
+                  />
+                </Form.Item>
+
+                <Form.List
+                name="content_footer2"
+                rules={[
+                  {
+                    validator: async (_, categorySize) => {
+                      if (!categorySize || categorySize.length < 2) {
+                        return Promise.reject(
+                          new Error("At least 2 passengers"),
+                        );
+                      }
+                    },
+                  },
+                ]}
+              >
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map(({ key, name, ...restField }) => (
+                      <Space
+                        key={key}
+                        style={{
+                          display: "flex",
+                          marginBottom: 8,
+                        }}
+                        align="baseline"
+                      >
+                        <Form.Item
+                          label={`nội dung ${key + 1} header 2`}
+                          key={key}
+                          {...restField}
+                          name={[name, "name"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Vui lòng nhập nội dung",
+                            },
+                          ]}
+                          className="ml-0 md:ml-[160px]"
+                        >
+                          <Input
+                            value={name}
+                            onChange={(e) =>
+                              handleOchangeInforFooter(key, e, "content_footer2")
+                            }
+                            name="name"
+                            className=" w-full md:w-[400px]"
+                          />
+                        </Form.Item>
+                    
+                        {fields.length > 1 ? (
+                          <MinusCircleOutlined
+                            className="dynamic-delete-button"
+                            onClick={() => {
+                              remove(name);
+                              handleRemoveInputDetail(name,"content_footer2");
+                            }}
+                          />
+                        ) : null}
+                      </Space>
+                    ))}
+                    <Form.Item
+                    >
+                      <Button
+                        type="dashed"
+                        onClick={() => {
+                          add();
+                          handleAddInputDetail('content_footer2');
+                        }}
+                        className="ml-0 md:ml-[160px]"
+                      >
+                        Thêm content footer 2
+                      </Button>
+                    </Form.Item>
+                  </>
+                )}
+              </Form.List>
+
+
+              <Form.Item
+                  label="Tiều đề footer 3"
+                  name="header_footer3"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập tiêu đề footer 3",
+                    },
+                  ]}
+                  className=""
+                >
+                  <Input
+                    value={InforPageDetail?.header_footer3}
+                    onChange={(e) =>handleOchangeInforFooter(null, e, "header_footer3")}
+                    name="header_footer3"
+                    className=" w-full md:w-[500px]"
+                  />
+                </Form.Item>
+
+                <Form.List
+                name="content_footer3"
+                rules={[
+                  {
+                    validator: async (_, categorySize) => {
+                      if (!categorySize || categorySize.length < 2) {
+                        return Promise.reject(
+                          new Error("At least 2 passengers"),
+                        );
+                      }
+                    },
+                  },
+                ]}
+              >
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map(({ key, name, ...restField }) => (
+                      <Space
+                        key={key}
+                        style={{
+                          display: "flex",
+                          marginBottom: 8,
+                        }}
+                        align="baseline"
+                      >
+                        <Form.Item
+                          label={`nội dung ${key + 1} header 3`}
+                          key={key}
+                          {...restField}
+                          name={[name, "name"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Vui lòng nhập nội dung",
+                            },
+                          ]}
+                          className="ml-0 md:ml-[160px]"
+                        >
+                          <Input
+                            value={name}
+                            onChange={(e) =>
+                              handleOchangeInforFooter(key, e, "content_footer3")
+                            }
+                            name="name"
+                            className=" w-full md:w-[400px]"
+                          />
+                        </Form.Item>
+                    
+                        {fields.length > 1 ? (
+                          <MinusCircleOutlined
+                            className="dynamic-delete-button"
+                            onClick={() => {
+                              remove(name);
+                              handleRemoveInputDetail(name,"content_footer3");
+                            }}
+                          />
+                        ) : null}
+                      </Space>
+                    ))}
+                    <Form.Item
+                    >
+                      <Button
+                        type="dashed"
+                        onClick={() => {
+                          add();
+                          handleAddInputDetail('content_footer3');
+                        }}
+                        className="ml-0 md:ml-[160px]"
+                      >
+                        Thêm content footer 3
+                      </Button>
+                    </Form.Item>
+                  </>
+                )}
+              </Form.List>
+
+              <Form.Item
+                  label="Tiều đề footer 4"
+                  name="header_footer4"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng nhập tiêu đề footer 4",
+                    },
+                  ]}
+                  className=""
+                >
+                  <Input
+                    value={InforPageDetail?.header_footer4}
+                    onChange={(e) =>handleOchangeInforFooter(null, e, "header_footer4")}
+                    name="header_footer4"
+                    className=" w-full md:w-[500px]"
+                  />
+                </Form.Item>
+
+                <Form.List
+                name="content_footer4"
+                rules={[
+                  {
+                    validator: async (_, categorySize) => {
+                      if (!categorySize || categorySize.length < 2) {
+                        return Promise.reject(
+                          new Error("At least 2 passengers"),
+                        );
+                      }
+                    },
+                  },
+                ]}
+              >
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map(({ key, name, ...restField }) => (
+                      <Space
+                        key={key}
+                        style={{
+                          display: "flex",
+                          marginBottom: 8,
+                        }}
+                        align="baseline"
+                      >
+                        <Form.Item
+                          label={`nội dung ${key + 1} header 4`}
+                          key={key}
+                          {...restField}
+                          name={[name, "name"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Vui lòng nhập nội dung",
+                            },
+                          ]}
+                          className="ml-0 md:ml-[160px]"
+                        >
+                          <Input
+                            value={name}
+                            onChange={(e) =>
+                              handleOchangeInforFooter(key, e, "content_footer4")
+                            }
+                            name="name"
+                            className=" w-full md:w-[400px]"
+                          />
+                        </Form.Item>
+                    
+                        {fields.length > 1 ? (
+                          <MinusCircleOutlined
+                            className="dynamic-delete-button"
+                            onClick={() => {
+                              remove(name);
+                              handleRemoveInputDetail(name,"content_footer4");
+                            }}
+                          />
+                        ) : null}
+                      </Space>
+                    ))}
+                    <Form.Item
+                    >
+                      <Button
+                        type="dashed"
+                        onClick={() => {
+                          add();
+                          handleAddInputDetail('content_footer4');
+                        }}
+                        className="ml-0 md:ml-[160px]"
+                      >
+                        Thêm content footer 4
+                      </Button>
+                    </Form.Item>
+                  </>
+                )}
+              </Form.List>
+            </Form>
             <div className="flex justify-between">
               <div></div>
               <div>

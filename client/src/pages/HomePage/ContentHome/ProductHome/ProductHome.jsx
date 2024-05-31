@@ -6,7 +6,6 @@ import { WapperButton } from './style'
 import {useQuery} from '@tanstack/react-query'
 import {ProductService,InformationPageService}from '../../../../services/index'
 import IsLoadingCardComponent from '../../../../components/LoadComponent/LoadingCard'
-import { buildModel, trainModel, recommendProducts } from '../../../../utils';
 import IsLoadingSideComponent from '../../../../components/LoadComponent/LoadingSlide'
 import IsLoadingAdvertisement from '../../../../components/LoadComponent/LoadingAdvertisement'
 import { updateInformationPage } from "../../../../redux/Slides/InformationPageSlide";
@@ -54,51 +53,7 @@ export default function ProductHome() {
   };
 
 
-  const convertProductToFeatures = (product) => {
-    return [
-      product.type
-    ];
-  };
   
-
-// Khởi tạo mô hình và huấn luyện mô hình
-useEffect(() => {
-  if (!productsLimit) return; // Đảm bảo rằng dữ liệu đã được tải trước khi tiếp tục
-  setProducts(productsLimit.data);
-  const inputSize = 1; // Sử dụng 1 đặc trưng
-  const outputSize = productsLimit.data.length;
-  const model = buildModel(inputSize, outputSize); // Sử dụng dữ liệu thực tế từ productsLimit
-  setModel(model);
-
-  // Huấn luyện mô hình một lần
-  const trainingData = products.map(convertProductToFeatures);
-  const trainingLabels = products.map((_, idx) => {
-    const label = Array(products.length).fill(0);
-    label[idx] = 1;
-    return label;
-  });
-
-  trainModel(model, trainingData, trainingLabels).then(() => {
-    console.log('Training complete');
-  });
-}, [productsLimit]);
-
-// Gợi ý sản phẩm
-useEffect(() => {
-  if (model && userPreferences.length > 0 && products.length > 0) {
-    const recommendedIndex = recommendProducts(model, userPreferences);
-    setRecommendedProduct(products[recommendedIndex]);
-  }
-}, [model, userPreferences, products]);
-// Xử lý khi người dùng click vào sản phẩm
-const handleProductClick = (product) => {
-    setUserPreferences((prevUserPreferences) => {
-      const updatedPreferences = [...prevUserPreferences, product.type];
-
-      localStorage.setItem('userPreferences', JSON.stringify(updatedPreferences));
-      return updatedPreferences;
-    });
-  };
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -206,7 +161,7 @@ const handleProductClick = (product) => {
           <div className=' text-[#ffc107] text-[20px] md:text-[30px] '>Giờ Vàng Deal Sốc</div>
           <div className='text-[#fff] text-[16px] md:text-[20px] '>Kết thúc trong: {formatTime(countdown)} </div>
           <div className='p-5'>
-            <SliderCardComponent products={products}/>
+            <SliderCardComponent products={productsLimit?.data}/>
           </div>
         </div>
         
@@ -219,7 +174,7 @@ const handleProductClick = (product) => {
           <>
           <div className='grid grid-cols-4 gap-2 mb-3 mt-3 md:grid-cols-6 md:gap-4'>
         
-          { products.map((product,index)=> {
+          { productsLimit?.data?.map((product,index)=> {
             return (
               <>
               

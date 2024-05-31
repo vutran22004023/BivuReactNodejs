@@ -128,35 +128,3 @@ export const buildModel = (inputSize, outputSize) => {
   model.compile({ optimizer: 'adam', loss: 'categoricalCrossentropy' });
   return model;
 };
-
-// Hàm để huấn luyện mô hình
-export const trainModel = async (model, trainingData, trainingLabels) => {
-  // Ensure trainingData and trainingLabels are arrays of numbers
-  const xs = tf.tensor2d(trainingData, [trainingData.length, trainingData[0].length], 'float32');
-  const ys = tf.tensor2d(trainingLabels, [trainingLabels.length, trainingLabels[0].length], 'float32');
-  await model.fit(xs, ys, { epochs: 10 });
-};
-
-// Hàm để gợi ý sản phẩm
-export const recommendProducts = (model, userPreferences) => {
-  // Ensure userPreferences is an array of numbers
-  const inputTensor = tf.tensor2d([userPreferences], [1, userPreferences.length], 'float32');
-  const prediction = model.predict(inputTensor);
-  return prediction.argMax(-1).dataSync()[0];
-};
-
-
-export const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  // Get the day, month, and year
-  const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-indexed
-  const year = date.getFullYear();
-
-  // Get the hours and minutes
-  const hours = date.getHours().toString().padStart(2, "0");
-  const minutes = date.getMinutes().toString().padStart(2, "0");
-  let seconds = date.getSeconds().toString().padStart(2, "0");
-  seconds = seconds.substring(0, 2);
-  return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
-};

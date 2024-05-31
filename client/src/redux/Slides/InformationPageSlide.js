@@ -25,6 +25,7 @@ const initialState = {
     link_qc_3: '',
     link_qc_4: '',
     link_qc_5: '',
+    type_Product: [],
 };
 
 export const createSlices = createSlice({
@@ -57,6 +58,7 @@ export const createSlices = createSlice({
         link_qc_3 = '',
         link_qc_4 = '',
         link_qc_5 = '',
+        type_Product= []
       } = action.payload;
       state.namePage = namePage;
       state.description = description;
@@ -82,6 +84,7 @@ export const createSlices = createSlice({
       state.link_qc_3 = link_qc_3;
       state.link_qc_4 = link_qc_4;
       state.link_qc_5 = link_qc_5;
+      state.type_Product = type_Product;
     },
   },
 });

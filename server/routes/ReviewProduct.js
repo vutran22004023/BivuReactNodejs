@@ -6,4 +6,5 @@ const router = express.Router();
 router.post('/create-review-product',authMiddleware.authUser,reviewProductController.createReviewProduct)
 router.put('/update-review-product/:id/:iduser',authMiddleware.authUser,reviewProductController.updateReviewProduct)
 router.get('/get-review-product/:productId', reviewProductController.getReviewProduct)
+router.get('/get-review-product-all', reviewProductController.getReviewProductAll)
 export default router

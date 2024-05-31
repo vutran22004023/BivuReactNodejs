@@ -59,8 +59,20 @@ const getReviewProduct = async(req, res) => {
     }
 }
 
+const getReviewProductAll = async(req, res) => {
+    try{
+        const response = await ReviewProductServicres.getReviewProductAll()
+        return res.status(200).json(response)
+    }catch(e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
+
 export default {
     createReviewProduct,
     updateReviewProduct,
-    getReviewProduct
+    getReviewProduct,
+    getReviewProductAll
 }

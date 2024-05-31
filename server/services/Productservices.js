@@ -92,9 +92,11 @@ const getAllProduct = async(limit = 10, page =0,sort ,filter) => {
         if (sort) {
           const sortObject = {};
           sortObject[sort[1]] = sort[0];
-
-          const allProductSort = await ProductModel.find().limit(limit).skip(page * limit).sort(sortObject)
-          return {
+          const filterObject = {};
+          filterObject[filter[0]] = {'$regex': filter[1],'$options': 'i'};
+          if(filterObject) {
+            const allProductSort = await ProductModel.find(filterObject).limit(limit).skip(page * limit).sort(sortObject)
+            return {
               status: 200,
               message: "Xem tất cả sản phẩm",
               data: allProductSort,
@@ -102,8 +104,19 @@ const getAllProduct = async(limit = 10, page =0,sort ,filter) => {
               pageCurrent: Number(page),
               totalPage: Math.ceil(totalProduct / limit)
           };
-          
-      }else if (filter) {
+          }else {
+            const allProductSort = await ProductModel.find().limit(limit).skip(page * limit).sort(sortObject)
+            return {
+              status: 200,
+              message: "Xem tất cả sản phẩm",
+              data: allProductSort,
+              total: totalProduct,
+              pageCurrent: Number(page),
+              totalPage: Math.ceil(totalProduct / limit)
+          };
+          }
+      }
+      else if (filter) {
         const filterObject = {};
         filterObject[filter[0]] = {'$regex': filter[1],'$options': 'i'};
         const allProductfilter = await ProductModel.find(filterObject)

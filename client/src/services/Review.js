@@ -14,9 +14,16 @@ const getDetailReviewProduct= async (id) => {
     return res.data
 }
 
+const getReviewProductAll= async (id) => {
+    const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/reviews/get-review-product-all`)
+    return res.data
+}
+
+
 
 
 export default{
     createReview,
-    getDetailReviewProduct
+    getDetailReviewProduct,
+    getReviewProductAll
 }

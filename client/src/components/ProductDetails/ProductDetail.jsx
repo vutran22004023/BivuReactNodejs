@@ -602,13 +602,17 @@ export default function ProductDetail({ idProduct }) {
               className="flex bg-[#dfcccc] p-5"
               style={{ border: "1px solid red" }}
             >
-              <div className="w-[120px] md:w-[200px] ">
+              <div className="w-[120px] md:w-[200px]" >
+              {averageRating ? (
                 <div className="text-[1rem] text-[#ee4d2d] md:text-[1.125rem] ">
                   <span className="text-[1.125rem] text-[#ee4d2d] md:text-[1.875rem] ">
                     {averageRating?.toFixed(1)}
                   </span>{" "}
                   trên 5 với
                 </div>
+              ): (
+                <div className="text-[1rem] text-[#ee4d2d] md:text-[1.125rem] mt-2">Chưa có đánh giá</div>
+              )}
               </div>
               <div className="flex w-full flex-1" style={{ padding: "0 20px" }}>
                 <TabList
@@ -643,6 +647,7 @@ export default function ProductDetail({ idProduct }) {
             </div>
             <div style={{ padding: "5px 10px" }}>
               <TabPanel value="1" sx={{ p: "15px 0" }}>
+              {productReview?.length > 0 ? (
                 <IsLoadingComponent isLoading={IsLoadingProductDetailReview}>
                   {productReview?.map((item) => (
                     <div className="mt-3">
@@ -685,8 +690,12 @@ export default function ProductDetail({ idProduct }) {
                     </div>
                   ))}
                 </IsLoadingComponent>
+              ): (
+                <div className="flex items-center justify-center h-[500px] text-[16px] md:text-[20px] text-[#ba3636]">Chưa có đánh giá</div>
+              )}
               </TabPanel>
               <TabPanel value="2" sx={{ p: "15px 0" }}>
+              {productReview?.filter((item) => item.rating === 5)?.length > 0 ? (
                 <IsLoadingComponent isLoading={IsLoadingProductDetailReview}>
                   {productReview
                     ?.filter((item) => item.rating === 5) // Filter reviews with 5-star rating
@@ -729,8 +738,12 @@ export default function ProductDetail({ idProduct }) {
                       </div>
                     ))}
                 </IsLoadingComponent>
+              ):(
+                <div className="flex items-center justify-center h-[500px] text-[16px] md:text-[20px] text-[#ba3636]">Chưa có đánh giá</div>
+              )}
               </TabPanel>
               <TabPanel value="3" sx={{ p: "15px 0" }}>
+              {productReview?.filter((item) => item.rating === 4)?.length > 0 ? (
                 <IsLoadingComponent isLoading={IsLoadingProductDetailReview}>
                   {productReview
                     ?.filter((item) => item.rating === 4) // Filter reviews with 5-star rating
@@ -773,9 +786,13 @@ export default function ProductDetail({ idProduct }) {
                       </div>
                     ))}
                 </IsLoadingComponent>
+              ): (
+                <div className="flex items-center justify-center h-[500px] text-[16px] md:text-[20px] text-[#ba3636]">Chưa có đánh giá</div>
+              )}
               </TabPanel>
 
               <TabPanel value="4" sx={{ p: "15px 0" }}>
+              {productReview?.filter((item) => item.rating === 3)?.length > 0 ? (
                 <IsLoadingComponent isLoading={IsLoadingProductDetailReview}>
                   {productReview
                     ?.filter((item) => item.rating === 3) // Filter reviews with 5-star rating
@@ -818,9 +835,13 @@ export default function ProductDetail({ idProduct }) {
                       </div>
                     ))}
                 </IsLoadingComponent>
+              ):(
+                <div className="flex items-center justify-center h-[500px] text-[16px] md:text-[20px] text-[#ba3636]">Chưa có đánh giá</div>
+              )}
               </TabPanel>
 
               <TabPanel value="5" sx={{ p: "15px 0" }}>
+              {productReview?.filter((item) => item.rating === 2)?.length > 0 ? (
                 <IsLoadingComponent isLoading={IsLoadingProductDetailReview}>
                   {productReview
                     ?.filter((item) => item.rating === 2) // Filter reviews with 5-star rating
@@ -863,9 +884,13 @@ export default function ProductDetail({ idProduct }) {
                       </div>
                     ))}
                 </IsLoadingComponent>
+              ):(
+                <div className="flex items-center justify-center h-[500px] text-[16px] md:text-[20px] text-[#ba3636]">Chưa có đánh giá</div>
+              )}
               </TabPanel>
 
               <TabPanel value="6" sx={{ p: "15px 0" }}>
+              {productReview?.filter((item) => item.rating === 1)?.length > 0 ? (
                 <IsLoadingComponent isLoading={IsLoadingProductDetailReview}>
                   {productReview
                     ?.filter((item) => item.rating === 1) // Filter reviews with 5-star rating
@@ -908,6 +933,9 @@ export default function ProductDetail({ idProduct }) {
                       </div>
                     ))}
                 </IsLoadingComponent>
+              ):(
+                <div className="flex items-center justify-center h-[500px] text-[16px] md:text-[20px] text-[#ba3636]">Chưa có đánh giá</div>
+              )}
               </TabPanel>
             </div>
           </TabContext>

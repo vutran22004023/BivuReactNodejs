@@ -151,7 +151,7 @@ const handleProductClick = (product) => {
           <Row>
           <Col span={16} className='px-2 md:px-0 md:pr-3.5 h-[140px] md:h-[450px]'>
 
-            <SiderConponent arrImage = {dataImageSide} isLoaidng ={handleImageLoad}/>
+            <SiderConponent arrImage = {dataImageSide} classNameStyle='image-sider w-full h-[140px] md:h-[450px]' isLoaidng ={handleImageLoad}/>
           </Col>
           <Col span={8} style={{width: '100px'}} className='pl-0 md:pl-2.5'>
               {dataInfor?.data[0]?.image_right?.map((imageSlider, index) => (

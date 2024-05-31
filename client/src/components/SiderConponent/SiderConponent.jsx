@@ -1,7 +1,7 @@
 import React from 'react'
 import Slider from "react-slick";
 
-export default function SiderConponent({arrImage,handleImageLoad}) {
+export default function SiderConponent({arrImage,handleImageLoad, classNameStyle}) {
     var settings = {
         infinite: true,
         speed: 500,
@@ -16,7 +16,7 @@ export default function SiderConponent({arrImage,handleImageLoad}) {
 
         {safeArrImage.map((image, index) => (
           <React.Fragment key={index}>
-            <img className='image-sider w-full h-[140px] md:h-[450px]' onLoad={handleImageLoad} src={image} key={image} alt='slider' preview={false}  />
+            <img className={classNameStyle} onLoad={handleImageLoad} src={image} key={image} alt='slider' preview={false}  />
           </React.Fragment>  
         )) }
     </Slider>

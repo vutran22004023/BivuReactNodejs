@@ -83,9 +83,30 @@ const getReviewProduct = async(productId) => {
   }
 }
 
+const getReviewProductAll= async() => {
+  try{  
+    const checkProductReview = await ReviewModel.find();
+
+   if(!checkProductReview) {
+    return {
+      status: "ERR",
+      message: "Id không tồn tại",
+    };
+   }
+   return {
+    status: 200,
+    message: `Show thông tin : `,
+    data: checkProductReview
+  };
+  }catch(e) {
+    throw e;
+  }
+}
+
 export default {
     createReviewProduct,
     updateReviewProduct,
-    getReviewProduct
+    getReviewProduct,
+    getReviewProductAll
 }
 

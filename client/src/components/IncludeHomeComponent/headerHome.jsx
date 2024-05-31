@@ -31,7 +31,7 @@ import {
   SearchProduct,
   SearchisInputEmpty,
 } from "../../redux/Slides/productSlide";
-import {IncreaseAmount,DecreaseAmount} from "../../redux/Slides/orderProductSlide";
+import {updateInformationPage} from "../../redux/Slides/InformationPageSlide";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import {
   Box,
@@ -106,6 +106,8 @@ export default function headerHome({isHeaderVisible}) {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const order = useSelector((state) => state.order);
+  const infor = useSelector((state) => state.information);
+  console.log(infor)
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState("");
@@ -174,6 +176,7 @@ export default function headerHome({isHeaderVisible}) {
     queryKey: ["productsType"],
     queryFn: fetchTypeProduct,
   });
+
   //Xử lý phần Loading Logout
   const handLogout = async () => {
     await signOut(auth)
@@ -512,11 +515,11 @@ export default function headerHome({isHeaderVisible}) {
         }}
       >
         <Col span={4} className="">
-          Xin Chào Bạn Đã Đến Shop
+          {infor.title_1}
         </Col>
-        <Col span={8}>MỌI THÔNG TIN( Bảo Hành)VỀ SẢN PHẨM VUI LÒNG LIÊN HỆ</Col>
+        <Col span={8}>{infor.title_2}</Col>
         <Col span={8}>
-          ZALO SHOP: 0943392799 Fanpage : Cửa Hàng Phật Giáo Bi Vũ
+        {infor.title_3}
         </Col>
         <Col span={4}>col-6</Col>
       </Row>

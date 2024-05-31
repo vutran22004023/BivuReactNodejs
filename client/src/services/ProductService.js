@@ -60,8 +60,8 @@ const getAllTypeProduct= async () => {
     return res.data
 }
 
-const getProductType= async (type,page,limit) => {
-    const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/all-products?filter=type&filter=${type}&limit=${limit}&page=${page}`)
+const getProductType= async (type,page,limit,sort) => {
+    const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/all-products?filter=type&filter=${type}&limit=${limit}&page=${page}&sort=${sort}&sort=createdAt`)
         return res.data
 }
 

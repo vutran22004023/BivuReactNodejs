@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import * as tf from '@tensorflow/tfjs';
 export const isJsonString = (data) => {
     try {
         JSON.parse(data)
@@ -119,12 +118,17 @@ export const vietnameseToSlug = (str) => {
   }
 }
 
+export const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  // Get the day, month, and year
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-indexed
+  const year = date.getFullYear();
 
-// Hàm để xây dựng mô hình
-export const buildModel = (inputSize, outputSize) => {
-  const model = tf.sequential();
-  model.add(tf.layers.dense({ units: 128, activation: 'relu', inputShape: [inputSize] }));
-  model.add(tf.layers.dense({ units: outputSize, activation: 'softmax' }));
-  model.compile({ optimizer: 'adam', loss: 'categoricalCrossentropy' });
-  return model;
+  // Get the hours and minutes
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  let seconds = date.getSeconds().toString().padStart(2, "0");
+  seconds = seconds.substring(0, 2);
+  return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
 };

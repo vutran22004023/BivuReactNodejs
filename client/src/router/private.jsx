@@ -6,7 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import { UserService } from "../services/index.js";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUser } from "../redux/Slides/userSlide";
-import IsLoadingComponent from "../components/LoadComponent/Loading.jsx";
+import IsLoadingComponent from "../components/LoadComponent/LoadingTotal.jsx";
 import {setDoc, doc, serverTimestamp} from 'firebase/firestore'
 import {txtDB} from "../Firebase/config.jsx"
 export const PrivateUser = () => {

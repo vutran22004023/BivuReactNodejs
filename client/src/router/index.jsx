@@ -53,6 +53,12 @@ const OrderProductAdmin = React.lazy(() =>
 const DiscountAdmin = React.lazy(() =>
   import("../pages/AdminPage/ContentAdmin/DiscountAdmin/discount.jsx")
 )
+const PaySuccess = React.lazy(() =>
+  import("../pages/HomePage/ContentHome/PayProduct/PaySuccess.jsx")
+)
+const PayError = React.lazy(() =>
+  import("../pages/HomePage/ContentHome/PayProduct/PayError.jsx")
+)
 
 
 export default createBrowserRouter([
@@ -90,6 +96,14 @@ export default createBrowserRouter([
               {
                 element: <PayProduct />,
                 path: "/mua-hang",
+              },
+              {
+                element: <PaySuccess />,
+                path: "/mua-hang/thanh-cong",
+              },
+              {
+                element: <PayError />,
+                path: "/mua-hang/that-bai",
               },
             ],
           },

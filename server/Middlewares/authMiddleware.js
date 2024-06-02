@@ -30,18 +30,10 @@ const authUser = (req, res, next) => {
     const userisAdmin = req.headers.isadmin;
     jwt.verify(token, process.env.ACCESS_TOKEN,async function(err, user) {
         if(err) {
-            let url = 'http://localhost:3001/api/user/refresh-token'
-            const resp = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    authorization: token,
-                    id: userId,
-                    isadmin:userisAdmin,
-                },
-            });
-                if(resp) {
-                    next()
-                }
+            return res.status(404).json({
+                status: 'ERR',
+                message: 'Hết hạn token',
+            })
         }
         if(user?.isAdmin || user?.id === userId) {
             next();

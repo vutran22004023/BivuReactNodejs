@@ -142,7 +142,6 @@ const allUser =async (req, res) => {
 
 const getDetailsUser =async (req, res) => {
     try{
-        const token = await req.headers.token.split(' ')[1];
         const userid = req.params.id
         const userisAdmin =req.params.isAdmin
         if(!userid) {
@@ -151,7 +150,7 @@ const getDetailsUser =async (req, res) => {
                 message: 'id không tồn tại'
             })
         }
-        const response = await Userservices.getDetailsUser(userid, token,userisAdmin)
+        const response = await Userservices.getDetailsUser(userid)
         return res.status(200).json(response).end()
     }catch(e) {
         return res.status(404).json({

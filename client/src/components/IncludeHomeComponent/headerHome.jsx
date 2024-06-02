@@ -107,7 +107,6 @@ export default function headerHome({isHeaderVisible}) {
   const user = useSelector((state) => state.user);
   const order = useSelector((state) => state.order);
   const infor = useSelector((state) => state.information);
-  console.log(infor)
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState("");

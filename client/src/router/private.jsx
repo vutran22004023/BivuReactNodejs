@@ -14,9 +14,9 @@ export const PrivateUser = () => {
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user);
     useEffect(() => {
-      const { cookieData, decoded } = handleDecoded();
+      const { cookieData, decoded,accessTokenCookie } = handleDecoded();
       if (decoded?.id) {
-        handleGetDetailsUser(decoded?.id, cookieData,decoded?.isAdmin);
+        handleGetDetailsUser(decoded?.id, accessTokenCookie,decoded?.isAdmin);
       }
     }, []);
 
@@ -43,9 +43,7 @@ export const PrivateUser = () => {
   
     const handleDecoded = () => {
       let cookieData = document.cookie;
-  
       let decoded = {};
-  
       if (cookieData) {
         let cookieArr = cookieData.split(";");
         let accessTokenCookie = cookieArr.find((cookie) =>
@@ -55,9 +53,9 @@ export const PrivateUser = () => {
           let accessTokenValue = accessTokenCookie.split("=")[1];
           decoded = jwtDecode(accessTokenValue);
         }
+        return { decoded, cookieData,accessTokenCookie };
       }
   
-      return { decoded, cookieData };
     };
   
     UserService.axiosJWT.interceptors.request.use(

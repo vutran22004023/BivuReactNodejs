@@ -310,7 +310,7 @@ const saveData = () => {
     const search = "";
     const limit = "";
     const page = context.queryKey[1];
-    const sort = 'desc'
+    const sort = ''
     const res = await ProductService.getAllProduct(limit, search, page,sort);
     return res;
   };

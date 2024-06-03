@@ -87,10 +87,35 @@ const updateOrderProduct = async(req, res)=> {
 
 }
 
+
+const getAllOrderProductDate = async(req, res) => {
+    try {
+        const datestart = req.params.datestart
+        const datesend = req.params.datesend
+        if(!datestart || !datesend) {
+            return  {
+                status: 'ERR',
+                message: 'chưa đầy đủ'
+            }
+        }
+        const startDate = new Date(datestart);
+        const endDate = new Date(datesend);
+        endDate.setHours(23, 59, 59, 999);
+
+        const response =  await OrderProductservices.getAllOrderProductDate(startDate,endDate)
+        return res.status(200).json(response)
+    }catch(e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
+
 export default {
     createOrderProduct,
     getOrderDetail,
     getOrderDetailProduct,
     getAllOrderProduct,
-    updateOrderProduct
+    updateOrderProduct,
+    getAllOrderProductDate
 }

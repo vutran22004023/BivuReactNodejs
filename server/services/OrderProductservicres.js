@@ -188,10 +188,62 @@ const updateOrderProduct = async(id,data) => {
         throw error;
       }
 }
+
+
+const getAllOrderProductDate = async(datestart,datesend) => {
+    try {
+        const checkOrderProductDate = await OrderProductModel.aggregate([
+            {
+                $match: {
+                    createdAt: {
+                        $gte: datestart,
+                        $lte: datesend
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
+                    },
+                    totalOrders: { $sum: 1 },
+                    totalDeliveredtrue: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$isDelivered", true] }, then: 1, else: 0 }
+                        }
+                    },
+                    totalDeliveredfalse: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$isDelivered", false] }, then: 1, else: 0 }
+                        }
+                    },
+                }
+            },
+            {
+                $sort: { _id: 1 } // Sắp xếp theo ngày tăng dần
+            }
+        ]);
+        
+        if(!checkOrderProductDate) {
+          return {
+            status: "ERR",
+            message: "Không có dữ liệu",
+          };
+        }
+        return {
+          status: 200,
+          message: `Show dữ thành công`,
+          data: checkOrderProductDate
+        };
+      } catch (error) {
+        throw error;
+      }
+}
 export default {
     createOrderProductservices,
     getOrderDetail,
     getOrderDetailProduct,
     getAllOrderProduct,
-    updateOrderProduct
+    updateOrderProduct,
+    getAllOrderProductDate
 }

@@ -43,11 +43,21 @@ const getDetailOrderProduct= async (id,access_Token) => {
     return res.data
 }
 
+const getAllOrderProductsDate = async (datestart, datesend,access_Token) => {
+    const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/order-product/get-all-order-product/date/${datestart}/${datesend}`,{
+        headers: {
+            token: `Beare ${access_Token}`,
+        }
+    })
+    return res.data
+}
+
 
 export default {
     createOrderProduct,
     getDetailOrder,
     getDetailOrderProduct,
     getAllOrderProducts,
-    updateOrderProduct
+    updateOrderProduct,
+    getAllOrderProductsDate
 }

@@ -68,6 +68,9 @@ export default function Sidebar() {
     setSelectedIndex(index);
     localStorage.setItem('selectedIndex', index);
     switch (index) {
+      case 'bang-dieu-kien':
+          navigate('/admin/bang-dieu-kien');
+          break;  
       case 'san-pham':
         navigate('/admin/san-pham');
         break;
@@ -170,19 +173,11 @@ export default function Sidebar() {
           }}
         >
           <ListItem>
-            <ListItemButton>
-              <HomeRoundedIcon />
-              <ListItemContent>
-                <Typography level="title-sm">Home</Typography>
-              </ListItemContent>
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem>
-            <ListItemButton>
+            <ListItemButton selected={selectedIndex === 'bang-dieu-kien'}
+              onClick={(event) => handleListItemClick(event, 'bang-dieu-kien')}>
               <DashboardRoundedIcon />
               <ListItemContent>
-                <Typography level="title-sm">Dashboard</Typography>
+                <Typography level="title-sm">Bản điều khiển</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>

@@ -1,3 +1,4 @@
+import { SortDescendingOutlined } from '@ant-design/icons'
 import axios from 'axios'
 const axiosJWT = axios.create()
 const createProduct = async (data, access_Token) => {
@@ -46,8 +47,8 @@ const getAllProduct = async (limit,search,page,sort) => {
         const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/all-products?filter=name&filter=${search}`)
         return res.data
 
-    }else if(sort.length > 0) {
-        const res =await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/all-products?limit=${limit}&page=${page}&sort=${sort}&sort=name`)
+    }else if(sort) {
+        const res =await axios.get(`${import.meta.env.REACT_APP_API_URL}/product/all-products?limit=${limit}&page=${page}&sort=${sort}&sort=createdAt`)
         return res.data
     }
     else {

@@ -50,6 +50,10 @@ const OrderProductAdmin = React.lazy(() =>
   import("../pages/AdminPage/ContentAdmin/OrderProductAdmin/OrderProduct.jsx")
 )
 
+const DashboardAdmin = React.lazy(() =>
+  import("../pages/AdminPage/ContentAdmin/DashboardAdmin/DashBoard.jsx")
+)
+
 const DiscountAdmin = React.lazy(() =>
   import("../pages/AdminPage/ContentAdmin/DiscountAdmin/discount.jsx")
 )
@@ -59,6 +63,7 @@ const PaySuccess = React.lazy(() =>
 const PayError = React.lazy(() =>
   import("../pages/HomePage/ContentHome/PayProduct/PayError.jsx")
 )
+
 
 
 export default createBrowserRouter([
@@ -148,6 +153,10 @@ export default createBrowserRouter([
               {
                 element: <DiscountAdmin />,
                 path: "giam-gia",
+              },
+              {
+                element: <DashboardAdmin />,
+                path: "bang-dieu-kien",
               },
             ],
           },

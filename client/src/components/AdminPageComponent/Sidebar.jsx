@@ -30,9 +30,11 @@ import { useNavigate } from 'react-router-dom';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import DiscountIcon from '@mui/icons-material/Discount';
 import FeedIcon from '@mui/icons-material/Feed';
-
+import { OrderProduct } from "../../services/index";
+import { useMutationHooks } from "../../hooks/UseMutationHook";
 function Toggler({ defaultExpanded = false, renderToggle, children }) {
   const [open, setOpen] = useState(defaultExpanded);
+
   return (
     <>
       {renderToggle({ open, setOpen })}
@@ -54,6 +56,7 @@ function Toggler({ defaultExpanded = false, renderToggle, children }) {
 
 export default function Sidebar() {
   const user = useSelector((state) => state.user);
+
   const navigate = useNavigate()
   const [selectedIndex, setSelectedIndex] = useState('san-pham');
   useEffect(() => {
@@ -86,10 +89,27 @@ export default function Sidebar() {
         case 'giam-gia':
           navigate('/admin/giam-gia');
           break;  
+          case 'don-hang-chua-xu-ly':
+          navigate('/admin/don-hang-chua-xu-ly');
+          break;  
+          case 'thong-ke-don-hang':
+          navigate('/admin/thong-ke-don-hang');
+          break;  
       default:
         break;
     }
   }
+
+  useEffect(() => {
+    mutationDashboard.mutate()
+  },[])
+  const mutationDashboard = useMutationHooks(async () => {
+    const access_Token =  user.access_Token.split("=")[1];
+    const res = await OrderProduct.getDashBoard(access_Token)
+    return res;
+  });
+
+  const {data: datadashboard} =  mutationDashboard
 
   return (
     <Sheet
@@ -210,14 +230,54 @@ export default function Sidebar() {
               </ListItemContent>
             </ListItemButton>
           </ListItem>
-          <ListItem>
-            <ListItemButton selected={selectedIndex === 'don-hang'}
-            onClick={(event) => handleListItemClick(event, 'don-hang')}>
-                <ShoppingCartRoundedIcon />
-              <ListItemContent>
-              <Typography level="title-sm">Đơn hàng</Typography>
-              </ListItemContent>
-            </ListItemButton>
+        
+          <ListItem nested>
+            <Toggler
+              renderToggle={({ open, setOpen }) => (
+                <ListItemButton onClick={() => setOpen(!open)}>
+                  <ShoppingCartRoundedIcon />
+                  <ListItemContent>
+                    <Typography level="title-sm">Đơn hàng</Typography>
+                  </ListItemContent>
+                  <Chip size="sm" sx={{color:'#fff', background:'red'}} variant="solid">
+                {datadashboard?.dataOrderProducttotalDelivered[0]?.totalDeliveredfalse}
+              </Chip>
+                  <KeyboardArrowDownIcon
+                    sx={{ transform: open ? 'rotate(180deg)' : 'none' }}
+                  />
+                </ListItemButton>
+              )}
+            >
+              <List sx={{ gap: 0.5 }}>
+                <ListItem sx={{ mt: 0.5 }}>
+                  <ListItemButton 
+                  selected={selectedIndex === 'thong-ke-don-hang'}
+                    onClick={(event) => handleListItemClick(event, 'thong-ke-don-hang')}
+                  >
+                    Thống kê
+                  </ListItemButton>
+                </ListItem>
+                <ListItem >
+                  <ListItemButton
+                  selected={selectedIndex === 'don-hang-chua-xu-ly'}
+                    onClick={(event) => handleListItemClick(event, 'don-hang-chua-xu-ly')}
+                  >
+                  <ListItemContent>
+                    <div >Đơn hàng chưa xử lý</div>
+                  </ListItemContent>
+                  <Chip size="sm" sx={{color:'#fff', background:'red'}} variant="solid">
+                  {datadashboard?.dataOrderProducttotalDelivered[0]?.totalDeliveredfalse}
+              </Chip>
+                  </ListItemButton>
+                </ListItem>
+                <ListItem>
+                  <ListItemButton 
+                  selected={selectedIndex === 'don-hang'}
+                    onClick={(event) => handleListItemClick(event, 'don-hang')}
+                  >Liệt kê đơn hàng</ListItemButton>
+                </ListItem>
+              </List>
+            </Toggler>
           </ListItem>
           <ListItem>
             <ListItemButton selected={selectedIndex === 'nguoi-dung'}
@@ -261,58 +321,9 @@ export default function Sidebar() {
             </Toggler>
           </ListItem> */}
 
-          {/* <ListItem>
-            <ListItemButton
-              role="menuitem"
-              component="a"
-              href="/joy-ui/getting-started/templates/messages/"
-            >
-              <QuestionAnswerRoundedIcon />
-              <ListItemContent>
-                <Typography level="title-sm">Messages</Typography>
-              </ListItemContent>
-              <Chip size="sm" color="primary" variant="solid">
-                4
-              </Chip>
-            </ListItemButton>
-          </ListItem> */}
-
-          {/* <ListItem nested>
-            <Toggler
-              renderToggle={({ open, setOpen }) => (
-                <ListItemButton onClick={() => setOpen(!open)}>
-                  <GroupRoundedIcon />
-                  <ListItemContent>
-                    <Typography level="title-sm">Users</Typography>
-                  </ListItemContent>
-                  <KeyboardArrowDownIcon
-                    sx={{ transform: open ? 'rotate(180deg)' : 'none' }}
-                  />
-                </ListItemButton>
-              )}
-            >
-              <List sx={{ gap: 0.5 }}>
-                <ListItem sx={{ mt: 0.5 }}>
-                  <ListItemButton
-                    role="menuitem"
-                    component="a"
-                    href="/joy-ui/getting-started/templates/profile-dashboard/"
-                  >
-                    My profile
-                  </ListItemButton>
-                </ListItem>
-                <ListItem>
-                  <ListItemButton>Create a new user</ListItemButton>
-                </ListItem>
-                <ListItem>
-                  <ListItemButton>Roles & permission</ListItemButton>
-                </ListItem>
-              </List>
-            </Toggler>
-          </ListItem> */}
         </List>
 
-        <List
+        {/* <List
           size="sm"
           sx={{
             mt: 'auto',
@@ -334,7 +345,7 @@ export default function Sidebar() {
               Settings
             </ListItemButton>
           </ListItem>
-        </List>
+        </List> */}
       </Box>
       <Divider />
       <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>

@@ -2,7 +2,8 @@ import {OrderProductservices} from '../services/index.js'
 
 const getAllOrderProduct = async(req, res) => {
     try {
-        const response = await OrderProductservices.getAllOrderProduct()
+        const {limit= 50,page} = req.query
+        const response = await OrderProductservices.getAllOrderProduct(limit,page)
         return res.status(200).json(response)
     }catch (e) {
         return res.status(404).json({
@@ -111,11 +112,36 @@ const getAllOrderProductDate = async(req, res) => {
     }
 }
 
+const getDashboard = async(req, res) => {
+    try{
+        const response =  await OrderProductservices.getDashboard()
+        return res.status(200).json(response)
+    }catch(e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
+
+const getAllOrderProductIsdeliveredfalse = async(req, res) => {
+    try{
+        const {limit= 50,page} = req.query
+        const response =  await OrderProductservices.getAllOrderProductIsdeliveredfalse(limit,page)
+        return res.status(200).json(response)
+    }catch(e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
+
 export default {
     createOrderProduct,
     getOrderDetail,
     getOrderDetailProduct,
     getAllOrderProduct,
     updateOrderProduct,
-    getAllOrderProductDate
+    getAllOrderProductDate,
+    getDashboard,
+    getAllOrderProductIsdeliveredfalse
 }

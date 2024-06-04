@@ -1,13 +1,24 @@
 import axios from 'axios'
 
-const getAllOrderProducts = async(access_Token) => {
-    const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/order-product/get-all-order-products`, {
+const getAllOrderProducts = async(page,access_Token) => {
+    const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/order-product/get-all-order-products?page=${page}`, {
         headers: {
             token: `Bearer ${access_Token}`,
         }
     })
     return res.data
 }
+
+const getAllOrderProductsIsDeliveredFalse = async(page,access_Token) => {
+    const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/order-product/get-order-product-isdelivered-false?page=${page}`, {
+        headers: {
+            token: `Bearer ${access_Token}`,
+        }
+    })
+    return res.data
+}
+
+
 const createOrderProduct= async (access_Token, data) => {
     const res = await axios.post(`${import.meta.env.REACT_APP_API_URL}/order-product/create-order`, data, {
         headers: {
@@ -52,6 +63,15 @@ const getAllOrderProductsDate = async (datestart, datesend,access_Token) => {
     return res.data
 }
 
+const getDashBoard = async (access_Token) => {
+    const res = await axios.get(`${import.meta.env.REACT_APP_API_URL}/order-product/get-dashboard`,{
+        headers: {
+            token: `Beare ${access_Token}`,
+        }
+    })
+    return res.data
+}
+
 
 export default {
     createOrderProduct,
@@ -59,5 +79,7 @@ export default {
     getDetailOrderProduct,
     getAllOrderProducts,
     updateOrderProduct,
-    getAllOrderProductsDate
+    getAllOrderProductsDate,
+    getDashBoard,
+    getAllOrderProductsIsDeliveredFalse
 }

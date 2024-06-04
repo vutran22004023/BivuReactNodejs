@@ -64,6 +64,17 @@ const PayError = React.lazy(() =>
   import("../pages/HomePage/ContentHome/PayProduct/PayError.jsx")
 )
 
+const StatisticalAdmin = React.lazy(() =>
+  import("../pages/AdminPage/ContentAdmin/OrderProductAdmin/Statistical.jsx")
+)
+
+const OrderProductnNotBeenProcessedAdmin = React.lazy(() =>
+  import("../pages/AdminPage/ContentAdmin/OrderProductAdmin/orderProductnNotBeenProcessed.jsx")
+)
+
+
+
+
 
 
 export default createBrowserRouter([
@@ -157,6 +168,14 @@ export default createBrowserRouter([
               {
                 element: <DashboardAdmin />,
                 path: "bang-dieu-kien",
+              },
+              {
+                element: <StatisticalAdmin />,
+                path: "thong-ke-don-hang",
+              },
+              {
+                element: <OrderProductnNotBeenProcessedAdmin />,
+                path: "don-hang-chua-xu-ly",
               },
             ],
           },

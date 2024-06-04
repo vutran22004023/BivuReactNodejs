@@ -38,15 +38,20 @@ import {
   ResponsiveContainer,
   Pie,
   Cell,
-  PieChart
+  PieChart,
+  Area,
+  Bar,
+  ComposedChart
 } from "recharts";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useMutationHooks } from "../../../../hooks/UseMutationHook";
 import { OrderProduct } from "../../../../services/index";
 import { success } from "../../../../components/MessageComponents/Message";
+import { useSelector, useDispatch } from "react-redux";
 dayjs.extend(customParseFormat);
 export default function DashBoard() {
+  const user = useSelector((state) => state.user);
   const [valuesDateOrder, setValueDateOrder] = useState({
     datestart: "",
     dateend: "",
@@ -68,6 +73,8 @@ export default function DashBoard() {
       datestart: datestart,
       dateend: dateend,
     });
+
+    mutationDashboard.mutate()
   }, []);
 
   useEffect(() => {
@@ -78,15 +85,24 @@ export default function DashBoard() {
   }, [valuesDateOrder]);
 
   const mutationDateOrderProduct = useMutationHooks(async (data) => {
+    const access_Token =  user.access_Token.split("=")[1];
     const res = await OrderProduct.getAllOrderProductsDate(
       data?.datestart,
       data?.dateend,
+      access_Token
     );
     return res;
   });
 
-  const { data: dateorderporuct } = mutationDateOrderProduct;
+  const mutationDashboard = useMutationHooks(async () => {
+    const access_Token =  user.access_Token.split("=")[1];
+    const res = await OrderProduct.getDashBoard(access_Token)
+    return res;
+  });
 
+  const { data: dateorderporuct } = mutationDateOrderProduct;
+  const {data: datadashboard} =  mutationDashboard
+  console.log(datadashboard)
   const data =
     dateorderporuct?.data?.map((item) => ({
       name: item._id,
@@ -107,15 +123,9 @@ export default function DashBoard() {
     value: item.totalOrders
   })) || [];
 
-  dateorderporuct?.data?.map((item) => ({
-    name: item._id,
-    "Tổng Đơn hàng": item.totalOrders,
-    "Tổng đơn hàng đã giao": item.totalDeliveredtrue,
-    "Tổng đơn hàng chưa giao": item.totalDeliveredfalse,
-  })) || [];
 
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042','#00FF00', '#0000FF', '#00FFFF'];
   const RADIAN = Math.PI / 180;
 const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -126,6 +136,33 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
     <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
       {`${(percent * 100).toFixed(0)}%`}
     </text>
+  );
+};
+
+
+const datatop =
+datadashboard?.topSellingProducts?.map((item) => ({
+  name: item.name,
+  "Số lượng đã bán": item?.selled,
+})) || [];
+
+const datapitop = datadashboard?.topSellingProducts?.map((item) => ({
+  name: item.name,
+  value: item?.selled
+})) || [];
+
+const CustomYAxisTick = ({ x, y, payload }) => {
+  const maxLabelLength = 15; // Maximum characters before truncation
+  const label = payload.value.length > maxLabelLength
+    ? `${payload.value.substring(0, maxLabelLength)}...`
+    : payload.value;
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={16} textAnchor="end" fill="#666" fontSize={12}>
+        {label}
+      </text>
+    </g>
   );
 };
 
@@ -184,7 +221,7 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
               <img src={ProductIcon} />
             </div>
             <div>
-              <div className="text-[25px] font-semibold">714k</div>
+              <div className="text-[25px] font-semibold">{datadashboard?.dataDashboard?.dataProductDashBoard}</div>
               <div className="text-[15px] font-light">Số sản phẩm</div>
             </div>
           </div>
@@ -193,8 +230,8 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
               <img src={OrderIcon} />
             </div>
             <div>
-              <div className="text-[25px] font-semibold">714k</div>
-              <div className="text-[15px] font-light">Số sản phẩm</div>
+              <div className="text-[25px] font-semibold">{datadashboard?.dataDashboard?.dataOrderProductDashBoard}</div>
+              <div className="text-[15px] font-light">Số đơn hàng</div>
             </div>
           </div>
           <div className="mb-2 flex flex-1 gap-2 rounded bg-[#f6f5f5] p-5 md:mb-0">
@@ -202,17 +239,8 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
               <img src={UserIcon} />
             </div>
             <div>
-              <div className="text-[25px] font-semibold">714k</div>
-              <div className="text-[15px] font-light">Số sản phẩm</div>
-            </div>
-          </div>
-          <div className="mb-2 flex flex-1 gap-2 rounded bg-[#f6f5f5] p-5 md:mb-0">
-            <div>
-              <img src={UserIcon} />
-            </div>
-            <div>
-              <div className="text-[25px] font-semibold">714k</div>
-              <div className="text-[15px] font-light">Số sản phẩm</div>
+              <div className="text-[25px] font-semibold">{datadashboard?.dataDashboard?.dataUserlengh}</div>
+              <div className="text-[15px] font-light">Số người dùng</div>
             </div>
           </div>
         </div>
@@ -237,7 +265,12 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
               ]}
             />
           </div>
-          <ResponsiveContainer width="100%" height={300} padding="10px 0">
+          <ResponsiveContainer width="100%" height={300} margin={{
+        top: 20,
+        right: 20,
+        bottom: 20,
+        left: 100, // Increase left margin to handle long labels
+      }}>
             <LineChart data={data}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
@@ -284,6 +317,66 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
         </div>
         </div>
       </Box>
+
+      <Box sx={{ marginTop: "20px" }}>
+        <Typography level="h2" component="h1" sx={{ marginBottom: "20px" }}>
+          Số liệu top sản phẩm
+        </Typography>
+        <div className="block md:flex">
+        <div className=" rounded bg-[#f6f5f5] w-full md:w-[70%]" style={{ padding: "20px 20px" }}>
+        <Typography level="h4" component="h5" sx={{marginBottom:'50px'}}>
+          Biểu đồ số liệu top 10 sản phẩm đã bán nhiều nhất
+        </Typography>
+
+        <ResponsiveContainer width="100%" height={400}>
+    <ComposedChart
+      layout="vertical"
+      width={500}
+      height={400}
+      data={datatop}
+      margin={{
+        top: 20,
+        right: 20,
+        bottom: 20,
+        left: 100, // Increase left margin to handle long labels
+      }}
+    >
+      <CartesianGrid stroke="#f5f5f5" />
+      <XAxis type="number" />
+      <YAxis type="category" dataKey="name" tick={<CustomYAxisTick />} />
+      <Tooltip />
+      <Legend />
+      <Bar dataKey="Số lượng đã bán" barSize={20} fill="#413ea0" />
+    </ComposedChart>
+  </ResponsiveContainer>
+        </div>
+        <div className="rounded bg-[#f6f5f5] ml-0 mt-[20px] md:mt-0 md:ml-[20px] w-full md:w-[30%]" style={{ padding: "20px 10px" }}>
+        <Typography level="h4" component="h5" sx={{marginBottom:'20px'}}>
+          Biểu đồ hình tròn số liệu đơn hàng
+        </Typography>
+        <ResponsiveContainer width="100%" height={400}>
+    <PieChart>
+      <Pie
+        data={datapitop}
+        cx="50%"
+        cy="50%"
+        labelLine={false}
+        label={renderCustomizedLabel}
+        outerRadius={80}
+        fill="#8884d8"
+        dataKey="value"
+      >
+        {datapitop.map((entry, index) => (
+          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+        ))}
+      </Pie>
+      <Legend />
+    </PieChart>
+  </ResponsiveContainer>
+        </div>
+        </div>
+      </Box>
+
     </Box>
   );
 }

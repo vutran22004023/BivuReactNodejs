@@ -113,13 +113,13 @@ export default function  OrderTable  (props) {
       </Dropdown>
     <Table rowSelection={rowSelection} columns={columns} dataSource={data} 
     pagination={{
-      pageSize: 10,
+      pageSize: 50,
       total: total,
       current:pageCurrent || 1,
       onChange: onPageChange
     }}
     scroll={{
-      y: 450,
+      y: 430,
     }}
     {...props}
      />

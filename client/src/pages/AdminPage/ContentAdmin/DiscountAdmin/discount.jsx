@@ -872,6 +872,7 @@ return (
     // total={Discounts?.total}
     // pageCurrent={Discounts?.pageCurrent}
     // totalPages={Discounts?.totalPage}
+    
     columns= {columns} 
     onRow={(record, rowIndex) => {
       return {

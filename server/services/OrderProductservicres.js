@@ -1,17 +1,18 @@
-import { OrderProductModel,ProductModel,DisCountModel } from "../model/index.js";
+import { OrderProductModel,ProductModel,DisCountModel,UserModel } from "../model/index.js";
 import {Emailservicres} from './index.js'
 
-const getAllOrderProduct = async () => {
+const getAllOrderProduct = async (limit = 50, page =0) => {
     try {
-        const dataOrderProduct = await OrderProductModel.find().sort({ createdAt: -1 });
+        const totalOrderProduct = await OrderProductModel.countDocuments()
+        const dataOrderProduct = await OrderProductModel.find().sort({ createdAt: -1 }).limit(limit).skip(page * limit);
         if(dataOrderProduct) {
             return {
                 status: 200,
                 message: "Xem tất cả sản phẩm",
                 data: dataOrderProduct,
-                // total: totalProduct,
-                // pageCurrent: Number(page),
-                // totalPage: Math.ceil(totalProduct / limit)
+                total: totalOrderProduct,
+                pageCurrent: Number(page),
+                totalPage: Math.ceil(totalOrderProduct / limit)
             };
         }
     }catch (e){
@@ -24,7 +25,7 @@ const createOrderProductservices = async (newOrder) => {
         const {oderItem,paymentMethod,itemsPrice,shippingPrice, totalPrice,fullName, address, city, phone,user,email,note_customers, voucher} =  newOrder
 
         // Check and update voucher if present
-        if (voucher && voucher.length > 0) {
+        if ( voucher.length > 0) {
             for (let i = 0; i < voucher.length; i++) {
                 const discount = voucher[i];
                 const discountData = await DisCountModel.findOneAndUpdate(
@@ -42,13 +43,6 @@ const createOrderProductservices = async (newOrder) => {
                         new: true // Return the updated document
                     }
                 );
-                if (!discountData) {
-                    return {
-                        status: 'ERR',
-                        message: "Voucher không hợp lệ hoặc đã hết",
-                        data: [discount.discountId]
-                    };
-                }
             }
         }
         const promises = oderItem.map(async(order) => {
@@ -223,27 +217,140 @@ const getAllOrderProductDate = async(datestart,datesend) => {
                 $sort: { _id: 1 } // Sắp xếp theo ngày tăng dần
             }
         ]);
-        
-        if(!checkOrderProductDate) {
-          return {
-            status: "ERR",
-            message: "Không có dữ liệu",
-          };
-        }
+
+        const checkOrderProductDatePrice = await OrderProductModel.aggregate([
+            {
+                $match: {
+                    createdAt: {
+                        $gte: datestart,
+                        $lte: datesend
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
+                    },
+                    totalAmountprice: {
+                        $sum: {
+                          $cond: { if: { $eq: ["$isDelivered", true] }, then: "$totalPrice", else: 0 }
+                        }
+                      },
+                    totalDeliveredtrue: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$isDelivered", true] }, then: 1, else: 0 }
+                        }
+                    },
+                    totalDeliveredfalse: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$isDelivered", false] }, then: 1, else: 0 }
+                        }
+                    },
+                }
+            },
+            {
+                $sort: { _id: 1 } // Sắp xếp theo ngày tăng dần
+            }
+        ]);
+
         return {
           status: 200,
           message: `Show dữ thành công`,
-          data: checkOrderProductDate
+          data: checkOrderProductDate,
+          dataOrderProductDate: checkOrderProductDatePrice
         };
       } catch (error) {
         throw error;
       }
 }
+
+const getDashboard = async() => {
+    try {  
+        const dataUserDashboard = await UserModel.find()
+        const dataProductDashBoard = await ProductModel.find()
+        const dataOrderProductDashBoard = await OrderProductModel.find()
+        const topSellingProducts = await ProductModel.find()
+            .sort({ selled: -1 })
+            .limit(10)
+            .select({ name: 1, selled: 1, _id: 0 });
+        const dataorderProductTotalPrice = await OrderProductModel.aggregate([
+            {
+                $match: {
+                    isDelivered: true
+                }
+            },
+            {
+                $group: {
+                  _id: null,
+                  totalAmountprice: { $sum: "$totalPrice" },
+                }
+              }
+        ])
+        const dataOrderProducttotalDelivered = await OrderProductModel.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    totalDeliveredtrue: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$isDelivered", true] }, then: 1, else: 0 }
+                        }
+                    },
+                    totalDeliveredfalse: {
+                        $sum: {
+                            $cond: { if: { $eq: ["$isDelivered", false] }, then: 1, else: 0 }
+                        }
+                    },
+                }
+            }
+        ])
+
+
+        return {
+            status: 200,
+            message: `Show dữ thành công`,
+            dataDashboard: {
+                dataUserlengh: dataUserDashboard.length,
+                dataProductDashBoard: dataProductDashBoard.length,
+                dataOrderProductDashBoard: dataOrderProductDashBoard.length
+            }, 
+            dataOrderProduct: dataorderProductTotalPrice,
+            dataOrderProducttotalDelivered: dataOrderProducttotalDelivered,
+            topSellingProducts: topSellingProducts
+          };
+
+    }catch (error) {
+        throw error;
+    }
+}
+
+const getAllOrderProductIsdeliveredfalse = async(limit = 50, page =0) => {
+    try {
+        const totalOrderProduct = await OrderProductModel.countDocuments()
+        const dataOrderProduct = await OrderProductModel.find({isDelivered: false}).sort({ createdAt: -1 }).limit(limit).skip(page * limit);
+        if(dataOrderProduct) {
+            return {
+                status: 200,
+                message: "Xem tất cả sản phẩm",
+                data: dataOrderProduct,
+                total: totalOrderProduct,
+                pageCurrent: Number(page),
+                totalPage: Math.ceil(totalOrderProduct / limit)
+            };
+        }
+    }catch (e){
+        throw e;
+    }
+}
+
+
 export default {
     createOrderProductservices,
     getOrderDetail,
     getOrderDetailProduct,
     getAllOrderProduct,
     updateOrderProduct,
-    getAllOrderProductDate
+    getAllOrderProductDate,
+    getDashboard,
+    getAllOrderProductIsdeliveredfalse
 }

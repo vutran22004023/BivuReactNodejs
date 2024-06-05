@@ -1,7 +1,7 @@
 import { ProductModel,ColorModel } from "../model/index.js";
 
 const createProduct = async (newProduct) => {
-        const {name,image,type,rating,description,discount,categorySize,slug,linksshopee,idColor} =  newProduct
+        const {name,image,type,rating,description,discount,categorySize,slug,linksshopee,idColor, dealsoc} =  newProduct
         try {
             const checkProduct = await ProductModel.findOne({
                 name: name,
@@ -23,7 +23,8 @@ const createProduct = async (newProduct) => {
               categorySize,
               slug,
               linksshopee,
-              idColor
+              idColor,
+              dealsoc
             })
             if(createProduct) {
                 return {
@@ -232,6 +233,24 @@ const getDetailColor = async(id) => {
   }
 }
 
+const getAllProductsdealsoc = async(limit = 20) => {
+  try {
+    const totalOrderProduct = await ProductModel.countDocuments()
+    const dataOrderProduct = await ProductModel.find({dealsoc: true}).sort({ createdAt: -1 }).limit(limit)
+    if(dataOrderProduct) {
+        return {
+            status: 200,
+            message: "Xem tất cả sản phẩm",
+            data: dataOrderProduct,
+            total: totalOrderProduct,
+            totalPage: Math.ceil(totalOrderProduct / limit)
+        };
+    }
+}catch (e){
+    throw e;
+}
+}
+
 
 
 export default {
@@ -243,5 +262,6 @@ export default {
     deleteProductMany,
     getAllTypeProduct,
     getAllColor,
-    getDetailColor
+    getDetailColor,
+    getAllProductsdealsoc
 }

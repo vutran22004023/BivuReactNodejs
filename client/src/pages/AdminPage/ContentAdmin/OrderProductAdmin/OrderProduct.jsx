@@ -58,7 +58,6 @@ useEffect(() => {
 
   const queryOrderProduct = useQuery({queryKey: ['OrderProduct', typePage], queryFn: fetchOrderProduct, retryDelay: 1000, staleTime: 1000});
   const {data: getAllOrderProduct} = queryOrderProduct
-  console.log(getAllOrderProduct)
   const {data: updateOrderProduct} = mutationsUpdateOrderProduct
 
   
@@ -123,11 +122,11 @@ useEffect(() => {
   }
 
   const handleOkUploadOrderDeliveredtrue = () => {
-    mutationsUpdateOrderProduct.mutate({isDelivered:true})
+    mutationsUpdateOrderProduct.mutate({isDelivered:true, isPaid: true})
     setOpenModal(false)
   }
   const handleOkUploadOrderDeliveredfalse = () => {
-    mutationsUpdateOrderProduct.mutate({isDelivered:false})
+    mutationsUpdateOrderProduct.mutate({isDelivered:false, isPaid: false})
     setOpenModal(false)
   }
   const getColumnSearchProps = (dataIndex) => ({

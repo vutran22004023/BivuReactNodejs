@@ -224,3 +224,7 @@ body {
     height: 75px;
   }
 }
+
+.card-spacing {
+  margin-right: 10px;  /* Adjust as needed */
+}

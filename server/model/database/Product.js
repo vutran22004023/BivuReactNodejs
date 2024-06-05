@@ -46,6 +46,10 @@ const ProductSchema =  new mongoose.Schema(
             type: String,
         }
     ],
+    dealsoc: {
+        type: Boolean,
+        default:false,
+    },
     categorySize: [
         {
             size: {

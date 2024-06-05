@@ -143,6 +143,7 @@ export default function ProductAdmin() {
     discount: "",
     linksshopee: "",
     idColor: [],
+    dealsoc: false,
     categorySize: [
       {
         size: "",
@@ -151,6 +152,20 @@ export default function ProductAdmin() {
       },
     ],
   });
+
+  const onChangeSwitchDealProductnew = (checked) => {
+    setStateProduct({
+      ...stateProduct,
+      dealsoc: checked
+    })
+  }
+
+  const onChangeSwitchDealProductDetailnew = (checked) => {
+    setStateProductDetail({
+      ...stateProductDetail,
+      dealsoc: checked
+    })
+  }
 
   const handleAddInput = () => {
     setStateProduct({
@@ -192,6 +207,7 @@ export default function ProductAdmin() {
 
   const [stateProduct, setStateProduct] = useState(inittial);
   const [stateProductDetail, setStateProductDetail] = useState(inittial);
+  console.log(stateProductDetail)
   const [RowSelected, setRowSelected] = useState("");
   const [valIdColor, setValIdColor] = useState([])
   useEffect(() => {
@@ -409,6 +425,13 @@ const saveData = () => {
     setSearchText("");
   };
 
+  const onChangeSwitchDeal =(checked) => {
+    mutationUpdate.mutate({dealsoc: checked},{
+      onSettled: () => {
+        queryProduct.refetch();
+      },
+    })
+  }
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -503,27 +526,48 @@ const saveData = () => {
     {
       title: "Name",
       dataIndex: "name",
+      fixed: 'left',
+      width: 70,
+      key: 'name',
       sorter: (a, b) => a.name.length - b.name.length,
       ...getColumnSearchProps("name"),
     },
     {
       title: "Đường dẫn",
       dataIndex: "slug",
+      fixed: 'left',
+      width: 50,
+      key: 'slug',
       sorter: (a, b) => a.slug.length - b.slug.length,
       ...getColumnSearchProps("slug"),
     },
     {
       title: "Type",
       dataIndex: "type",
+      fixed: 'left',
+      width: 40,
+      key: 'type',
       sorter: (a, b) => a.type.length - b.type.length,
       ...getColumnSearchProps("type"),
     },
     {
+      title: "Deal sốc",
+      fixed: 'left',
+      width: 20,
+      key: 'deal',
+      dataIndex: 'dealsoc',
+      render: (text) => {
+        return (
+          <Switch defaultChecked={text} onChange={onChangeSwitchDeal} />
+        )
+      } 
+    },
+    {
       title: "Action",
       dataIndex: "action",
-              key: 'operation',
+      width: 20,
+      key: 'operation',
         fixed: 'right',
-        width: 100,
       render: RowMenu,
     },
   ];
@@ -589,7 +633,8 @@ const saveData = () => {
         discount: res?.data?.discount,
         categorySize: res.data?.categorySize,
         linksshopee: res.data?.linksshopee,
-        idColor: res?.data?.idColor
+        idColor: res?.data?.idColor,
+        dealsoc: res?.data?.dealsoc
       });
     }
     setIsLoadingUpdate(false);
@@ -1548,6 +1593,10 @@ const saveData = () => {
                   max='100'
                 />
               </Form.Item>
+
+              <Form.Item label="Deal sốc">
+                <Switch defaultChecked={stateProduct.dealsoc} onChange={onChangeSwitchDealProductnew} />
+              </Form.Item>
               <Form.Item
                 label="Link shopee"
                 name="linksshopee"
@@ -1909,6 +1958,10 @@ const saveData = () => {
                   tag="textarea"
                   name="description"
                 />
+              </Form.Item>
+
+              <Form.Item label="Deal sốc">
+                <Switch value={stateProductDetail.dealsoc} onChange={onChangeSwitchDealProductDetailnew} />
               </Form.Item>
 
               <Form.Item

@@ -31,15 +31,20 @@ export default function ProductHome() {
       return res; 
   }
 
+  const fetchProductDetalSoc = async (context) => {
+    const res = await ProductService.getProductDeatSoc()
+      return res; 
+  }
+
   const fetchInformationAll = async () => {
     const res = await InformationPageService.getAllInforPage();
     return res; 
   }
 
   const { data: productsLimit, isLoading: isLoadingProductsLimit, isPreviousData } = useQuery({ queryKey: ['productsLimit', limit], queryFn: fetchProductAllLimit,keepPreviousData: true, retry:3, retryDelay: 1000 });
+  const { data: productsDealSoc, isLoading: isLoadingProductDealSoc, isPreviousDataProduct } = useQuery({ queryKey: ['productsDeal'], queryFn: fetchProductDetalSoc,keepPreviousData: true, retry:3, retryDelay: 1000 });
   const { data: dataInfor, isLoading: isLoadingDataInfor } = useQuery({ queryKey: ['dataInformationPage'], queryFn: fetchInformationAll});
-
-
+  console.log(productsDealSoc)
 
   useEffect(()=> {
     const ImagesSiderComponent = dataInfor?.data[0]?.image_slider?.map((imageSlider) => imageSlider)
@@ -161,7 +166,7 @@ export default function ProductHome() {
           <div className=' text-[#ffc107] text-[20px] md:text-[30px] '>Giờ Vàng Deal Sốc</div>
           <div className='text-[#fff] text-[16px] md:text-[20px] '>Kết thúc trong: {formatTime(countdown)} </div>
           <div className='p-5'>
-            <SliderCardComponent products={productsLimit?.data}/>
+            <SliderCardComponent products={productsDealSoc?.data}/>
           </div>
         </div>
         

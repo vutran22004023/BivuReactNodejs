@@ -26,8 +26,7 @@ export const SampleNextArrow = (props) => {
   };
 export default function SiderConponent({products }) {
     var settings = {
-        infinite: true,
-        slidesToShow: 7,
+        slidesToShow: 6,
         slidesToScroll: 2,
         autoplay: false,
         nextArrow: <SampleNextArrow />,
@@ -43,8 +42,9 @@ export default function SiderConponent({products }) {
           ],
       };
   return (
-    <Slider {...settings}>
+    <Slider {...settings} >
         {products?.map((product, index) => (
+          <div key={product._id} style={{ paddingRight: '20px' }}>
             <CardComponent
               key={product._id}
               description={product.description}
@@ -58,6 +58,7 @@ export default function SiderConponent({products }) {
               selled = {product.selled}
               id = {product._id}
               />
+              </div>
         )) }
     </Slider>
   )

@@ -33,7 +33,7 @@ const getDetailProduct = async(req,res) => {
 
 const createProduct = async (req, res) => {
     try {
-    const {name,image,type,rating,description,discount,categorySize,slug,linksshopee,idColor} = req.body;
+    const {name,image,type,rating,description,discount,categorySize,slug,linksshopee,idColor, dealsoc} = req.body;
 
     if(!name || !image || !type || !description || !categorySize || !slug) {
         return res.status(200).json({
@@ -148,6 +148,17 @@ const getColorDetail = async (req, res) => {
     }
 }
 
+const getAllProductsdealsoc = async(req, res) => {
+    try{
+        const response = await Productservices.getAllProductsdealsoc()
+        return res.status(200).json(response)
+    }catch(e) {
+        return res.status(404).json({
+            message: e
+        })
+    }
+}
+
 
 export default {
     getAllProduct,
@@ -158,5 +169,6 @@ export default {
     deleteManyProduct,
     getAlltypeProduct,
     getColor,
-    getColorDetail
+    getColorDetail,
+    getAllProductsdealsoc
 }

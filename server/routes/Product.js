@@ -12,4 +12,5 @@ router.post('/delete-many-product', authMiddleware.auth,productController.delete
 router.get('/get-all-type',productController.getAlltypeProduct)
 router.get('/color',productController.getColor)
 router.get('/color/detail/:id',productController.getColorDetail)
+router.get('/all-products-dealsoc',productController.getAllProductsdealsoc)
 export default router

@@ -21,7 +21,9 @@ const CardComponent =(props) => {
     navigate(`/chi-tiet/${id}/${slug}`)
   }
   return (
+    <div className=" mr-2">
     <Card
+    {...props}
       // hoverable= {counInStock !== 0 ? true: false}
       hoverable= {true}
       // onClick={()=> counInStock !== 0 && handleDetailsProduct(id)}
@@ -32,8 +34,7 @@ const CardComponent =(props) => {
       // style={{display: counInStock === 0 ? 'none': ''}}
       // className={counInStock === 0 ? "cursor-not-allowed" : ''}
       // style={{backgroundColor: counInStock === 0 ? '#ccc' :'#fff',}}
-      style={{backgroundColor: '#fff'}}
-      className="w-full "
+      className="w-full card-spacing"
       cover={
         <img
           alt="example"
@@ -57,6 +58,7 @@ const CardComponent =(props) => {
         <span><div className="ml-[3px] text-[10px] md:text-[12px] font-medium">{discount}%</div></span>
       </div>
     </Card>
+    </div>
   );
 
 }
@@ -66,7 +68,6 @@ const CardLoading =() =>{
     <WapperCardStyled
       hoverable
       bodyStyle={{ padding: "13px" }}
-      className="movie--isloading"
       cover={
         <div className="loading-image"></div>
       }

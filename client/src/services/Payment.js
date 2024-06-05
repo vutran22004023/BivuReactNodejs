@@ -11,8 +11,14 @@ const createPaymentZaloPay= async (data) => {
     return res.data
 }
 
+const orderStatusZaloPay = async (apptransid) => {
+    const res = await axios.post(`${import.meta.env.REACT_APP_API_URL_PAY}/order-status-zalopay/${apptransid}`)
+    return res.data
+}
+
 
 export default {
     createPaymentLink,
-    createPaymentZaloPay
+    createPaymentZaloPay,
+    orderStatusZaloPay
 }

@@ -87,31 +87,37 @@ const createPaymentZaloPay = async(req,res) => {
       };
       const {oderItem,fullName,address,phone,paymentMethod,itemsPrice,shippingPrice,totalPrice,user} = req.body
       const embed_data = {
-        redirecturl: "https://sb-openapi.zalopay.vn",
+        redirecturl: `${process.env.URL_CLIENT}/trang-thai`,
       };
     
-      const items = [{
-        itemid: "knb",
-        itemname: "kim nguyen bao",
-        itemprice: 198400,
-        itemquantity: 1
-      }];
+      // const items = [{
+      //   itemid: "knb",
+      //   itemname: "kim nguyen bao",
+      //   itemprice: 198400,
+      //   itemquantity: 1
+      // }];
+
+      const items = oderItem ? oderItem?.map(item => ({
+        itemid: item.productId,
+        itemname: item.name,
+        itemprice: item.price,
+        itemquantity: item.amount
+      })) : [];
       const transID = Math.floor(Math.random() * 1000000);
       const order = {
         app_id: config.app_id, 
         app_trans_id: `${moment().format('YYMMDD')}_${transID}`, // mã giao dich có định dạng yyMMdd_xxxx
-        app_user: "demo", 
+        app_user: fullName, 
         app_time: Date.now(), // miliseconds
         item: JSON.stringify(items), 
         embed_data: JSON.stringify(embed_data), 
-        amount: 50000,
-        description: `Zalo - Payment for the order #${transID}`,
+        amount: totalPrice,
+        description: `Zalo - Thanh toán đơn hàng #${transID}`,
         // bank_code: "zalopayapp",
-        callback_url: ' https://4120-2001-ee0-4b49-bae0-f965-b39e-b88d-4021.ngrok-free.app/callback-zalo'
+        callback_url: 'https://1547-112-197-208-25.ngrok-free.app/callback-zalo'
+        
       };
 
-      
-    
       // appid|app_trans_id|appuser|amount|apptime|embeddata|item
       const data =
         config.app_id +
@@ -150,7 +156,6 @@ const callbackZaloPay = async(req,res) => {
       let reqMac = req.body.mac;
   
       let mac = CryptoJS.HmacSHA256(dataStr, config.key2).toString();
-      console.log("mac =", mac);
   
       // kiểm tra callback hợp lệ (đến từ ZaloPay server)
       if (reqMac !== mac) {
@@ -161,10 +166,6 @@ const callbackZaloPay = async(req,res) => {
         // thanh toán thành công
         // merchant cập nhật trạng thái cho đơn hàng
         let dataJson = JSON.parse(dataStr, config.key2);
-        console.log(
-          "update order's status = success where app_trans_id =",
-          dataJson["apptransid"]
-        );
   
         result.return_code = 1;
         result.return_message = "success";

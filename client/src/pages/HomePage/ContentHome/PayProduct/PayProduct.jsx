@@ -32,6 +32,7 @@ import { updateUser } from "../../../../redux/Slides/userSlide";
 import SellIcon from "@mui/icons-material/Sell";
 import IconVoucher from '../../../../assets/font-end/imgs/icon/iconVoucher.png';
 import PlaceIcon from '@mui/icons-material/Place';
+import {datapayOrderProduct} from '../../../../redux/Slides/payorderProductSlide.js' 
 export default function PayProduct() {
   const [value, setValue] = useState(null);
   const [valueRadioShip, setValueRadioShip] = useState();
@@ -126,28 +127,48 @@ export default function PayProduct() {
       user?.city &&
       user?.id
     ) {
-      mutationOrderProduct.mutate({
-        oderItem: order?.orderItemsSlected,
-        fullName: user?.name,
-        address: user?.specific_address,
-        phone: user?.phone,
-        city: user?.city,
-        email: user?.email,
-        paymentMethod: valueRadio,
-        itemsPrice: priceMemo,
-        shippingPrice: diliveryPriceMemo,
-        totalPrice: TotalpriceMemo,
-        user: user?.id,
-        note_customers: stateUserDetail.note_customers,
-        voucher: [
-          {
-            discountId: valueVouchermutation?.data?._id,
-            namediscount: valueVouchermutation?.data?.name,
-            discountPercentdiscount:valueVouchermutation?.data?.discountPercent,
-            discountAmountdiscount: valueVouchermutation?.data?.discountAmount,
-          }
-        ]
-      });
+      // mutationOrderProduct.mutate({
+      //   oderItem: order?.orderItemsSlected,
+      //   fullName: user?.name,
+      //   address: user?.specific_address,
+      //   phone: user?.phone,
+      //   city: user?.city,
+      //   email: user?.email,
+      //   paymentMethod: valueRadio,
+      //   itemsPrice: priceMemo,
+      //   shippingPrice: diliveryPriceMemo,
+      //   totalPrice: TotalpriceMemo,
+      //   user: user?.id,
+      //   note_customers: stateUserDetail.note_customers,
+      //   voucher: [
+      //     {
+      //       discountId: valueVouchermutation?.data?._id,
+      //       namediscount: valueVouchermutation?.data?.name,
+      //       discountPercentdiscount:valueVouchermutation?.data?.discountPercent,
+      //       discountAmountdiscount: valueVouchermutation?.data?.discountAmount,
+      //     }
+      //   ]
+      // });
+      dispatch(datapayOrderProduct({
+        orderItem: order?.orderItemsSlected ,
+        fullName: user?.name ,
+        address: user?.specific_address ,
+        phone: user?.phone ,
+        city: user?.city ,
+        email: user?.email ,
+        paymentMethod: valueRadio ,
+        itemsPrice: priceMemo ,
+        shippingPrice: diliveryPriceMemo ,
+        totalPrice: TotalpriceMemo ,
+        user: user?.id ,
+        note_customers: stateUserDetail.note_customers ,
+        voucher: [{
+          discountId: valueVouchermutation?.data?._id,
+          namediscount: valueVouchermutation?.data?.name ,
+          discountPercentdiscount: valueVouchermutation?.data?.discountPercent,
+          discountAmountdiscount: valueVouchermutation?.data?.discountAmount,
+        }]
+      }));
 
       if (valueRadio === "Thanh toán khi nhận hàng") {
       } else if (valueRadio === "Thanh toán QR") {

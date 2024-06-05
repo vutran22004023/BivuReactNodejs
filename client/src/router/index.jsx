@@ -5,7 +5,8 @@ import {
   PrivateUser,
   PrivateRouteAdmin,
   PrivateRoutePay,
-  PrivateRouteUser} from './private.jsx'
+  PrivateRouteUser,
+  PrivateStatusOrderPay} from './private.jsx'
 // import ProductHome from "../pages/HomePage/ContentHome/ProductHome/ProductHome";
 import "../index.css";
 //sử dụng Code Splitting
@@ -114,13 +115,19 @@ export default createBrowserRouter([
                 path: "/mua-hang",
               },
               {
-                element: <PaySuccess />,
-                path: "/mua-hang/thanh-cong",
-              },
-              {
-                element: <PayError />,
-                path: "/mua-hang/that-bai",
-              },
+                element: <PrivateStatusOrderPay/>,
+                path: "/trang-thai",
+                children: [
+                  {
+                    element: <PaySuccess />,
+                    path: "mua-hang/thanh-cong",
+                  },
+                  {
+                    element: <PayError />,
+                    path: "mua-hang/that-bai",
+                  },
+                ]
+              }
             ],
           },
           {

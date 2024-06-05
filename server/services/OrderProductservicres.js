@@ -22,10 +22,10 @@ const getAllOrderProduct = async (limit = 50, page =0) => {
 
 const createOrderProductservices = async (newOrder) => {
     try {
-        const {oderItem,paymentMethod,itemsPrice,shippingPrice, totalPrice,fullName, address, city, phone,user,email,note_customers, voucher} =  newOrder
+        const {orderItem,paymentMethod,itemsPrice,shippingPrice, totalPrice,fullName, address, city, phone,user,email,note_customers, voucher} =  newOrder
 
         // Check and update voucher if present
-        if ( voucher.length > 0) {
+        if ( voucher?.discountId !== ''  ) {
             for (let i = 0; i < voucher.length; i++) {
                 const discount = voucher[i];
                 const discountData = await DisCountModel.findOneAndUpdate(
@@ -45,7 +45,7 @@ const createOrderProductservices = async (newOrder) => {
                 );
             }
         }
-        const promises = oderItem.map(async(order) => {
+        const promises = orderItem.map(async(order) => {
             const productData = await ProductModel.findOneAndUpdate(
                 {
                     name: order.name,
@@ -64,7 +64,7 @@ const createOrderProductservices = async (newOrder) => {
             );
             if(productData) {
                 const createProduct = await OrderProductModel.create({
-                oderItems: oderItem,
+                oderItems: orderItem,
                 shippingAddress: {
                     fullName,
                     address,

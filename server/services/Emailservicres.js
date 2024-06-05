@@ -10,7 +10,7 @@ dotenv.config();
     }
 }
 const sendEmailCreateOrder = async (newOrder) => {
-    const { oderItem, totalPrice, fullName, address, city, phone, email,shippingPrice } = newOrder;
+    const { orderItem, totalPrice, fullName, address, city, phone, email,shippingPrice } = newOrder;
     // Tạo HTML cho email
     let htmlContent = `
         <div>
@@ -32,7 +32,7 @@ const sendEmailCreateOrder = async (newOrder) => {
                 <tbody>`;
 
     // Thêm từng mục trong đơn hàng vào bảng
-    oderItem?.forEach((item, index) => {
+    orderItem?.forEach((item, index) => {
         htmlContent += `
             <tr>
                 <td>${index + 1}</td>

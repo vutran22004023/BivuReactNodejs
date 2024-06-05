@@ -1,14 +1,16 @@
 import React, {Suspense, useEffect } from "react";
-import { createBrowserRouter, Outlet, useNavigate } from "react-router-dom";
+import { createBrowserRouter, Outlet, useNavigate, useLocation } from "react-router-dom";
 import ProductHome from "../pages/HomePage/ContentHome/ProductHome/ProductHome";
 import { isJsonString } from "../utils";
 import { jwtDecode } from "jwt-decode";
-import { UserService } from "../services/index.js";
+import { UserService, PaymentService, OrderProduct } from "../services/index.js";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUser } from "../redux/Slides/userSlide";
 import IsLoadingComponent from "../components/LoadComponent/LoadingTotal.jsx";
 import {setDoc, doc, serverTimestamp} from 'firebase/firestore'
 import {txtDB} from "../Firebase/config.jsx"
+import {useMutationHooks} from '../hooks/UseMutationHook.js'
+import {deletedataOrderProduct} from '../redux/Slides/payorderProductSlide.js'
 export const PrivateUser = () => {
 
     const dispatch = useDispatch();
@@ -135,4 +137,53 @@ export const PrivateUser = () => {
         </Suspense>
       );
     }
+  }
+
+
+  export const PrivateStatusOrderPay = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user);
+    const pay = useSelector((state) => state.payorderproduct);
+    const useQuery =() => {
+      return new URLSearchParams(useLocation().search);
+    }
+    const query = useQuery();
+  const apptransid = query.get('apptransid');
+  
+  const mutationOrderStatus = useMutationHooks (async(apptransid) => {
+      const res = await PaymentService.orderStatusZaloPay(apptransid)
+      return res
+  })
+  const mutationOrderProduct = useMutationHooks((data) => {
+    const { ...rests } = data;
+    const access_Token = user.access_Token.split("=")[1];
+    const res = OrderProduct.createOrderProduct(access_Token, data);
+    return res;
+  });
+
+  const {data: dataOrderStatus} = mutationOrderStatus
+  useEffect(() => {
+    if(apptransid) {
+      mutationOrderStatus.mutate(apptransid)
+    }
+  },[apptransid])
+
+  useEffect(() => {
+    if(dataOrderStatus?.returncode === 1) {
+      mutationOrderProduct.mutate(pay)
+        dispatch(deletedataOrderProduct())
+      navigate('/trang-thai/mua-hang/thanh-cong');
+      window.location.reload();
+    }else if(dataOrderStatus?.returncode === -49) {
+      dispatch(deletedataOrderProduct())
+      navigate('/trang-thai/mua-hang/that-bai');
+      window.location.reload();
+    }
+  },[dataOrderStatus])
+  return (
+    <Suspense fallback={<IsLoadingComponent></IsLoadingComponent>}>
+    <Outlet />
+  </Suspense>
+  )
   }

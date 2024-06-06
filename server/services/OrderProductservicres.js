@@ -81,13 +81,13 @@ const createOrderProductservices = async (newOrder) => {
             })
             if(createProduct) {
                 await Emailservicres.sendEmailCreateOrder(newOrder)
-                return {
-                    status: 200,
-                    message: "Thêm sản phẩm thành công",
-                    data: {
-                      ...createProduct._doc,
-                    },
             }
+            return {
+                status: 200,
+                message: "Thêm sản phẩm thành công",
+                data: {
+                  ...createProduct._doc,
+                }
         }
             }else {
                 return {
@@ -98,17 +98,22 @@ const createOrderProductservices = async (newOrder) => {
             }
         })
         const results = await Promise.all(promises)
-        const newData = results.filter((item) => item._id)
-        if(newData.length) {
+        const errorResults = results.filter((item) => item.status === 'ERR');
+        const successResults = results.filter((item) => item.status === 200);
+
+        if (errorResults.length) {
             return {
                 status: 'ERR',
-                message: `Sản phẩm với id: ${newData.join(', ')} không đủ hàng`,
-            }
+                message: `Sản phẩm với id: ${errorResults.map(item => item.data).join(', ')} không đủ hàng`,
+                data: errorResults
+            };
         }
+
         return {
             status: 200,
-            message: 'Success'
-        }
+            message: "Tất cả sản phẩm đã được thêm thành công",
+            successResults
+        };
 }
     catch(e) {
         console.log(e)

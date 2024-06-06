@@ -127,28 +127,7 @@ export default function PayProduct() {
       user?.city &&
       user?.id
     ) {
-      // mutationOrderProduct.mutate({
-      //   oderItem: order?.orderItemsSlected,
-      //   fullName: user?.name,
-      //   address: user?.specific_address,
-      //   phone: user?.phone,
-      //   city: user?.city,
-      //   email: user?.email,
-      //   paymentMethod: valueRadio,
-      //   itemsPrice: priceMemo,
-      //   shippingPrice: diliveryPriceMemo,
-      //   totalPrice: TotalpriceMemo,
-      //   user: user?.id,
-      //   note_customers: stateUserDetail.note_customers,
-      //   voucher: [
-      //     {
-      //       discountId: valueVouchermutation?.data?._id,
-      //       namediscount: valueVouchermutation?.data?.name,
-      //       discountPercentdiscount:valueVouchermutation?.data?.discountPercent,
-      //       discountAmountdiscount: valueVouchermutation?.data?.discountAmount,
-      //     }
-      //   ]
-      // });
+
       dispatch(datapayOrderProduct({
         orderItem: order?.orderItemsSlected ,
         fullName: user?.name ,

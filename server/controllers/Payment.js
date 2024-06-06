@@ -15,7 +15,6 @@ const payos = new PayOS(
 const createLinkPayOs = async(req, res) => {
   const {oderItem,fullName,address,phone,paymentMethod,itemsPrice,shippingPrice,totalPrice,user,email} = req.body
   const transID = Math.floor(Math.random() * 1000000000);
-  console.log(oderItem)
   const items = oderItem.map(item => ({
     name: item.name,
     quantity: item.amount,
@@ -30,8 +29,8 @@ const createLinkPayOs = async(req, res) => {
     buyerPhone: phone,
     buyerAddress: address,
     items: items,
-    cancelUrl: "http://localhost:5173/mua-hang",
-    returnUrl: "https://your-success-url.com",
+    cancelUrl: `${process.env.URL_CLIENT}/trang-thai`,
+    returnUrl: `${process.env.URL_CLIENT}/trang-thai`,
   };
   try {
     const paymentLinkData = await payos.createPaymentLink(order);
@@ -43,7 +42,6 @@ const createLinkPayOs = async(req, res) => {
 }
 
 const receiveHookPayOs = async(req, res) => {
-  console.log(req.body);
   res.json();
 }
 
@@ -51,7 +49,6 @@ const getPaymentInfomationsPayOs = async(req, res) => {
   const orderCode = req.params.idorder
   try {
     const paymentLinkInfo = await payos.getPaymentLinkInformation(orderCode);
-    console.log(paymentLinkInfo)
     return res.status(200).json(paymentLinkInfo)
   }catch(err) {
     console.log(err.message)
@@ -70,7 +67,7 @@ const canceledPaymentLinkPayOs = async(req, res) => {
 
 const confirmWebhookPayOs = async(req, res) => {
   try {
-    const confirmWebhookPayOs =  await payos.confirmWebhook("https://4120-2001-ee0-4b49-bae0-f965-b39e-b88d-4021.ngrok-free.app/receive-hook");
+    const confirmWebhookPayOs =  await payos.confirmWebhook("https://0d6a-14-224-175-102.ngrok-free.app/receive-hook");
     return res.status(200).json(confirmWebhookPayOs)
   }catch(err) {
     console.log(err.message)

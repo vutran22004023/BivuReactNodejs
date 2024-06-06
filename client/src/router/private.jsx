@@ -1,5 +1,5 @@
-import React, {Suspense, useEffect } from "react";
-import { createBrowserRouter, Outlet, useNavigate, useLocation } from "react-router-dom";
+import React, {useState ,Suspense, useEffect } from "react";
+import { createBrowserRouter, Outlet, useNavigate, useLocation, useNavigation  } from "react-router-dom";
 import ProductHome from "../pages/HomePage/ContentHome/ProductHome/ProductHome";
 import { isJsonString } from "../utils";
 import { jwtDecode } from "jwt-decode";
@@ -143,14 +143,16 @@ export const PrivateUser = () => {
   export const PrivateStatusOrderPay = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const navigation = useNavigation();
     const user = useSelector((state) => state.user);
     const pay = useSelector((state) => state.payorderproduct);
+    const [dataCreateOrderProduct, setDataCreateOrderProduct] = useState()
     const useQuery =() => {
       return new URLSearchParams(useLocation().search);
     }
     const query = useQuery();
   const apptransid = query.get('apptransid');
-  
+  const orderCode = query.get('orderCode');
   const mutationOrderStatus = useMutationHooks (async(apptransid) => {
       const res = await PaymentService.orderStatusZaloPay(apptransid)
       return res
@@ -162,7 +164,49 @@ export const PrivateUser = () => {
     return res;
   });
 
-  const {data: dataOrderStatus} = mutationOrderStatus
+
+  const mutationCheckOrderProductPayOs = useMutationHooks (async(orderCode) => {
+    const res = await PaymentService.CheckOrderProductPayOs(orderCode)
+    return res
+  })
+
+  const mutationsUpdateOrder = useMutationHooks(async(id,data) => {
+    const access_Token = user.access_Token.split("=")[1];
+    const res = await OrderProduct.updateOrderProduct(id,data,access_Token)
+    return res
+  })
+
+  const {data: dataOrderStatus, isLoading: isLoadingDataOrderStatus} = mutationOrderStatus
+  const {data: dataOrderProductCreate, isLoading: isLoadingProductCreate} =mutationOrderProduct
+  const {data: dataCheckOrderStatusPayOs, isLoading: isLoadingCheckOrderStatusPayOs} = mutationCheckOrderProductPayOs
+  const {data: dataUpdateOrderProduct, isLoading: isLoadingUpdateOrderProduct} = mutationsUpdateOrder
+  useEffect(() => {
+    if(dataOrderProductCreate) {
+      if(dataOrderProductCreate?.status === 200) {
+        mutationsUpdateOrder.mutate(dataOrderProductCreate?.successResults[0]?.data?._id,{isPaid: true})
+      }
+    }
+  }, [dataOrderProductCreate])
+
+  useEffect(() => {
+    if(dataUpdateOrderProduct?.status === 200) {
+      navigate('/trang-thai/mua-hang/thanh-cong');
+      dispatch(deletedataOrderProduct())
+      window.location.reload();
+    }
+  },[dataUpdateOrderProduct])
+  
+
+
+  useEffect (() => {
+    if(dataCheckOrderStatusPayOs?.status === "PAID") {
+      mutationOrderProduct.mutate(pay)
+    }else if(dataCheckOrderStatusPayOs?.status === "CANCELLED") {
+      dispatch(deletedataOrderProduct())
+      navigate('/trang-thai/mua-hang/that-bai');
+      window.location.reload();
+    }
+  }, [dataCheckOrderStatusPayOs])
   useEffect(() => {
     if(apptransid) {
       mutationOrderStatus.mutate(apptransid)
@@ -170,11 +214,14 @@ export const PrivateUser = () => {
   },[apptransid])
 
   useEffect(() => {
+    if(orderCode) {
+      mutationCheckOrderProductPayOs.mutate(orderCode)
+    }
+  },[orderCode])
+
+  useEffect(() => {
     if(dataOrderStatus?.returncode === 1) {
       mutationOrderProduct.mutate(pay)
-        dispatch(deletedataOrderProduct())
-      navigate('/trang-thai/mua-hang/thanh-cong');
-      window.location.reload();
     }else if(dataOrderStatus?.returncode === -49) {
       dispatch(deletedataOrderProduct())
       navigate('/trang-thai/mua-hang/that-bai');
@@ -182,8 +229,13 @@ export const PrivateUser = () => {
     }
   },[dataOrderStatus])
   return (
-    <Suspense fallback={<IsLoadingComponent></IsLoadingComponent>}>
-    <Outlet />
-  </Suspense>
+    <>
+    {isLoadingDataOrderStatus ||isLoadingCheckOrderStatusPayOs ||isLoadingProductCreate || isLoadingUpdateOrderProduct ? (
+      <IsLoadingComponent ></IsLoadingComponent>
+    ): (
+      <Outlet />
+    )
+    }
+    </>
   )
   }

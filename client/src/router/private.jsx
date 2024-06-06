@@ -170,9 +170,9 @@ export const PrivateUser = () => {
     return res
   })
 
-  const mutationsUpdateOrder = useMutationHooks(async(id,data) => {
+  const mutationsUpdateOrder = useMutationHooks(async(id) => {
     const access_Token = user.access_Token.split("=")[1];
-    const res = await OrderProduct.updateOrderProduct(id,data,access_Token)
+    const res = await OrderProduct.updateOrderProduct(id,{isPaid: true},access_Token)
     return res
   })
 
@@ -180,10 +180,11 @@ export const PrivateUser = () => {
   const {data: dataOrderProductCreate, isLoading: isLoadingProductCreate} =mutationOrderProduct
   const {data: dataCheckOrderStatusPayOs, isLoading: isLoadingCheckOrderStatusPayOs} = mutationCheckOrderProductPayOs
   const {data: dataUpdateOrderProduct, isLoading: isLoadingUpdateOrderProduct} = mutationsUpdateOrder
+  console.log(dataUpdateOrderProduct)
   useEffect(() => {
     if(dataOrderProductCreate) {
       if(dataOrderProductCreate?.status === 200) {
-        mutationsUpdateOrder.mutate(dataOrderProductCreate?.successResults[0]?.data?._id,{isPaid: true})
+        mutationsUpdateOrder.mutate(dataOrderProductCreate?.successResults[0]?.data?._id)
       }
     }
   }, [dataOrderProductCreate])
@@ -192,7 +193,7 @@ export const PrivateUser = () => {
     if(dataUpdateOrderProduct?.status === 200) {
       navigate('/trang-thai/mua-hang/thanh-cong');
       dispatch(deletedataOrderProduct())
-      window.location.reload();
+      // window.location.reload();
     }
   },[dataUpdateOrderProduct])
   

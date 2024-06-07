@@ -49,6 +49,7 @@ import { useMutationHooks } from "../../../../hooks/UseMutationHook";
 import { OrderProduct } from "../../../../services/index";
 import { success } from "../../../../components/MessageComponents/Message";
 import { useSelector, useDispatch } from "react-redux";
+import IsLoadingComponent from '../../../../components/LoadComponent/Loading'
 dayjs.extend(customParseFormat);
 export default function DashBoard() {
   const user = useSelector((state) => state.user);
@@ -101,8 +102,7 @@ export default function DashBoard() {
   });
 
   const { data: dateorderporuct } = mutationDateOrderProduct;
-  const {data: datadashboard} =  mutationDashboard
-  console.log(datadashboard)
+  const {data: datadashboard,isLoading:isLoadingdatadashboard} =  mutationDashboard
   const data =
     dateorderporuct?.data?.map((item) => ({
       name: item._id,
@@ -221,8 +221,10 @@ const CustomYAxisTick = ({ x, y, payload }) => {
               <img src={ProductIcon} />
             </div>
             <div>
+            <IsLoadingComponent isLoading={isLoadingdatadashboard}>
               <div className="text-[25px] font-semibold">{datadashboard?.dataDashboard?.dataProductDashBoard}</div>
               <div className="text-[15px] font-light">Số sản phẩm</div>
+              </IsLoadingComponent>
             </div>
           </div>
           <div className="mb-2 flex flex-1 gap-2 rounded bg-[#f6f5f5] p-5 md:mb-0">
@@ -230,8 +232,10 @@ const CustomYAxisTick = ({ x, y, payload }) => {
               <img src={OrderIcon} />
             </div>
             <div>
+            <IsLoadingComponent isLoading={isLoadingdatadashboard}>
               <div className="text-[25px] font-semibold">{datadashboard?.dataDashboard?.dataOrderProductDashBoard}</div>
               <div className="text-[15px] font-light">Số đơn hàng</div>
+              </IsLoadingComponent>
             </div>
           </div>
           <div className="mb-2 flex flex-1 gap-2 rounded bg-[#f6f5f5] p-5 md:mb-0">
@@ -239,8 +243,10 @@ const CustomYAxisTick = ({ x, y, payload }) => {
               <img src={UserIcon} />
             </div>
             <div>
+            <IsLoadingComponent isLoading={isLoadingdatadashboard}>
               <div className="text-[25px] font-semibold">{datadashboard?.dataDashboard?.dataUserlengh}</div>
               <div className="text-[15px] font-light">Số người dùng</div>
+              </IsLoadingComponent>
             </div>
           </div>
         </div>

@@ -1,24 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
-  Modal,
-  Form,
-  Input,
-  Upload,
-  Avatar,
-  Space,
-  InputNumber,
   DatePicker,
 } from "antd";
 const { RangePicker } = DatePicker;
-const { TextArea } = Input;
 import {
-  Menu,
-  MenuButton,
-  Dropdown,
-  MenuItem,
-  Divider,
-  Button,
-  Link,
   Typography,
   Box,
   Breadcrumbs,
@@ -41,12 +26,11 @@ import {
   PieChart
 } from "recharts";
 import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useMutationHooks } from "../../../../hooks/UseMutationHook";
 import { OrderProduct } from "../../../../services/index";
-import { success } from "../../../../components/MessageComponents/Message";
 import {convertPrice} from "../../../../utils"
 import { useSelector, useDispatch } from "react-redux";
+import IsLoadingComponent from '../../../../components/LoadComponent/Loading'
 export default function Statistical() {
   const user = useSelector((state) => state.user);
   const [valuesDateOrder, setValueDateOrder] = useState({
@@ -98,7 +82,7 @@ export default function Statistical() {
   });
 
   const { data: dateorderporuct } = mutationDateOrderProduct;
-  const {data: datadashboard} =  mutationDashboard
+  const {data: datadashboard, isLoading: isLoadingDashBoard} =  mutationDashboard
   const data =
     dateorderporuct?.dataOrderProductDate?.map((item) => ({
       name: item._id,
@@ -207,8 +191,10 @@ const tooltipFormatter = (value, name) => {
             <img src={priceIcon} className="w-[64px] h-[64px]"/>
           </div>
           <div>
+            <IsLoadingComponent isLoading={isLoadingDashBoard}>
             <div className="text-[25px] font-semibold">{convertPrice(datadashboard?.dataOrderProduct[0]?.totalAmountprice)}</div>
             <div className="text-[15px] font-light">Tổng tiền</div>
+            </IsLoadingComponent>
           </div>
         </div>
         <div className="mb-2 flex flex-1 gap-2 rounded bg-[#f6f5f5] p-5 md:mb-0">
@@ -216,8 +202,10 @@ const tooltipFormatter = (value, name) => {
             <img src={iconproductsuccess} className="w-[64px] h-[64px]" />
           </div>
           <div>
+          <IsLoadingComponent isLoading={isLoadingDashBoard}>
             <div className="text-[25px] font-semibold">{datadashboard?.dataOrderProducttotalDelivered[0]?.totalDeliveredtrue}</div>
             <div className="text-[15px] font-light">Số đơn hàng giao thành công</div>
+            </IsLoadingComponent>
           </div>
         </div>
         <div className="mb-2 flex flex-1 gap-2 rounded bg-[#f6f5f5] p-5 md:mb-0">
@@ -225,8 +213,10 @@ const tooltipFormatter = (value, name) => {
             <img src={iconproducterror} className="w-[64px] h-[64px]"/>
           </div>
           <div>
+          <IsLoadingComponent isLoading={isLoadingDashBoard}>
             <div className="text-[25px] font-semibold">{datadashboard?.dataOrderProducttotalDelivered[0]?.totalDeliveredfalse}</div>
             <div className="text-[15px] font-light">Số đơn hàng chưa giao</div>
+            </IsLoadingComponent>
           </div>
         </div>
       </div>

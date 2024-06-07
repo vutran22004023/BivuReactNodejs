@@ -151,6 +151,12 @@ export default function ProductAdmin() {
         counInStock: "",
       },
     ],
+    detailproduct: [
+      {
+        title: "",
+        description: "",
+      }
+    ]
   });
 
   const onChangeSwitchDealProductnew = (checked) => {
@@ -177,12 +183,31 @@ export default function ProductAdmin() {
     });
   };
 
+  const handleAddInputDetailProduct =() => {
+    setStateProduct({
+      ...stateProduct,
+      detailproduct: [
+        ...stateProduct.detailproduct,
+        { title: "", description: "" },
+      ],
+    });
+  }
+
   const handleAddInputDetail = () => {
     setStateProductDetail({
       ...stateProductDetail,
       categorySize: [
         ...stateProductDetail.categorySize,
         { size: "", price: "", counInStock: "" },
+      ],
+    });
+  };
+  const handleAddInputDetail1 = () => {
+    setStateProductDetail({
+      ...stateProductDetail,
+      detailproduct: [
+        ...stateProductDetail.detailproduct,
+        { title: "", description: "" },
       ],
     });
   };
@@ -196,6 +221,17 @@ export default function ProductAdmin() {
     });
   };
 
+  const handleRemoveInputDetailProduct = () => {
+    const newSize = [...stateProduct.detailproduct];
+    newSize.splice(index, 1);
+    setStateProduct({
+      ...stateProduct,
+      detailproduct: newSize,
+    });
+  }
+
+
+
   const handleRemoveInputDetail = (index) => {
     const newSize = [...stateProductDetail.categorySize];
     newSize.splice(index, 1);
@@ -205,9 +241,17 @@ export default function ProductAdmin() {
     });
   };
 
+  const handleRemoveInputDetailProduct1 = (index) => {
+    const newSize = [...stateProductDetail.detailproduct];
+    newSize.splice(index, 1);
+    setStateProductDetail({
+      ...stateProductDetail,
+      detailproduct: newSize,
+    });
+  };
+
   const [stateProduct, setStateProduct] = useState(inittial);
   const [stateProductDetail, setStateProductDetail] = useState(inittial);
-  console.log(stateProductDetail)
   const [RowSelected, setRowSelected] = useState("");
   const [valIdColor, setValIdColor] = useState([])
   useEffect(() => {
@@ -261,7 +305,15 @@ const saveData = () => {
         ...stateProduct,
         categorySize: newSize,
       });
-    } else if (fieldName === "name") {
+    }else if(fieldName === "detailproduct") {
+      const newSize = [...stateProduct.detailproduct];
+      newSize[index][e.target.name] = e.target.value;
+      setStateProduct({
+        ...stateProduct,
+        detailproduct: newSize,
+      });
+    }
+     else if (fieldName === "name") {
       setStateProduct({
         ...stateProduct,
         [fieldName]: e.target.value,
@@ -285,7 +337,15 @@ const saveData = () => {
         ...stateProductDetail,
         categorySize: newSize,
       });
-    } else if (fieldName === "name") {
+    }else if (fieldName === "detailproduct") {
+      const newSize = [...stateProductDetail.detailproduct];
+      newSize[index][e.target.name] = e.target.value;
+      setStateProductDetail({
+        ...stateProductDetail,
+        detailproduct: newSize,
+      });
+    }
+     else if (fieldName === "name") {
       setStateProductDetail({
         ...stateProductDetail,
         [fieldName]: e.target.value,
@@ -634,7 +694,8 @@ const saveData = () => {
         categorySize: res.data?.categorySize,
         linksshopee: res.data?.linksshopee,
         idColor: res?.data?.idColor,
-        dealsoc: res?.data?.dealsoc
+        dealsoc: res?.data?.dealsoc,
+        detailproduct:res?.data?.detailproduct
       });
     }
     setIsLoadingUpdate(false);
@@ -1433,7 +1494,9 @@ const saveData = () => {
                   />
                 )}
               </Form.Item>
-
+              
+              <div className="p-3 border-dashed border-2 rounded-sm">
+              <div className="mb-4">Kích thước - Giá cả - Số Lượng</div>
               {stateProduct?.categorySize?.map((item, index) => (
                 <div key={index}>
                   <div className="flex">
@@ -1522,6 +1585,63 @@ const saveData = () => {
                   Thêm size
                 </Button>
               </Form.Item>
+              </div>
+
+                            
+              <div className="mt-3 p-3 border-dashed border-2 rounded-sm">
+              <div className="mb-4">Chi tiết sản phẩm</div>
+              {stateProduct?.detailproduct?.map((item, index) => (
+                <div key={index}>
+                  <div className="flex">
+                    <Form.Item
+                      label={`Tiều đề ${index}`}
+                      name={`title${index}`}
+                      className="w-full"
+                    >
+                      <Input
+                        name="title"
+                        value={item.title}
+                        onChange={(e) =>
+                          handleOnchanges(index, e, "detailproduct")
+                        }
+                      />
+                    </Form.Item>
+
+                    <Form.Item
+                      label={`Mô tả ${index}`}
+                      name={`description${index}`}
+                      className="w-full"
+                    >
+                      <Input
+                        name="description"
+                        value={item.description}
+                        onChange={(e) =>
+                          handleOnchanges(index, e, "detailproduct")
+                        }
+                      />
+                    </Form.Item>
+                    <Form.Item>
+                      {index === 0 ? (
+                        ""
+                      ) : (
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => handleRemoveInputDetailProduct(index)}
+                        >
+                          Xóa
+                        </Button>
+                      )}
+                    </Form.Item>
+                  </div>
+                </div>
+              ))}
+              <Form.Item className="ml-[100px]">
+                <Button onClick={handleAddInputDetailProduct} type="primary">
+                  Thêm chi tiết
+                </Button>
+              </Form.Item>
+              </div>
 
               <Form.Item label="Màu sắc">
                 <Switch defaultChecked={false} onChange={onChange} />
@@ -1793,6 +1913,8 @@ const saveData = () => {
                   />
                 )}
               </Form.Item>
+              <div className="mt-3 p-3 border-dashed border-2 rounded-sm">
+              <div className="mb-4">Kích thước - Giá cả - Số Lượng</div>
               <Form.List
                 name="categorySize"
                 rules={[
@@ -1906,6 +2028,88 @@ const saveData = () => {
                   </>
                 )}
               </Form.List>
+              </div>
+
+              <div className="mt-3 p-3 border-dashed border-2 rounded-sm ">
+              <div className="mb-4">Chi tiết sản phẩm</div>
+              <Form.List
+                name="detailproduct"
+                rules={[
+                  {
+                    validator: async (_, detailproduct) => {
+                      if (!detailproduct || detailproduct.length < 2) {
+                        return Promise.reject(
+                          new Error("At least 2 passengers"),
+                        );
+                      }
+                    },
+                  },
+                ]}
+              >
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map(({ key, name, ...restField }) => (
+                      <Space
+                        key={key}
+                        style={{
+                          display: "flex",
+                          marginBottom: 8,
+                        }}
+                        align="baseline"
+                      >
+                        <Form.Item
+                          label={`Tiêu đề ${key}`}
+                          {...restField}
+                          name={[name, "title"]}
+                        >
+                          <Input
+                            value={name}
+                            onChange={(e) =>
+                              handleOnchangeDetails(key, e, "detailproduct")
+                            }
+                            name="title"
+                          />
+                        </Form.Item>
+                        <Form.Item
+                          label={`Mô tả ${key}`}
+                          {...restField}
+                          name={[name, "description"]}
+                        >
+                          <Input
+                            value={name}
+                            onChange={(e) =>
+                              handleOnchangeDetails(key, e, "detailproduct")
+                            }
+                            name="description"
+                          />
+                        </Form.Item>
+                        {fields.length > 1 ? (
+                          <MinusCircleOutlined
+                            className="dynamic-delete-button"
+                            onClick={() => {
+                              remove(name);
+                              handleRemoveInputDetailProduct1(name);
+                            }}
+                          />
+                        ) : null}
+                      </Space>
+                    ))}
+                    <Form.Item>
+                      <Button
+                        type="dashed"
+                        onClick={() => {
+                          handleAddInputDetail1();
+                          add();
+                        }}
+                        icon={<PlusOutlined />}
+                      >
+                        Thêm chi tiết
+                      </Button>
+                    </Form.Item>
+                  </>
+                )}
+              </Form.List>
+              </div>
               <Form.Item label="Màu sắc">
   <div className="text-[red]">(Nếu có tắt vui lòng để check box trống tránh tình trạng lưu vào db)</div>
   <Checkbox.Group

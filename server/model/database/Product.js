@@ -50,6 +50,16 @@ const ProductSchema =  new mongoose.Schema(
         type: Boolean,
         default:false,
     },
+    detailproduct: [
+        {
+            title: {
+                type: String,
+            },
+            description: {
+                type: String,
+            }
+        }
+    ],
     categorySize: [
         {
             size: {

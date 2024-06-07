@@ -33,7 +33,7 @@ const getDetailProduct = async(req,res) => {
 
 const createProduct = async (req, res) => {
     try {
-    const {name,image,type,rating,description,discount,categorySize,slug,linksshopee,idColor, dealsoc} = req.body;
+    const {name,image,type,rating,description,discount,categorySize,slug,linksshopee,idColor, dealsoc, detailproduct} = req.body;
 
     if(!name || !image || !type || !description || !categorySize || !slug) {
         return res.status(200).json({

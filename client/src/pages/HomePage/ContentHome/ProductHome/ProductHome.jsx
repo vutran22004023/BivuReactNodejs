@@ -13,6 +13,7 @@ import { useSelector, useDispatch } from "react-redux";
 import SliderCardComponent from '../../../../components/SiderConponent/SliderCardComponent'
 export default function ProductHome() {
   const dispatch = useDispatch();
+  const infor = useSelector((state) => state.information);
   const [limit, setLimit] = useState(6)
   const [dataImageSide, setDataImageSide] = useState([])
   const [products, setProducts] = useState([]);
@@ -36,22 +37,14 @@ export default function ProductHome() {
       return res; 
   }
 
-  const fetchInformationAll = async () => {
-    const res = await InformationPageService.getAllInforPage();
-    return res; 
-  }
 
   const { data: productsLimit, isLoading: isLoadingProductsLimit, isPreviousData } = useQuery({ queryKey: ['productsLimit', limit], queryFn: fetchProductAllLimit,keepPreviousData: true, retry:3, retryDelay: 1000 });
   const { data: productsDealSoc, isLoading: isLoadingProductDealSoc, isPreviousDataProduct } = useQuery({ queryKey: ['productsDeal'], queryFn: fetchProductDetalSoc,keepPreviousData: true, retry:3, retryDelay: 1000 });
-  const { data: dataInfor, isLoading: isLoadingDataInfor } = useQuery({ queryKey: ['dataInformationPage'], queryFn: fetchInformationAll});
-  console.log(productsDealSoc)
 
   useEffect(()=> {
-    const ImagesSiderComponent = dataInfor?.data[0]?.image_slider?.map((imageSlider) => imageSlider)
+    const ImagesSiderComponent = infor?.image_slider?.map((imageSlider) => imageSlider)
     setDataImageSide(ImagesSiderComponent)
-    setLoadingImages(true);
-    dispatch(updateInformationPage({...dataInfor?.data[0]}));
-  },[dataInfor])
+  },[infor])
 
   const handleImageLoad = () => {
     setLoadingImages(false); // Set loading state to false once the images are loaded
@@ -104,7 +97,7 @@ export default function ProductHome() {
 
   return (
     <div id='container' className='p-pad-sm md:p-pad-md mt-4 bg-[rgb(235 232 232)]'>
-        {isLoadingDataInfor  ? (
+        {infor?.isLoading  ? (
           <IsLoadingSideComponent></IsLoadingSideComponent>
         ) : (
           <>
@@ -114,13 +107,13 @@ export default function ProductHome() {
             <SiderConponent arrImage = {dataImageSide} classNameStyle='image-sider w-full h-[140px] md:h-[450px]' isLoaidng ={handleImageLoad}/>
           </Col>
           <Col span={8} style={{width: '100px'}} className='pl-0 md:pl-2.5'>
-              {dataInfor?.data[0]?.image_right?.map((imageSlider, index) => (
+              {infor?.image_right?.map((imageSlider, index) => (
                   <img src={imageSlider} onLoad={handleImageLoad}  preview={false} className='w-full h-[65px] md:h-[215px] rounded-lg mb-2'/>
               ))}
           </Col>
         </Row>  
         <Row style={{marginTop:'10px'}} gutter={[16, 16]}>
-          {dataInfor?.data[0]?.image_bottom?.map((imageSlider, index) => (
+          {infor?.image_bottom?.map((imageSlider, index) => (
             <>
             <Col span={8}>
 
@@ -133,28 +126,28 @@ export default function ProductHome() {
           </>
         )}
 
-        {isLoadingDataInfor  ? (
+        {infor?.isLoading  ? (
           <IsLoadingAdvertisement></IsLoadingAdvertisement>
         ): (
           <div className='mt-6'>
           <div>
             
-              <img src={dataInfor?.data[0]?.image_qc_1} onLoad={handleImageLoad} preview={false} className="w-full h-[75px] md:h-[150px]" style={{borderRadius: '10px 10px 0 0'}} />
+              <img src={infor?.image_qc_1} onLoad={handleImageLoad} preview={false} className="w-full h-[75px] md:h-[150px]" style={{borderRadius: '10px 10px 0 0'}} />
             
           </div>
           <div>
             
-              <img src={dataInfor?.data[0]?.image_qc_2} onLoad={handleImageLoad} preview={false} className="w-full h-[75px] md:h-[150px]" />
+              <img src={infor?.image_qc_2} onLoad={handleImageLoad} preview={false} className="w-full h-[75px] md:h-[150px]" />
             
           </div>
           <div className='flex'>
               <div className='w-full'>
               
-              <img src={dataInfor?.data[0]?.image_qc_3} onLoad={handleImageLoad} preview={false} className="w-full h-[75px] md:h-[150px]"  style={{borderRadius: '0 0 0 10px'}} />
+              <img src={infor?.image_qc_3} onLoad={handleImageLoad} preview={false} className="w-full h-[75px] md:h-[150px]"  style={{borderRadius: '0 0 0 10px'}} />
             
               </div>
               <div className='w-full'>
-              <img src={dataInfor?.data[0]?.image_qc_4} onLoad={handleImageLoad} preview={false} className="w-full h-[75px] md:h-[150px]" style={{borderRadius: '0 0 10px 0'}} />
+              <img src={infor?.image_qc_4} onLoad={handleImageLoad} preview={false} className="w-full h-[75px] md:h-[150px]" style={{borderRadius: '0 0 10px 0'}} />
 
               </div>
           </div>

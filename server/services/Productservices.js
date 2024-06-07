@@ -1,7 +1,7 @@
 import { ProductModel,ColorModel } from "../model/index.js";
 
 const createProduct = async (newProduct) => {
-        const {name,image,type,rating,description,discount,categorySize,slug,linksshopee,idColor, dealsoc} =  newProduct
+        const {name,image,type,rating,description,discount,categorySize,slug,linksshopee,idColor, dealsoc, detailproduct} =  newProduct
         try {
             const checkProduct = await ProductModel.findOne({
                 name: name,
@@ -24,7 +24,8 @@ const createProduct = async (newProduct) => {
               slug,
               linksshopee,
               idColor,
-              dealsoc
+              dealsoc,
+              detailproduct
             })
             if(createProduct) {
                 return {

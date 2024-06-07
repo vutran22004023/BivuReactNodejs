@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useNavigate  } from "react-router-dom";
 import ButtonComponent from "../../../../components/ButtonSearch/Button";
 import { useSelector, useDispatch } from "react-redux";
 import { convertPrice, formatDate } from "../../../../utils";
@@ -49,6 +50,7 @@ export default function PayProduct() {
   const [valueRadiovoucher, setValueRadiovoucher] = useState()
   const [valueVoucher, setValueVoucher] = useState();
   const [valueVouchermutation,setvalueVouchermutation] = useState();
+  const navigate = useNavigate()
   const handleButtonVoucher = () => {
     setIsModalVoucher(true);
   };
@@ -150,6 +152,7 @@ export default function PayProduct() {
       }));
 
       if (valueRadio === "Thanh toán khi nhận hàng") {
+          navigate('/trang-thai')
       } else if (valueRadio === "Thanh toán QR") {
         mutationPayQR.mutate({
           oderItem: order?.orderItemsSlected,
@@ -189,6 +192,7 @@ export default function PayProduct() {
     const res = await ProvinceVn.apiGetAllCity();
     return res;
   };
+  
 
   const fetchDetailDistrict = useMutationHooks(async (city) => {
     const res = await ProvinceVn.apiDetailAllDistrict(city);

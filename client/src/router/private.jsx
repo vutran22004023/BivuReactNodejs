@@ -3,7 +3,7 @@ import { createBrowserRouter, Outlet, useNavigate, useLocation, useNavigation  }
 import ProductHome from "../pages/HomePage/ContentHome/ProductHome/ProductHome";
 import { isJsonString } from "../utils";
 import { jwtDecode } from "jwt-decode";
-import { UserService, PaymentService, OrderProduct } from "../services/index.js";
+import { UserService, PaymentService, OrderProduct,InformationPageService } from "../services/index.js";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUser } from "../redux/Slides/userSlide";
 import IsLoadingComponent from "../components/LoadComponent/LoadingTotal.jsx";
@@ -11,10 +11,20 @@ import {setDoc, doc, serverTimestamp} from 'firebase/firestore'
 import {txtDB} from "../Firebase/config.jsx"
 import {useMutationHooks} from '../hooks/UseMutationHook.js'
 import {deletedataOrderProduct} from '../redux/Slides/payorderProductSlide.js'
+import {useQuery} from '@tanstack/react-query'
+import { updateInformationPage } from "../redux/Slides/InformationPageSlide";
 export const PrivateUser = () => {
-
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user);
+    const fetchInformationAll = async () => {
+      const res = await InformationPageService.getAllInforPage();
+      return res; 
+    }
+    const { data: dataInfor, isLoading: isLoadingDataInfor } = useQuery({ queryKey: ['dataInformationPage'], queryFn: fetchInformationAll});
+
+    useEffect(()=> {
+      dispatch(updateInformationPage({...dataInfor?.data[0], isLoading:isLoadingDataInfor }));
+    },[dataInfor])
     useEffect(() => {
       const { cookieData, decoded,accessTokenCookie } = handleDecoded();
       if (decoded?.id) {
@@ -143,10 +153,14 @@ export const PrivateUser = () => {
   export const PrivateStatusOrderPay = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const navigation = useNavigation();
     const user = useSelector((state) => state.user);
     const pay = useSelector((state) => state.payorderproduct);
-    const [dataCreateOrderProduct, setDataCreateOrderProduct] = useState()
+    console.log(pay);
+    useEffect(() => {
+      if(pay?.paymentMethod === "Thanh toán khi nhận hàng") {
+        mutationOrderProduct.mutate(pay)
+      }
+    },[pay])
     const useQuery =() => {
       return new URLSearchParams(useLocation().search);
     }
@@ -180,7 +194,6 @@ export const PrivateUser = () => {
   const {data: dataOrderProductCreate, isLoading: isLoadingProductCreate} =mutationOrderProduct
   const {data: dataCheckOrderStatusPayOs, isLoading: isLoadingCheckOrderStatusPayOs} = mutationCheckOrderProductPayOs
   const {data: dataUpdateOrderProduct, isLoading: isLoadingUpdateOrderProduct} = mutationsUpdateOrder
-  console.log(dataUpdateOrderProduct)
   useEffect(() => {
     if(dataOrderProductCreate) {
       if(dataOrderProductCreate?.status === 200) {

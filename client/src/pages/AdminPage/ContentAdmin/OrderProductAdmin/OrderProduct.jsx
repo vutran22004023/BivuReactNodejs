@@ -113,20 +113,44 @@ useEffect(() => {
   }
 
   const handleOkUploadOrder = ()=> {
-    mutationsUpdateOrderProduct.mutate({confirmation_Order:true})
+    mutationsUpdateOrderProduct.mutate({confirmation_Order:true},
+      {
+        onSettled: () => {
+          queryOrderProduct.refetch();
+        },
+      },
+    )
     setOpenModal(false)
   }
   const handleOkUploadOrderconfirmation = () => {
-    mutationsUpdateOrderProduct.mutate({confirmation_Order:false})
+    mutationsUpdateOrderProduct.mutate({confirmation_Order:false},
+      {
+        onSettled: () => {
+          queryOrderProduct.refetch();
+        },
+      },
+    )
     setOpenModal(false)
   }
 
   const handleOkUploadOrderDeliveredtrue = () => {
-    mutationsUpdateOrderProduct.mutate({isDelivered:true, isPaid: true})
+    mutationsUpdateOrderProduct.mutate({isDelivered:true, isPaid: true},
+      {
+        onSettled: () => {
+          queryOrderProduct.refetch();
+        },
+      },
+    )
     setOpenModal(false)
   }
   const handleOkUploadOrderDeliveredfalse = () => {
-    mutationsUpdateOrderProduct.mutate({isDelivered:false, isPaid: false})
+    mutationsUpdateOrderProduct.mutate({isDelivered:false, isPaid: false},
+      {
+        onSettled: () => {
+          queryOrderProduct.refetch();
+        },
+      },
+    )
     setOpenModal(false)
   }
   const getColumnSearchProps = (dataIndex) => ({
